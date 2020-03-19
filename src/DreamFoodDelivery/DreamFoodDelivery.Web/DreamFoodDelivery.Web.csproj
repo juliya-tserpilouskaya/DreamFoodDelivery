@@ -5,9 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TrainingProject.Common\TrainingProject.Common.csproj" />
-      <ProjectReference Include="..\TrainingProject.Domain.Logic\TrainingProject.Domain.Logic.csproj" />
-      <ProjectReference Include="..\TrainingProject.Domain\TrainingProject.Domain.csproj" />
+      <ProjectReference Include="..\DreamFoodDelivery.Common\DreamFoodDelivery.Common.csproj" />
+      <ProjectReference Include="..\DreamFoodDelivery.Domain.Logic\DreamFoodDelivery.Domain.Logic.csproj" />
+      <ProjectReference Include="..\DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
