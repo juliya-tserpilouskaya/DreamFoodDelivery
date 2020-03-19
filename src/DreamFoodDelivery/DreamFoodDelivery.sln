@@ -1,18 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Web", "TrainingProject.Web\TrainingProject.Web.csproj", "{5EF419DD-B172-4CD6-AF6C-9EDF706CF6BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Web", "DreamFoodDelivery.Web\DreamFoodDelivery.Web.csproj", "{5EF419DD-B172-4CD6-AF6C-9EDF706CF6BC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0EED08DD-536A-44F4-8721-4827A1EDA681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Logic.Tests", "TrainingProject.Logic.Tests\TrainingProject.Logic.Tests.csproj", "{DA0251C9-89FD-4BC8-9BF1-78B048E0990B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Logic.Tests", "DreamFoodDelivery.Logic.Tests\DreamFoodDelivery.Logic.Tests.csproj", "{DA0251C9-89FD-4BC8-9BF1-78B048E0990B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Domain.Logic", "TrainingProject.Domain.Logic\TrainingProject.Domain.Logic.csproj", "{6313C2F6-028A-495A-A5AD-54F2A239462E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Domain.Logic", "DreamFoodDelivery.Domain.Logic\DreamFoodDelivery.Domain.Logic.csproj", "{6313C2F6-028A-495A-A5AD-54F2A239462E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Data", "TrainingProject.Data\TrainingProject.Data.csproj", "{CA46D02D-A99A-44D1-80B4-90C9AD5DA4E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Data", "DreamFoodDelivery.Data\DreamFoodDelivery.Data.csproj", "{CA46D02D-A99A-44D1-80B4-90C9AD5DA4E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Domain", "TrainingProject.Domain\TrainingProject.Domain.csproj", "{7A9400B2-E0BC-4700-B6C9-2A91660342AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Domain", "DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj", "{7A9400B2-E0BC-4700-B6C9-2A91660342AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainingProject.Common", "TrainingProject.Common\TrainingProject.Common.csproj", "{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Common", "DreamFoodDelivery.Common\DreamFoodDelivery.Common.csproj", "{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
