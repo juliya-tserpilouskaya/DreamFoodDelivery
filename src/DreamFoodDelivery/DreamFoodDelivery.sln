@@ -1,18 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Web", "DreamFoodDelivery.Web\DreamFoodDelivery.Web.csproj", "{5EF419DD-B172-4CD6-AF6C-9EDF706CF6BC}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29911.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Web", "DreamFoodDelivery.Web\DreamFoodDelivery.Web.csproj", "{5EF419DD-B172-4CD6-AF6C-9EDF706CF6BC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0EED08DD-536A-44F4-8721-4827A1EDA681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Logic.Tests", "DreamFoodDelivery.Logic.Tests\DreamFoodDelivery.Logic.Tests.csproj", "{DA0251C9-89FD-4BC8-9BF1-78B048E0990B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Logic.Tests", "DreamFoodDelivery.Logic.Tests\DreamFoodDelivery.Logic.Tests.csproj", "{DA0251C9-89FD-4BC8-9BF1-78B048E0990B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Domain.Logic", "DreamFoodDelivery.Domain.Logic\DreamFoodDelivery.Domain.Logic.csproj", "{6313C2F6-028A-495A-A5AD-54F2A239462E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Domain.Logic", "DreamFoodDelivery.Domain.Logic\DreamFoodDelivery.Domain.Logic.csproj", "{6313C2F6-028A-495A-A5AD-54F2A239462E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Data", "DreamFoodDelivery.Data\DreamFoodDelivery.Data.csproj", "{CA46D02D-A99A-44D1-80B4-90C9AD5DA4E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Data", "DreamFoodDelivery.Data\DreamFoodDelivery.Data.csproj", "{CA46D02D-A99A-44D1-80B4-90C9AD5DA4E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Domain", "DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj", "{7A9400B2-E0BC-4700-B6C9-2A91660342AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Domain", "DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj", "{7A9400B2-E0BC-4700-B6C9-2A91660342AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamFoodDelivery.Common", "DreamFoodDelivery.Common\DreamFoodDelivery.Common.csproj", "{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DreamFoodDelivery.Common", "DreamFoodDelivery.Common\DreamFoodDelivery.Common.csproj", "{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{672DF4F5-5A87-4DD3-AEF7-9B846464356D}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.editorconfig = ..\..\.editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,7 +53,13 @@ Global
 		{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6B4FCA5-89E3-4EDB-8513-67B0A3706780}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DA0251C9-89FD-4BC8-9BF1-78B048E0990B} = {0EED08DD-536A-44F4-8721-4827A1EDA681}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB7CFFAE-1E30-41D7-B1BC-7257FE3F33D1}
 	EndGlobalSection
 EndGlobal
