@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Domain.Baskets;
+﻿using DreamFoodDelivery.Domain.Basket;
 using DreamFoodDelivery.Domain.Orders;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace DreamFoodDelivery.Domain.Users
         public string Phone { get; set; }
         public string Name { get; set; }
         public string Role { get; set; }
-        public List<Pottle> Basket { get; set; }
+        public List<BasketModel> Basket { get; set; }
         public List<Order> Orders { get; set; }
         public List<Comment> Comments { get; set; }
     }

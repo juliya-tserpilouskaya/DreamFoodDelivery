@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.Baskets
+namespace DreamFoodDelivery.Domain.Basket
 {
-    public class Pottle
+    public class BasketModel
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public List<Dish> DishItems { get; set; }

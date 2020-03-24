@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Domain.Baskets;
+﻿using DreamFoodDelivery.Domain.Basket;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,21 +13,21 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Basket
         /// Asynchronously returns all baskets
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Pottle>> GetAllAsync();
+        Task<IEnumerable<BasketModel>> GetAllAsync();
 
         /// <summary>
         /// Create basket
         /// </summary>
         /// <param name="basket">New basket</param>
         /// <returns></returns>
-        Task<Result<Pottle>> AddAsync(Pottle basket);
+        Task<Result<BasketModel>> AddAsync(BasketModel basket);
 
         /// <summary>
         /// Asynchronously returns oeder by id
         /// </summary>
         /// <param name="id">order id</param>
         /// <returns></returns>
-        Task<Pottle> GetByIdAsync(string id);
+        Task<BasketModel> GetByIdAsync(string id);
 
         
 
@@ -36,7 +36,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Basket
         /// </summary>
         /// <param name="order">order</param>
         /// <returns></returns>
-        Task<Result<Pottle>> UpdateAsync(Pottle order);
+        Task<Result<BasketModel>> UpdateAsync(BasketModel order);
 
         /// <summary>
         /// Removes order by id async
@@ -55,7 +55,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Basket
         /// </summary>
         /// <param name="userID">User id</param>
         /// <returns></returns>
-        Task<IEnumerable<Pottle>> GetByUserIdAsync(string userID);
+        Task<IEnumerable<BasketModel>> GetByUserIdAsync(string userID);
 
         /// <summary>
         /// Updates order
@@ -63,7 +63,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Basket
         /// <param name="order">order</param>
         /// <param name="userId">user id</param>
         /// <returns></returns>
-        Task<Result<Pottle>> UpdateByUserIdAsync(Pottle order, string userId);
+        Task<Result<BasketModel>> UpdateByUserIdAsync(BasketModel order, string userId);
 
         /// <summary>
         /// Removes comments by user id
