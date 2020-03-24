@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.Baskets
 {
-    public class Basket
+    public class Pottle
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public List<Dish> DishItems { get; set; }
