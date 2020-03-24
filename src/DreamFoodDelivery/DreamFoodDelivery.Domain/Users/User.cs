@@ -16,7 +16,7 @@ namespace DreamFoodDelivery.Domain.Users
         public string Phone { get; set; }
         public string Name { get; set; }
         public string Role { get; set; }
-        public List<Basket> Basket { get; set; }
+        public List<Pottle> Basket { get; set; }
         public List<Order> Orders { get; set; }
         public List<Comment> Comments { get; set; }
     }
