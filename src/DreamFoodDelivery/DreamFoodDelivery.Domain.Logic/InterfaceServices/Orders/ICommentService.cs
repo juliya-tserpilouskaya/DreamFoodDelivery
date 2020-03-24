@@ -58,7 +58,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         /// <summary>
         /// Creates comment
         /// </summary>
-        /// <param name="bookmark">New comment</param>
+        /// <param name="comment">New comment</param>
         /// <returns></returns>
         Task<Result<Comment>> AddAsync(Comment bookmark);
 
@@ -70,9 +70,9 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         Comment Update(Comment comment);
 
         /// <summary>
-        /// Updates course data async
+        /// Updates comment data async
         /// </summary>
-        /// <param name="course">Learning course</param>
+        /// <param name="comment">comment</param>
         /// <returns></returns>
         Task<Result<Comment>> UpdateAsync(Comment comment);
 
