@@ -47,14 +47,14 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Menu
         /// Asynchronously returns sales
         /// </summary>
         /// <returns></returns>
-        Task<Dish> GetDishSales();
+        Task<Dish> GetSalesAsync();
 
         /// <summary>
         /// Asynchronously returns dish by condition
         /// </summary>
         /// <param name="condition">dish condition</param>
         /// <returns></returns>
-        Task<Dish> GetDishByСondition(string condition);
+        Task<Dish> GetByСonditionAsync(string condition);
 
         /// <summary>
         /// Create dish
@@ -71,13 +71,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Menu
         Task<Result<Dish>> UpdateAsync(Dish dish);
 
         /// <summary>
-        /// Removes dish by id
-        /// </summary>
-        /// <param name="id">dish id</param>
-        /// <returns></returns>
-        void RemoveById(string id);
-
-        /// <summary>
         /// Removes dish by id async
         /// </summary>
         /// <param name="id">dish id</param>
@@ -85,7 +78,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Menu
         Task<Result> RemoveByIdAsync(string id);
 
         /// <summary>
-        /// Removes all comments from database
+        /// Removes all dishes from database
         /// </summary>
         void RemoveAll();
     }

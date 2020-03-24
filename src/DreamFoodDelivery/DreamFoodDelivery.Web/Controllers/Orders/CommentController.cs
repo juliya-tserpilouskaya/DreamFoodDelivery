@@ -112,7 +112,7 @@ namespace DreamFoodDelivery.Web.Controllers.Orders
         /// Update comment
         /// </summary>
         /// <param name="comment">Comment</param>
-        /// <returns>Learning course</returns>
+        /// <returns>Comments</returns>
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Course doesn't exists")]
