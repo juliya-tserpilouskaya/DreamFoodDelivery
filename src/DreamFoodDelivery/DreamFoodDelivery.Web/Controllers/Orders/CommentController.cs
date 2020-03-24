@@ -109,14 +109,42 @@ namespace DreamFoodDelivery.Web.Controllers.Orders
         }
 
         /// <summary>
+        /// Update comment
+        /// </summary>
+        /// <param name="comment">Comment</param>
+        /// <returns>Learning course</returns>
+        [HttpPut, Route("")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Course doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Course updated", typeof(Comment))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        public async Task<IActionResult> Update([FromBody]Comment comment)
+        {
+
+            if (comment is null /*|| !ModelState.IsValid*/)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var result = await _commentService.UpdateAsync(comment);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Delete comment
         /// </summary>
         /// <param name="id">comment id</param>
         /// <returns></returns>
         [HttpDelete, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Bookmark doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Bookmark deleted")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comment deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> RemoveById(string id)
         {
@@ -138,10 +166,37 @@ namespace DreamFoodDelivery.Web.Controllers.Orders
         /// <summary>
         /// Delete comments
         /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns></returns>
+        [HttpDelete, Route("user/{id}")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
+        public IActionResult RemoveAllByUserId(string id)
+        {
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _) || _commentService.GetById(id) == null /*|| _commentService.GetById(id).UserId != UserId*/)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                _commentService.RemoveAllByUserId(id);
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Delete comments
+        /// </summary>
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments removed")]
-        public IActionResult ClearAll()
+        public IActionResult RemoveAll()
         {
             _commentService.RemoveAll();
             return Ok();

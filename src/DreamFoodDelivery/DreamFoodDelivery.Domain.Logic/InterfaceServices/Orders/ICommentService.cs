@@ -63,6 +63,20 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         Task<Result<Comment>> AddAsync(Comment bookmark);
 
         /// <summary>
+        /// Updates comment
+        /// </summary>
+        /// <param name="comment">comment</param>
+        /// <returns></returns>
+        Comment Update(Comment comment);
+
+        /// <summary>
+        /// Updates course data async
+        /// </summary>
+        /// <param name="course">Learning course</param>
+        /// <returns></returns>
+        Task<Result<Comment>> UpdateAsync(Comment comment);
+
+        /// <summary>
         /// Removes comment by id
         /// </summary>
         /// <param name="id">comment id</param>
@@ -76,6 +90,12 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         /// <returns></returns>
         Task<Result> RemoveByIdAsync(string id);
 
+        /// <summary>
+        /// Removes comments by user id
+        /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns></returns>
+        void RemoveAllByUserId(string id);
 
         /// <summary>
         /// Removes all comments from database
