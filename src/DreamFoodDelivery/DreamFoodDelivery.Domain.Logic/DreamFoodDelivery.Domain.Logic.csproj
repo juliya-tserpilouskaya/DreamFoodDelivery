@@ -20,4 +20,11 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Basket\" />
+      <Folder Include="Services\Menu\" />
+      <Folder Include="Services\Usres\" />
+      <Folder Include="Services\Orders\" />
+    </ItemGroup>
+
 </Project>

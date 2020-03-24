@@ -32,6 +32,7 @@ namespace TrainingProject.Web
             services.AddOpenApiDocument();
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddSwaggerGen(c => { c.EnableAnnotations(); }); //added on 23.03; read more about
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
