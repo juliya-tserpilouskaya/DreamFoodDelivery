@@ -54,6 +54,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         /// <returns></returns>
         Task<IEnumerable<Order>> GetByUserIdAsync(string userID);
 
+        //Is it necessary?
         /// <summary>
         /// Updates order
         /// </summary>
@@ -63,7 +64,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
         Task<Result<Order>> UpdateByUserIdAsync(Order order, string userId);
 
         /// <summary>
-        /// Removes comments by user id
+        /// Removes orders by user id
         /// </summary>
         /// <param name="id">user id</param>
         /// <returns></returns>

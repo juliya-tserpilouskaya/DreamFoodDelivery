@@ -115,8 +115,8 @@ namespace DreamFoodDelivery.Web.Controllers.Orders
         /// <returns>Comments</returns>
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Course doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Course updated", typeof(Comment))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comment updated", typeof(Comment))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         public async Task<IActionResult> Update([FromBody]Comment comment)
         {

@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Domain.Baskets;
+﻿using DreamFoodDelivery.Domain.Basket;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,68 +8,40 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Basket
 {
     public interface IBasketService
     {
-        //for Admin
+        //all for Admin
         /// <summary>
         /// Asynchronously returns all baskets
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Pottle>> GetAllAsync();
+        Task<IEnumerable<BasketModel>> GetAllAsync();
 
         /// <summary>
         /// Create basket
         /// </summary>
         /// <param name="basket">New basket</param>
         /// <returns></returns>
-        Task<Result<Pottle>> AddAsync(Pottle basket);
+        Task<Result<BasketModel>> AddAsync(BasketModel basket);
 
         /// <summary>
-        /// Asynchronously returns oeder by id
+        /// Updates basket
         /// </summary>
-        /// <param name="id">order id</param>
+        /// <param name="basket">basket</param>
         /// <returns></returns>
-        Task<Pottle> GetByIdAsync(string id);
-
-        
+        Task<Result<BasketModel>> UpdateAsync(BasketModel basket);
 
         /// <summary>
-        /// Updates order
+        /// Remove basket by id async
         /// </summary>
-        /// <param name="order">order</param>
-        /// <returns></returns>
-        Task<Result<Pottle>> UpdateAsync(Pottle order);
-
-        /// <summary>
-        /// Removes order by id async
-        /// </summary>
-        /// <param name="id">order id</param>
+        /// <param name="id">basket id</param>
         /// <returns></returns>
         Task<Result> RemoveByIdAsync(string id);
 
+        //Is it necessary?
         /// <summary>
-        /// Removes all orders from database
-        /// </summary>
-        void RemoveAll();
-
-        /// <summary>
-        /// Asynchronously returns order by user id
-        /// </summary>
-        /// <param name="userID">User id</param>
-        /// <returns></returns>
-        Task<IEnumerable<Pottle>> GetByUserIdAsync(string userID);
-
-        /// <summary>
-        /// Updates order
-        /// </summary>
-        /// <param name="order">order</param>
-        /// <param name="userId">user id</param>
-        /// <returns></returns>
-        Task<Result<Pottle>> UpdateByUserIdAsync(Pottle order, string userId);
-
-        /// <summary>
-        /// Removes comments by user id
+        /// Removes basket by user id
         /// </summary>
         /// <param name="id">user id</param>
         /// <returns></returns>
-        void RemoveAllByUserId(string id);
+        Task<Result> RemoveAllByUserIdAsync(string id);
     }
 }
