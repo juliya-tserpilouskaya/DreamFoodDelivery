@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.Logic
+namespace DreamFoodDelivery.Common.Helpers
 {
     public class Result
     {
