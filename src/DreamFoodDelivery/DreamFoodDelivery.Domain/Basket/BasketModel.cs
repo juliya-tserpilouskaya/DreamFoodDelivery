@@ -7,6 +7,7 @@ namespace DreamFoodDelivery.Domain.Basket
 {
     public class BasketModel
     {
+        //old
         public string Id { get; set; } = Guid.NewGuid().ToString();
         public List<Dish> DishItems { get; set; }
     }
