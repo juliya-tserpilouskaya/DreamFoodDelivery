@@ -15,7 +15,11 @@ namespace DreamFoodDelivery.Data.Models
         public string Weigh { get; set; }
         public int? Sale { get; set; }
         public HashSet<TagDB> Tags { get; set; }
+        public Guid TagId { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
+        public BasketDB Basket { get; set; }
+        public Guid BasketId { get; set; }
+        public ICollection<DishTagDB> DishTags { get; set; }
     }
 }

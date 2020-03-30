@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.Menu
+namespace DreamFoodDelivery.Domain.Models
 {
     public class Dish
     {

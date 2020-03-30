@@ -1,11 +1,11 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Users;
+using DreamFoodDelivery.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Users
+namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface IUserService
     {

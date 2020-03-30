@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Data.Models
+namespace DreamFoodDelivery.Domain.Models
 {
-    public class TagDB
+    public class Tag
     {
         public Guid Id { get; set; }
         public Guid DishId { get; set; }
-        public HashSet<DishDB> Dishes { get; set; }
+        public HashSet<Dish> Dishes { get; set; }
         public int? IndexNumber { get; set; } //Is it necessary? I can use a guid
-        public ICollection<DishTagDB> DishTags { get; set; }
     }
 }

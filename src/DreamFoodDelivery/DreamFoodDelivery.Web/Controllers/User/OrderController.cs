@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders;
-using DreamFoodDelivery.Domain.Orders;
+using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace DreamFoodDelivery.Web.Controllers.Orders
+namespace DreamFoodDelivery.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
