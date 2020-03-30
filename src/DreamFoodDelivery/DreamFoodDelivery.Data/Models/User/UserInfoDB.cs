@@ -8,6 +8,7 @@ namespace DreamFoodDelivery.Data.Models
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public UserDB User { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string PhoneNumber { get; set; }

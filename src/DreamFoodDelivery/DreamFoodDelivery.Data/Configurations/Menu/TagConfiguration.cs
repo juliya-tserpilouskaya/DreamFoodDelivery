@@ -11,7 +11,14 @@ namespace DreamFoodDelivery.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<TagDB> builder)
         {
-            throw new NotImplementedException();
+            builder.ToTable("Tag");
+            builder.HasKey(i => i.Id);
+            builder.Property(_ => _.Id).ValueGeneratedOnAdd();
+
+            builder.HasMany(_ => _.DishTags).WithOne(_ => _.Tag).HasForeignKey(_ => _.TagId).OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(i => i.Id).HasColumnName("Id");
+            builder.Property(i => i.IndexNumber).HasColumnName("IndexNumber").IsRequired();
         }
     }
 }

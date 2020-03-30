@@ -12,7 +12,9 @@ namespace DreamFoodDelivery.Data.Models
         public string EMail { get; set; }
         public string Role { get; set; }
         public UserInfoDB UserInfo { get; set; }
+        public Guid UserInfoId { get; set; }
         public BasketDB Basket { get; set; }
+        public Guid BasketId { get; set; }
         public HashSet<OrderDB> Orders { get; set; }
         public HashSet<CommentDB> Comments { get; set; }
     }

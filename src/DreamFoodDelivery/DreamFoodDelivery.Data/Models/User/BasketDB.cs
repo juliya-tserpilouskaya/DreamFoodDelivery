@@ -9,5 +9,7 @@ namespace DreamFoodDelivery.Data.Models
         public Guid Id { get; set; }
         public HashSet<DishDB> Dishes { get; set; }
         public DateTime? Modified { get; set; }
+        public Guid UserId { get; set; }
+        public UserDB User { get; set; }
     }
 }
