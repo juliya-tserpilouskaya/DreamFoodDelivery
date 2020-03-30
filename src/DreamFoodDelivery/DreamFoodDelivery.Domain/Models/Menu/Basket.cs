@@ -1,11 +1,10 @@
-﻿using DreamFoodDelivery.Domain.Menu;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.Basket
+namespace DreamFoodDelivery.Domain.Models
 {
-    public class BasketModel
+    public class Basket
     {
         //old
         public string Id { get; set; } = Guid.NewGuid().ToString();

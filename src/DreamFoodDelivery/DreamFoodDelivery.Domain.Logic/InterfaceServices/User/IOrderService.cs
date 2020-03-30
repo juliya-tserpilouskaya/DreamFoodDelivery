@@ -1,11 +1,11 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Orders;
+using DreamFoodDelivery.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DreamFoodDelivery.Domain.Logic.InterfaceServices.Orders
+namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface IOrderService
     {

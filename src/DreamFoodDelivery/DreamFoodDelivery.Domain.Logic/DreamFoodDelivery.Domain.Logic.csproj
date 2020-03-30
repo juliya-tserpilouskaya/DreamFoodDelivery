@@ -21,10 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\Basket\" />
       <Folder Include="Services\Menu\" />
-      <Folder Include="Services\Usres\" />
-      <Folder Include="Services\Orders\" />
+      <Folder Include="Services\User\" />
     </ItemGroup>
 
 </Project>
