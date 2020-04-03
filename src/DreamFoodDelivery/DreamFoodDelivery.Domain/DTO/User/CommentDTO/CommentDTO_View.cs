@@ -14,7 +14,7 @@ namespace DreamFoodDelivery.Domain.DTO
         public string Headline { get; set; }
         public byte? Rating { get; set; }
         public string Content { get; set; }
-        public DateTime? PostTime { get; set; };
+        public DateTime? PostTime { get; set; }
         public DateTime? ModificationTime { get; set; }
     }
 }

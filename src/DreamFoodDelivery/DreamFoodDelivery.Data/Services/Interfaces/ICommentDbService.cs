@@ -1,81 +1,47 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
+namespace DreamFoodDelivery.Data.Services.Interfaces
 {
-    public interface ICommentService
+    public interface ICommentDbService
     {
-        /// <summary>
-        /// Returns all comments
-        /// </summary>
-        /// <returns></returns>
-        //IEnumerable<CommentDTO_View> GetAll();
-
         /// <summary>
         /// Asynchronously returns all comments
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<CommentDTO_View>> GetAllAsync();
-
-        /// <summary>
-        /// Returns comment by id
-        /// </summary>
-        /// <param name="id">comment id</param>
-        /// <returns></returns>
-        //CommentDTO_View GetById(string id);
+        Task<IEnumerable<CommentDB>> GetAllAsync();
 
         /// <summary>
         /// Asynchronously returns comment by id
         /// </summary>
         /// <param name="id">comment id</param>
         /// <returns></returns>
-        Task<CommentDTO_View> GetByIdAsync(string id);
-
-        /// <summary>
-        /// Returns comment by user id
-        /// </summary>
-        /// <param name="userID">User id</param>
-        /// <returns></returns>
-        //IEnumerable<CommentDTO_View> GetByUserId(string userID);
+        Task<CommentDB> GetByIdAsync(string id);
 
         /// <summary>
         /// Asynchronously returns comment by user id
         /// </summary>
         /// <param name="userID">User id</param>
         /// <returns></returns>
-        Task<IEnumerable<CommentDTO_View>> GetByUserIdAsync(string userID);
+        Task<IEnumerable<CommentDB>> GetByUserIdAsync(string userID);
 
         /// <summary>
         /// Creates comment
         /// </summary>
         /// <param name="comment">New comment</param>
         /// <returns></returns>
-        //CommentDTO_Add Add(CommentDTO_Add comment);
-
-        /// <summary>
-        /// Creates comment
-        /// </summary>
-        /// <param name="comment">New comment</param>
-        /// <returns></returns>
-        Task<Result<CommentDTO_Add>> AddAsync(CommentDTO_Add comment);
-
-        /// <summary>
-        /// Updates comment
-        /// </summary>
-        /// <param name="comment">comment</param>
-        /// <returns></returns>
-        //CommentDTO_Update Update(CommentDTO_Update comment);
+        Task<Result<CommentDB>> AddAsync(CommentDB comment);
 
         /// <summary>
         /// Updates comment data async
         /// </summary>
         /// <param name="comment">comment</param>
         /// <returns></returns>
-        Task<Result<CommentDTO_Update>> UpdateAsync(CommentDTO_Update comment);
+        Task<Result<CommentDB>> UpdateAsync(CommentDB comment);
 
         /// <summary>
         /// Removes comment by id

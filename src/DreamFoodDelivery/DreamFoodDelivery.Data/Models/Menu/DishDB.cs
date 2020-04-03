@@ -14,7 +14,7 @@ namespace DreamFoodDelivery.Data.Models
         public double? Cost { get; set; }
         public string Weigh { get; set; }
         public int? Sale { get; set; }
-        public HashSet<TagDB> Tags { get; set; }
+        //public HashSet<TagDB> Tags { get; set; }
         public Guid TagId { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
