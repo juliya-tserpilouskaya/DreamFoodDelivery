@@ -16,6 +16,6 @@ namespace DreamFoodDelivery.Domain.DTO
         public BasketDTO Basket { get; set; }
         public Guid BasketId { get; set; }
         public HashSet<OrderDTO_View> Orders { get; set; }
-        public HashSet<CommentDTO_View> Comments { get; set; }
+        public HashSet<CommentView> Comments { get; set; }
     }
 }
