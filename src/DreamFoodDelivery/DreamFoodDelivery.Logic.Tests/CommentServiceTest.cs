@@ -2,8 +2,6 @@
 using Bogus;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
-using DreamFoodDelivery.Data.Services;
-using DreamFoodDelivery.Data.Services.Interfaces;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.Services;
 using FluentAssertions;
@@ -24,6 +22,7 @@ namespace DreamFoodDelivery.Logic.Tests
             .RuleFor(x => x.Content, y => y.Random.Words());
 
         List<CommentDB> _comments;
+        IMapper _mapper;
 
         public CommentServiceTest()
         {
@@ -33,6 +32,7 @@ namespace DreamFoodDelivery.Logic.Tests
             });
 
             _comments = _fakeComment.Generate(10);
+            _mapper = new Mapper(mapperConfiguration);
         }
 
         [Fact]
@@ -52,14 +52,14 @@ namespace DreamFoodDelivery.Logic.Tests
             // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var service = new CommentDbService(context);
+                var service = new CommentService(_mapper, context);
                 var result = await service.GetAllAsync();
 
-                foreach (var item in _comments) //Assert.Equal(expected.Name, actual.Name);
+                foreach (var item in _comments)
                 {
                     var itemFromResult = result.Where(_ => _.Headline.Equals(item.Headline)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
-                }                
+                }
             }
         }
     }

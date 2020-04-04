@@ -174,7 +174,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
-        public IActionResult RemoveAllByUserId(string id)
+        public async Task<IActionResult> RemoveAllByUserId(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _) /*|| _commentService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
             {
@@ -182,7 +182,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                _commentService.RemoveAllByUserId(id);
+                await _commentService.RemoveAllByUserIdAsync(id);
                 return Ok();
             }
             catch (InvalidOperationException ex)
@@ -197,9 +197,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments removed")]
-        public IActionResult RemoveAll()
+        public async Task<IActionResult> RemoveAll()
         {
-            _commentService.RemoveAll();
+            await _commentService.RemoveAllAsync();
             return Ok();
         }
     }
