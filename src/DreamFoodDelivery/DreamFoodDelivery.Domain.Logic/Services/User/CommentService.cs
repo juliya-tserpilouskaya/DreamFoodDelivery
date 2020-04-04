@@ -24,7 +24,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _mapper = mapper;
         }
 
-        public async Task<Result<CommentDTO_Add>> AddAsync(CommentDTO_Add comment)
+        public async Task<Result<CommentToAdd>> AddAsync(CommentToAdd comment)
         {
             var commentToAdd = _mapper.Map<CommentDB>(comment);
 
@@ -36,30 +36,30 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
                 CommentDB commentAfterAdding = await _commentContext.Comments.Where(_ => _.UserId == commentToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
 
-                return (Result<CommentDTO_Add>)Result<CommentDTO_Add>
-                    .Ok(_mapper.Map<CommentDTO_Add>(commentAfterAdding));
+                return (Result<CommentToAdd>)Result<CommentToAdd>
+                    .Ok(_mapper.Map<CommentToAdd>(commentAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<CommentDTO_Add>.Fail<CommentDTO_Add>($"Cannot save model. {ex.Message}");
+                return Result<CommentToAdd>.Fail<CommentToAdd>($"Cannot save model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<CommentDTO_Add>.Fail<CommentDTO_Add>($"Cannot save model. {ex.Message}");
+                return Result<CommentToAdd>.Fail<CommentToAdd>($"Cannot save model. {ex.Message}");
             }
             catch (ArgumentNullException ex)
             {
-                return Result<CommentDTO_Add>.Fail<CommentDTO_Add>($"Source is null. {ex.Message}");
+                return Result<CommentToAdd>.Fail<CommentToAdd>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Asynchronously returns all comments
         /// </summary>
-        public async Task<IEnumerable<CommentDTO_View>> GetAllAsync()
+        public async Task<IEnumerable<CommentView>> GetAllAsync()
         {
             var comment = await _commentContext.Comments.ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDB>, List<CommentDTO_View>>(comment);
+            return _mapper.Map<IEnumerable<CommentDB>, List<CommentView>>(comment);
         }
 
         /// <summary>
@@ -67,11 +67,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="commentId"></param>
         /// <returns></returns>
-        public async Task<CommentDTO_View> GetByIdAsync(string commentId)
+        public async Task<CommentView> GetByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
             var comment = await _commentContext.Comments.Where(_ => _.Id == id).FirstOrDefaultAsync();
-            return _mapper.Map<CommentDTO_View>(comment);
+            return _mapper.Map<CommentView>(comment);
         }
 
         /// <summary>
@@ -79,11 +79,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<CommentDTO_View>> GetByUserIdAsync(string userId)
+        public async Task<IEnumerable<CommentView>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
             var comment = await _commentContext.Comments.Where(_ => _.UserId == id).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDB>, List<CommentDTO_View>>(comment);
+            return _mapper.Map<IEnumerable<CommentDB>, List<CommentView>>(comment);
         }
         
         public async Task<Result> RemoveAllAsync()
@@ -172,7 +172,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
-        public async Task<Result<CommentDTO_Update>> UpdateAsync(CommentDTO_Update comment)
+        public async Task<Result<CommentToUpdate>> UpdateAsync(CommentToUpdate comment)
         {
             comment.ModificationTime = DateTime.Now;
             CommentDB commentForUpdate = _mapper.Map<CommentDB>(comment);
@@ -184,15 +184,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _commentContext.SaveChangesAsync();
-                return Result<CommentDTO_Update>.Ok(comment);
+                return Result<CommentToUpdate>.Ok(comment);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<CommentDTO_Update>.Fail<CommentDTO_Update>($"Cannot update model. {ex.Message}");
+                return Result<CommentToUpdate>.Fail<CommentToUpdate>($"Cannot update model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<CommentDTO_Update>.Fail<CommentDTO_Update>($"Cannot update model. {ex.Message}");
+                return Result<CommentToUpdate>.Fail<CommentToUpdate>($"Cannot update model. {ex.Message}");
             }
         }
     }

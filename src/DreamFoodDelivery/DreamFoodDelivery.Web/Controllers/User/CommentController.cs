@@ -27,7 +27,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all comments stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no comments in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Comments were found", typeof(IEnumerable<CommentDTO_View>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comments were found", typeof(IEnumerable<CommentView>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _commentService.GetAllAsync();
@@ -42,7 +42,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Comment was found", typeof(CommentDTO_View))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comment was found", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -68,7 +68,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("user/{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid UserId")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment wasn't found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "ID users comments were found", typeof(IEnumerable<CommentDTO_View>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "ID users comments were found", typeof(IEnumerable<CommentView>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetByUserId(string id)
         {
@@ -99,7 +99,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]CommentDTO_Add comment)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]CommentToAdd comment)
         {
             //if (!ModelState.IsValid)
             //{
@@ -119,7 +119,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment updated", typeof(Comment))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]CommentDTO_Update comment)
+        public async Task<IActionResult> Update([FromBody]CommentToUpdate comment)
         {
 
             if (comment is null /*|| !ModelState.IsValid*/)

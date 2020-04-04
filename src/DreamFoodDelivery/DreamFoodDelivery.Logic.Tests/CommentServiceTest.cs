@@ -16,19 +16,18 @@ namespace DreamFoodDelivery.Logic.Tests
 {
     public class CommentServiceTest
     {
-        private Faker<CommentDB> _fakeComment = new Faker<CommentDB>()
+        private readonly Faker<CommentDB> _fakeComment = new Faker<CommentDB>()
             .RuleFor(x => x.Headline, y => y.Random.Word())
             .RuleFor(x => x.Rating, y => y.Random.Byte(0, 5))
             .RuleFor(x => x.Content, y => y.Random.Words());
-
-        List<CommentDB> _comments;
-        IMapper _mapper;
+        readonly List<CommentDB> _comments;
+        readonly IMapper _mapper;
 
         public CommentServiceTest()
         {
             var mapperConfiguration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<CommentDB, CommentDTO_View>().ReverseMap();
+                cfg.CreateMap<CommentDB, CommentView>().ReverseMap();
             });
 
             _comments = _fakeComment.Generate(10);
@@ -36,6 +35,7 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "<Pending>")]
         public async void GetAllUsersTestAsync()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
@@ -57,7 +57,7 @@ namespace DreamFoodDelivery.Logic.Tests
 
                 foreach (var item in _comments)
                 {
-                    var itemFromResult = result.Where(_ => _.Headline.Equals(item.Headline)).Select(_ => _).FirstOrDefault();
+                    var itemFromResult = result.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
                 }
             }

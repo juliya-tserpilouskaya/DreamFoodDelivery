@@ -258,3 +258,9 @@ dotnet_naming_style.camalcase.required_prefix =
 dotnet_naming_style.camalcase.required_suffix = 
 dotnet_naming_style.camalcase.word_separator = 
 dotnet_naming_style.camalcase.capitalization = camel_case
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
+# CS0693: Type parameter has the same name as the type parameter from outer type
+dotnet_diagnostic.CS0693.severity = silent

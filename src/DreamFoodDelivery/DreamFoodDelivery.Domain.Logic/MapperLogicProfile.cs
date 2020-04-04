@@ -12,9 +12,9 @@ namespace DreamFoodDelivery.Domain.Logic
         public MapperLogicProfile()
         {
             // rethink
-            CreateMap<CommentDB, CommentDTO_View>().ReverseMap();
-            CreateMap<CommentDB, CommentDTO_Add>().ReverseMap();
-            CreateMap<CommentDB, CommentDTO_Update>().ReverseMap();
+            CreateMap<CommentDB, CommentView>().ReverseMap();
+            CreateMap<CommentDB, CommentToAdd>().ReverseMap();
+            CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
         }
     }
 }

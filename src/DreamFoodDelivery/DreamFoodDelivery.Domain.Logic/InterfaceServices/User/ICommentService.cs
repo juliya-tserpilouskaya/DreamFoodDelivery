@@ -13,35 +13,35 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// Asynchronously returns all comments
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<CommentDTO_View>> GetAllAsync();
+        Task<IEnumerable<CommentView>> GetAllAsync();
 
         /// <summary>
         /// Asynchronously returns comment by id
         /// </summary>
         /// <param name="id">comment id</param>
         /// <returns></returns>
-        Task<CommentDTO_View> GetByIdAsync(string id);
+        Task<CommentView> GetByIdAsync(string id);
 
         /// <summary>
         /// Asynchronously returns comment by user id
         /// </summary>
         /// <param name="userID">User id</param>
         /// <returns></returns>
-        Task<IEnumerable<CommentDTO_View>> GetByUserIdAsync(string userID);
+        Task<IEnumerable<CommentView>> GetByUserIdAsync(string userID);
 
         /// <summary>
         /// Creates comment
         /// </summary>
         /// <param name="comment">New comment</param>
         /// <returns></returns>
-        Task<Result<CommentDTO_Add>> AddAsync(CommentDTO_Add comment);
+        Task<Result<CommentToAdd>> AddAsync(CommentToAdd comment);
 
         /// <summary>
         /// Updates comment data async
         /// </summary>
         /// <param name="comment">comment</param>
         /// <returns></returns>
-        Task<Result<CommentDTO_Update>> UpdateAsync(CommentDTO_Update comment);
+        Task<Result<CommentToUpdate>> UpdateAsync(CommentToUpdate comment);
 
         /// <summary>
         /// Removes comment by id async
