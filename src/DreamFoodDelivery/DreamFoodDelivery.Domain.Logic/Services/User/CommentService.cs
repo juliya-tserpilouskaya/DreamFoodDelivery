@@ -65,7 +65,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comments = await _commentContext.Comments.AsNoTracking().ToListAsync();
             if (!comments.Any())
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No Users found");
+                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
             }
             return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(comments));
         }
@@ -93,7 +93,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        ///  Asynchronously get by userId. Id must be verified 
+        ///  Asynchronously get order by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
         public async Task<IEnumerable<CommentView>> GetByUserIdAsync(string userId)

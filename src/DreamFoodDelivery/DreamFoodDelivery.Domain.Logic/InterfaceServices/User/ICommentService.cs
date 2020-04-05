@@ -21,10 +21,10 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<CommentView>> GetByIdAsync(string commentId);
 
         /// <summary>
-        ///  Asynchronously get by userId. Id must be verified 
+        ///  Asynchronously get order by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        Task<IEnumerable<CommentView>> GetByUserIdAsync(string userID);
+        Task<IEnumerable<CommentView>> GetByUserIdAsync(string userId);
 
         /// <summary>
         ///  Asynchronously add new comment

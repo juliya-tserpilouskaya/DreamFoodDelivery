@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,63 +12,48 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all orders
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Order>> GetAllAsync();
+        Task<Result<IEnumerable<OrderView>>> GetAllAsync();
 
         /// <summary>
-        /// Asynchronously returns oeder by id
+        ///  Asynchronously get order by order Id. Id must be verified 
         /// </summary>
-        /// <param name="id">order id</param>
-        /// <returns></returns>
-        Task<Order> GetByIdAsync(string id);
+        /// <param name="orderId">ID of existing order</param>
+        Task<Result<OrderView>> GetByIdAsync(string orderId);
 
         /// <summary>
-        /// Create order
+        ///  Asynchronously get orders by userId. Id must be verified 
         /// </summary>
-        /// <param name="order">New order</param>
-        /// <returns></returns>
-        Task<Result<Order>> AddAsync(Order order);
+        /// <param name="userId">ID of user</param>
+        Task<IEnumerable<OrderView>> GetByUserIdAsync(string userId);
 
         /// <summary>
-        /// Updates order
+        ///  Asynchronously add new thing
         /// </summary>
-        /// <param name="order">order</param>
-        /// <returns></returns>
-        Task<Result<Order>> UpdateAsync(Order order);
+        /// <param name="order">New order to add</param>
+        Task<Result<OrderToAdd>> AddAsync(OrderToAdd order);
 
         /// <summary>
-        /// Removes order by id async
+        ///  Asynchronously remove order by Id. Id must be verified
         /// </summary>
-        /// <param name="id">order id</param>
-        /// <returns></returns>
-        Task<Result> RemoveByIdAsync(string id);
+        /// <param name="orderId">ID of existing order</param>
+        Task<Result> RemoveByIdAsync(string orderId);
 
         /// <summary>
-        /// Removes all orders from database
+        ///  Asynchronously remove all orders 
         /// </summary>
-        void RemoveAll();
+        Task<Result> RemoveAllAsync();
 
         /// <summary>
-        /// Asynchronously returns order by user id
+        ///  Asynchronously update order
         /// </summary>
-        /// <param name="userID">User id</param>
-        /// <returns></returns>
-        Task<IEnumerable<Order>> GetByUserIdAsync(string userID);
-
-        //Is it necessary?
-        /// <summary>
-        /// Updates order
-        /// </summary>
-        /// <param name="order">order</param>
-        /// <param name="userId">user id</param>
-        /// <returns></returns>
-        Task<Result<Order>> UpdateByUserIdAsync(Order order, string userId);
+        /// <param name="order">Existing order to update</param>
+        /// <param name="userId">ID of existing order</param>
+        Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order, Guid userId);
 
         /// <summary>
-        /// Removes orders by user id
+        ///  Asynchronously remove all orders by user Id. Id must be verified 
         /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
-        void RemoveAllByUserId(string id);
+        /// <param name="userId">ID of user</param>
+        Task<Result> RemoveAllByUserIdAsync(string userId);
     }
 }

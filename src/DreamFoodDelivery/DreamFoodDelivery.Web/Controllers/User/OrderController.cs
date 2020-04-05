@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -26,7 +26,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all orders stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no orders in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Orders were found", typeof(IEnumerable<Order>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Orders were found", typeof(IEnumerable<OrderView>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _orderService.GetAllAsync();
@@ -41,7 +41,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "order was found", typeof(Order))]
+        [SwaggerResponse(StatusCodes.Status200OK, "order was found", typeof(OrderView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -68,7 +68,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "order added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]Order order)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]OrderToAdd order)
         {
             //if (!ModelState.IsValid)
             //{
@@ -86,18 +86,19 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Order updated", typeof(Order))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Order updated", typeof(OrderToUpdate))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]Order order)
+        public async Task<IActionResult> Update([FromBody]OrderToUpdate order)
         {
-
+            //temp:
+            Guid id = Guid.NewGuid(); //Guid.Parse(Id);
             if (order is null /*|| !ModelState.IsValid*/)
             {
                 return BadRequest(ModelState);
             }
             try
             {
-                var result = await _orderService.UpdateAsync(order);
+                var result = await _orderService.UpdateAsync(order, id);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -141,7 +142,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "orders removed")]
         public IActionResult RemoveAll()
         {
-            _orderService.RemoveAll();
+            _orderService.RemoveAllAsync();
             return Ok();
         }
 
@@ -152,7 +153,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("user/{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid UserId")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "orders wasn't found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "ID users orders were found", typeof(IEnumerable<Order>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "ID users orders were found", typeof(IEnumerable<OrderView>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetByUserId(string id)
         {
@@ -193,7 +194,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                _orderService.RemoveAllByUserId(id);
+                _orderService.RemoveAllByUserIdAsync(id);
                 return Ok();
             }
             catch (InvalidOperationException ex)

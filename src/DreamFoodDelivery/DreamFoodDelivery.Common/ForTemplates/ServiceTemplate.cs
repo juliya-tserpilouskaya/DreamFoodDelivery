@@ -64,7 +64,7 @@
 //            var things = await _context.Things.AsNoTracking().ToListAsync();
 //            if (!things.Any())
 //            {
-//                return Result<IEnumerable<ThingView>>.Fail<IEnumerable<ThingView>>("No Users found");
+//                return Result<IEnumerable<ThingView>>.Fail<IEnumerable<ThingView>>("No things found");
 //            }
 //            return Result<IEnumerable<ThingView>>.Ok(_mapper.Map<IEnumerable<ThingView>>(things));
 //        }
@@ -92,7 +92,7 @@
 //        }
 
 //        /// <summary>
-//        ///  Asynchronously get by userId. Id must be verified 
+//        ///  Asynchronously get things by userId. Id must be verified 
 //        /// </summary>
 //        /// <param name="userId">ID of user</param>
 //        public async Task<IEnumerable<ThingView>> GetByUserIdAsync(string userId)
@@ -140,7 +140,7 @@
 
 //            if (thing is null)
 //            {
-//                return await Task.FromResult(Result.Fail("Commenst were not found"));
+//                return await Task.FromResult(Result.Fail("Things were not found"));
 //            }
 //            try
 //            {

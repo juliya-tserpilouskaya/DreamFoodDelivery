@@ -22,7 +22,7 @@
 //        Task<Result<ThingView>> GetByIdAsync(string thingId);
 
 //        /// <summary>
-//        ///  Asynchronously get by userId. Id must be verified 
+//        ///  Asynchronously get things by userId. Id must be verified 
 //        /// </summary>
 //        /// <param name="userId">ID of user</param>
 //        Task<IEnumerable<ThingView>> GetByUserIdAsync(string userID);
