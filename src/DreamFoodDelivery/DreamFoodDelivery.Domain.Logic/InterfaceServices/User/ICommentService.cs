@@ -12,66 +12,47 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all comments
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<CommentView>> GetAllAsync();
+        Task<Result<IEnumerable<CommentView>>> GetAllAsync();
 
         /// <summary>
-        /// Asynchronously returns comment by id
+        ///  Asynchronously get comment by comment Id. Id must be verified 
         /// </summary>
-        /// <param name="id">comment id</param>
-        /// <returns></returns>
-        Task<CommentView> GetByIdAsync(string id);
+        /// <param name="commentId">ID of existing comment</param>
+        Task<Result<CommentView>> GetByIdAsync(string commentId);
 
         /// <summary>
-        /// Asynchronously returns comment by user id
+        ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
-        /// <param name="userID">User id</param>
-        /// <returns></returns>
+        /// <param name="userId">ID of user</param>
         Task<IEnumerable<CommentView>> GetByUserIdAsync(string userID);
 
         /// <summary>
-        /// Creates comment
+        ///  Asynchronously add new comment
         /// </summary>
-        /// <param name="comment">New comment</param>
-        /// <returns></returns>
+        /// <param name="comment">New comment to add</param>
         Task<Result<CommentToAdd>> AddAsync(CommentToAdd comment);
 
         /// <summary>
-        /// Updates comment data async
+        ///  Asynchronously update comment
         /// </summary>
-        /// <param name="comment">comment</param>
-        /// <returns></returns>
+        /// <param name="comment">Existing comment to update</param>
         Task<Result<CommentToUpdate>> UpdateAsync(CommentToUpdate comment);
 
         /// <summary>
-        /// Removes comment by id async
+        ///  Asynchronously remove comment by Id. Id must be verified
         /// </summary>
-        /// <param name="id">comment id</param>
-        /// <returns></returns>
-        Task<Result> RemoveByIdAsync(string id);
+        /// <param name="commentId">ID of existing comment</param>
+        Task<Result> RemoveByIdAsync(string commentId);
 
         /// <summary>
-        /// Removes comments by user id async
+        ///  Asynchronously remove all comments by user Id. Id must be verified 
         /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
+        /// <param name="userId">ID of user</param>
         Task<Result> RemoveAllByUserIdAsync(string userId);
 
         /// <summary>
-        /// Removes comments by user id
-        /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
-        //void RemoveAllByUserId(string id);
-
-        /// <summary>
-        /// Removes all comments from database
+        ///  Asynchronously remove all comments 
         /// </summary>
         Task<Result> RemoveAllAsync();
-
-        /// <summary>
-        /// Removes all comments from database
-        /// </summary>
-        //void RemoveAll();
     }
 }

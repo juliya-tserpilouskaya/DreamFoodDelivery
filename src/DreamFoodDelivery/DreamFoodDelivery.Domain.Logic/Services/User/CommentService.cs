@@ -24,6 +24,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _mapper = mapper;
         }
 
+        /// <summary>
+        ///  Asynchronously add new comment
+        /// </summary>
+        /// <param name="comment">New comment to add</param>
         public async Task<Result<CommentToAdd>> AddAsync(CommentToAdd comment)
         {
             var commentToAdd = _mapper.Map<CommentDB>(comment);
@@ -56,36 +60,52 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns all comments
         /// </summary>
-        public async Task<IEnumerable<CommentView>> GetAllAsync()
+        public async Task<Result<IEnumerable<CommentView>>> GetAllAsync()
         {
-            var comment = await _commentContext.Comments.ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDB>, List<CommentView>>(comment);
+            var comments = await _commentContext.Comments.AsNoTracking().ToListAsync();
+            if (!comments.Any())
+            {
+                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No Users found");
+            }
+            return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(comments));
         }
 
         /// <summary>
-        /// Get by commentId. Id must be verified 
+        ///  Asynchronously get comment by comment Id. Id must be verified 
         /// </summary>
-        /// <param name="commentId"></param>
-        /// <returns></returns>
-        public async Task<CommentView> GetByIdAsync(string commentId)
+        /// <param name="commentId">ID of existing comment</param>
+        public async Task<Result<CommentView>> GetByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
-            var comment = await _commentContext.Comments.Where(_ => _.Id == id).FirstOrDefaultAsync();
-            return _mapper.Map<CommentView>(comment);
+            try
+            {
+                var comment = await _commentContext.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                if (comment is null)
+                {
+                    return Result<CommentView>.Fail<CommentView>($"Comment was not found");
+                }
+                return Result<CommentView>.Ok(_mapper.Map<CommentView>(comment));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<CommentView>.Fail<CommentView>($"Source is null. {ex.Message}");
+            }
         }
 
         /// <summary>
-        /// Get by userId. Id must be verified 
+        ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">ID of user</param>
         public async Task<IEnumerable<CommentView>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
             var comment = await _commentContext.Comments.Where(_ => _.UserId == id).Select(_ => _).ToListAsync();
             return _mapper.Map<IEnumerable<CommentDB>, List<CommentView>>(comment);
         }
-        
+
+        /// <summary>
+        ///  Asynchronously remove all comments 
+        /// </summary>
         public async Task<Result> RemoveAllAsync()
         {
             var comment = await _commentContext.Comments.ToListAsync();
@@ -110,6 +130,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
+        /// <summary>
+        ///  Asynchronously remove all comments by user Id. Id must be verified 
+        /// </summary>
+        /// <param name="userId">ID of user</param>
         public async Task<Result> RemoveAllByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -137,10 +161,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        /// Delete comment by Id. Id must be verified
+        ///  Asynchronously remove comment by Id. Id must be verified
         /// </summary>
-        /// <param name="commentId"></param>
-        /// <returns></returns>
+        /// <param name="commentId">ID of existing comment</param>
         public async Task<Result> RemoveByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -168,10 +191,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        /// Update comment in DataBase
+        ///  Asynchronously update comment
         /// </summary>
-        /// <param name="comment"></param>
-        /// <returns></returns>
+        /// <param name="comment">Existing comment to update</param>
         public async Task<Result<CommentToUpdate>> UpdateAsync(CommentToUpdate comment)
         {
             comment.ModificationTime = DateTime.Now;
