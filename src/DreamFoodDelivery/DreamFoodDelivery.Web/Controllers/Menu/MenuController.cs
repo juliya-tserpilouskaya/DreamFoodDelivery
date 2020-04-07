@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -26,7 +26,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all dishes stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no dishes in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<DishDTO>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _menuService.GetAllAsync();
@@ -41,7 +41,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish was found", typeof(Dish))]
+        [SwaggerResponse(StatusCodes.Status200OK, "dish was found", typeof(DishDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -68,7 +68,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("dishes/{name}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         public async Task<IActionResult> GetByLanguage(string name)
         {
@@ -95,7 +95,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("dishes/{category}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         public async Task<IActionResult> GetByCategory(string category)
         {
@@ -122,7 +122,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("dishes/{cost}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         public async Task<IActionResult> GetByCost(string cost)
         {
@@ -148,7 +148,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("sale")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         public async Task<IActionResult> GetSales()
         {
@@ -164,7 +164,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("dishes/{condition}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<Dish>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         public async Task<IActionResult> GetByСondition(string condition)
         {
@@ -191,7 +191,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]Dish dish)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]DishDTO dish)
         {
             //if (!ModelState.IsValid)
             //{
@@ -209,9 +209,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish updated", typeof(Dish))]
+        [SwaggerResponse(StatusCodes.Status200OK, "dish updated", typeof(DishDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]Dish dish)
+        public async Task<IActionResult> Update([FromBody]DishDTO dish)
         {
 
             if (dish is null /*|| !ModelState.IsValid*/)
@@ -262,9 +262,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes removed")]
-        public IActionResult RemoveAll()
+        public async Task<IActionResult> RemoveAllAsync()
         {
-            _menuService.RemoveAll();
+            await _menuService.RemoveAllAsync();
             return Ok();
         }
 

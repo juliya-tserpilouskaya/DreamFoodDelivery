@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,36 +13,32 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all baskets
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Basket>> GetAllAsync();
+        Task<Result<IEnumerable<BasketDTO>>> GetAllAsync();
 
         /// <summary>
-        /// Create basket
+        ///  Asynchronously add new basket
         /// </summary>
-        /// <param name="basket">New basket</param>
-        /// <returns></returns>
-        Task<Result<Basket>> AddAsync(Basket basket);
+        /// <param name="basket">New basket to add</param>>
+        Task<Result<BasketDTO>> AddAsync(BasketDTO basket);
+
+        //Add/remive dishes here
+        /// <summary>
+        ///  Asynchronously update basket
+        /// </summary>
+        /// <param name="basket">Existing basket to update</param>
+        Task<Result<BasketDTO>> UpdateAsync(BasketDTO basket);
 
         /// <summary>
-        /// Updates basket
+        ///  Asynchronously remove basket by Id. Id must be verified
         /// </summary>
-        /// <param name="basket">basket</param>
-        /// <returns></returns>
-        Task<Result<Basket>> UpdateAsync(Basket basket);
-
-        /// <summary>
-        /// Remove basket by id async
-        /// </summary>
-        /// <param name="id">basket id</param>
-        /// <returns></returns>
-        Task<Result> RemoveByIdAsync(string id);
+        /// <param name="basketId">ID of existing basket</param>
+        Task<Result> RemoveByIdAsync(string basketId);
 
         //Is it necessary?
         /// <summary>
-        /// Removes basket by user id
+        ///  Asynchronously remove all basket by user Id. Id must be verified 
         /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
-        Task<Result> RemoveAllByUserIdAsync(string id);
+        /// <param name="userId">ID of user</param>
+        Task<Result> RemoveAllByUserIdAsync(string userId);
     }
 }

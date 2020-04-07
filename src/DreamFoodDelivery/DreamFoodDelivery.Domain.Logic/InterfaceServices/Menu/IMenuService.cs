@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,77 +10,66 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
     public interface IMenuService
     {
         /// <summary>
-        /// Asynchronously returns all dishes
+        /// Asynchronously returns menu
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Dish>> GetAllAsync();
+        Task<Result<IEnumerable<DishDTO>>> GetAllAsync();
 
         /// <summary>
-        /// Asynchronously returns dish by id
+        ///  Asynchronously get dish by dish Id. Id must be verified 
         /// </summary>
-        /// <param name="id">dish id</param>
-        /// <returns></returns>
-        Task<Dish> GetByIdAsync(string id);
-
-        //Change to search later
-        /// <summary>
-        /// Asynchronously returns dish by name
-        /// </summary>
-        /// <param name="name">dish name</param>
-        /// <returns></returns>
-        Task<Dish> GetByNameAsync(string name);
+        /// <param name="dishId">ID of existing dish</param>
+        Task<Result<DishDTO>> GetByIdAsync(string dishId);
 
         /// <summary>
-        /// Asynchronously returns dish by category
+        ///  Asynchronously returns dish by nam. Id must be verified 
         /// </summary>
-        /// <param name="category">dish category</param>
-        /// <returns></returns>
-        Task<Dish> GetByCategoryAsync(string category);
+        /// <param name="name">Dish name</param>
+        Task<IEnumerable<DishDTO>> GetByNameAsync(string name);
 
         /// <summary>
-        /// Asynchronously returns dish by cost
+        ///  Asynchronously returns dish by category. Id must be verified 
         /// </summary>
-        /// <param name="cost">dish cost</param>
-        /// <returns></returns>
-        Task<Dish> GetByCostAsync(string cost);
+        /// <param name="category">Dish category</param>
+        Task<IEnumerable<DishDTO>> GetByCategoryAsync(string category);
+
+        /// <summary>
+        ///  Asynchronously returns dish by cost. Id must be verified 
+        /// </summary>
+        /// <param name="cost">Dish cost</param>
+        Task<IEnumerable<DishDTO>> GetByCostAsync(string cost);
 
         /// <summary>
         /// Asynchronously returns sales
         /// </summary>
-        /// <returns></returns>
-        Task<Dish> GetSalesAsync();
+        Task<IEnumerable<DishDTO>> GetSalesAsync();
 
         /// <summary>
-        /// Asynchronously returns dish by condition
+        ///  Asynchronously returns dish by condition. Id must be verified 
         /// </summary>
-        /// <param name="condition">dish condition</param>
-        /// <returns></returns>
-        Task<Dish> GetByСonditionAsync(string condition);
+        /// <param name="condition">Dish condition</param>
+        Task<IEnumerable<DishDTO>> GetByСonditionAsync(string condition);
 
         /// <summary>
-        /// Create dish
+        ///  Asynchronously add new dish
         /// </summary>
-        /// <param name="dish">New dish</param>
-        /// <returns></returns>
-        Task<Result<Dish>> AddAsync(Dish dish);
+        /// <param name="dish">New dish to add</param>
+        Task<Result<DishDTO>> AddAsync(DishDTO dish);
 
         /// <summary>
-        /// Updates dish
+        ///  Asynchronously update dish
         /// </summary>
-        /// <param name="dish">dish</param>
-        /// <returns></returns>
-        Task<Result<Dish>> UpdateAsync(Dish dish);
+        /// <param name="dish">Existing dish to update</param>
+        Task<Result<DishDTO>> UpdateAsync(DishDTO dish);
 
         /// <summary>
-        /// Removes dish by id async
+        ///  Asynchronously remove dish by Id. Id must be verified
         /// </summary>
-        /// <param name="id">dish id</param>
-        /// <returns></returns>
-        Task<Result> RemoveByIdAsync(string id);
+        /// <param name="dishId">ID of existing dish</param>
+        Task<Result> RemoveByIdAsync(string dishId);
 
         /// <summary>
-        /// Removes all dishes from database
+        ///  Asynchronously remove all dishes 
         /// </summary>
-        void RemoveAll();
+        Task<Result> RemoveAllAsync();
     }
 }

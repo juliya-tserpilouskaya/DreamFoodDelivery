@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -27,7 +27,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all tags stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no tags in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tags were found", typeof(IEnumerable<Tag>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tags were found", typeof(IEnumerable<TagDTO>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _tagService.GetAllAsync();
@@ -42,7 +42,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "tag added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid tag data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]Tag tag)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]TagDTO tag)
         {
             //if (!ModelState.IsValid)
             //{
@@ -60,9 +60,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(Tag))]
+        [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(TagDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]Tag tag)
+        public async Task<IActionResult> Update([FromBody]TagDTO tag)
         {
 
             if (tag is null /*|| !ModelState.IsValid*/)
@@ -113,9 +113,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "tags removed")]
-        public IActionResult RemoveAll()
+        public async Task<IActionResult> RemoveAllAsync()
         {
-            _tagService.RemoveAll();
+            await _tagService.RemoveAllAsync();
             return Ok();
         }
     }

@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,33 +12,35 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all tags
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Tag>> GetAllAsync();
+        Task<Result<IEnumerable<TagDTO>>> GetAllAsync();
 
         /// <summary>
-        /// Create tag
+        ///  Asynchronously add new tag
         /// </summary>
-        /// <param name="tag">New tag</param>
-        /// <returns></returns>
-        Task<Result<Tag>> AddAsync(Tag tag);
+        /// <param name="tag">New tag to add</param>
+        Task<Result<TagDTO>> AddAsync(TagDTO tag);
 
         /// <summary>
-        /// Updates tag
+        ///  Asynchronously update tag
         /// </summary>
-        /// <param name="tag">tag</param>
-        /// <returns></returns>
-        Task<Result<Tag>> UpdateAsync(Tag tag);
+        /// <param name="tag">Existing tag to update</param>
+        Task<Result<TagDTO>> UpdateAsync(TagDTO tag);
 
         /// <summary>
-        /// Remove tag by id async
+        ///  Asynchronously remove tag by Id. Id must be verified
         /// </summary>
-        /// <param name="id">tag id</param>
-        /// <returns></returns>
+        /// <param name="tagId">ID of existing tag</param>
         Task<Result> RemoveByIdAsync(string id);
 
         /// <summary>
-        /// Removes all comments from database
+        ///  Asynchronously remove all tags 
         /// </summary>
-        void RemoveAll();
+        Task<Result> RemoveAllAsync();
+
+        /// <summary>
+        ///  Asynchronously get tag by tag Id. Id must be verified 
+        /// </summary>
+        /// <param name="tagId">ID of existing tag</param>
+        Task<Result<TagDTO>> GetByIdAsync(string tagId);
     }
 }

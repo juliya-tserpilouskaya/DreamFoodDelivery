@@ -57,7 +57,7 @@ namespace DreamFoodDelivery.Logic.Tests
 
                 foreach (var item in _comments)
                 {
-                    var itemFromResult = result.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
+                    var itemFromResult = result.Data.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
                 }
             }
