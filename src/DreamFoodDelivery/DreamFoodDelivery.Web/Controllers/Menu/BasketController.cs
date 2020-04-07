@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -26,7 +26,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all baskets stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no baskets in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Baskets were found", typeof(IEnumerable<Basket>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Baskets were found", typeof(IEnumerable<BasketDTO>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _basketService.GetAllAsync();
@@ -41,7 +41,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "basket added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid basket data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]Basket basket)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]BasketDTO basket)
         {
             //if (!ModelState.IsValid)
             //{
@@ -59,9 +59,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "basket doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "basket updated", typeof(Basket))]
+        [SwaggerResponse(StatusCodes.Status200OK, "basket updated", typeof(BasketDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]Basket basket)
+        public async Task<IActionResult> Update([FromBody]BasketDTO basket)
         {
 
             if (basket is null /*|| !ModelState.IsValid*/)

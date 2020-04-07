@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,35 +12,30 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all users
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<User>> GetAllAsync();
+        Task<Result<IEnumerable<UserDTO>>> GetAllAsync();
 
         /// <summary>
-        /// Create new account
+        ///  Asynchronously add new account
         /// </summary>
-        /// <param name="user">user</param>
-        /// <returns></returns>
-        Task<Result<User>> CreateAccountAsync(User user);
+        /// <param name="user">New user to add</param>
+        Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
 
         /// <summary>
-        /// Get user account by Id
+        ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
-        Task<User> GetByIdAsync(string id);
+        /// <param name="userId">ID of user</param>
+        Task<Result<UserDTO>> GetByIdAsync(string id);
 
         /// <summary>
-        /// Update the user account
+        ///  Asynchronously update user
         /// </summary>
-        /// <param name="user">user</param>
-        /// <returns></returns>
-        Task<Result<User>> UpdateAsync(User user);
+        /// <param name="user">Existing user to update</param>
+        Task<Result<UserDTO>> UpdateAsync(UserDTO user);
 
         /// <summary>
-        /// Remove user by Id
+        ///  Asynchronously remove user by Id. Id must be verified
         /// </summary>
-        /// <param name="id">user id</param>
-        /// <returns></returns>
-        Task<Result> RemoveByIdAsync(string id);
+        /// <param name="userId">ID of existing user</param>
+        Task<Result> RemoveByIdAsync(string userId);
     }
 }

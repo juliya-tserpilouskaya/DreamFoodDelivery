@@ -15,6 +15,14 @@ namespace DreamFoodDelivery.Domain.Logic
             CreateMap<CommentDB, CommentView>().ReverseMap();
             CreateMap<CommentDB, CommentToAdd>().ReverseMap();
             CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
+            CreateMap<OrderDB, OrderView>().ReverseMap();
+            CreateMap<OrderDB, OrderToAdd>().ReverseMap();
+            CreateMap<OrderDB, OrderToUpdate>().ReverseMap();
+            CreateMap<TagDB, TagDTO>().ReverseMap();
+            CreateMap<DishDB, DishDTO>().ReverseMap();
+            CreateMap<BasketDB, BasketDTO>().ReverseMap();
+            CreateMap<UserDB, UserDTO>().ReverseMap();
+            CreateMap<UserInfoDB, UserInfoDTO>().ReverseMap();
         }
     }
 }

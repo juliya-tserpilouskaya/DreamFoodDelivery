@@ -8,7 +8,7 @@ namespace DreamFoodDelivery.Domain.DTO
     {
         public Guid Id { get; set; }
         public HashSet<DishDTO> Dishes { get; set; }
-        public DateTime? Modified { get; set; }
+        public DateTime? ModificationTime { get; set; }
         public Guid UserId { get; set; }
     }
 }
