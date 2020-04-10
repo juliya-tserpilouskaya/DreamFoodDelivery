@@ -46,7 +46,7 @@ namespace TrainingProject.Web
                         ValidateLifetime = true
                     };
                 });
-            services.AddScoped<IIdentityService, IdentityService>();
+            //services.AddScoped<IIdentityService, IdentityService>();
             services.AddDomainServices(Configuration);
 
             services.AddOpenApiDocument();

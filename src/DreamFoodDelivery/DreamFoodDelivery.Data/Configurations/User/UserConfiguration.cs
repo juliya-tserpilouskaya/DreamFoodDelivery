@@ -15,6 +15,9 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.HasKey(i => i.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 
+            builder.Property(_ => _.IdFromIdentity).IsRequired();
+            builder.HasIndex(_ => _.IdFromIdentity).IsUnique();
+
             builder.HasOne(_ => _.UserInfo).WithOne(_ => _.User)
                    .HasForeignKey<UserInfoDB>(_ => _.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
@@ -32,6 +35,7 @@ namespace DreamFoodDelivery.Data.Configurations
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
+            builder.Property(i => i.IdFromIdentity).HasColumnName("Identity ID");
             builder.Property(i => i.Login).HasColumnName("Login").IsRequired().HasMaxLength(63);
             builder.Property(i => i.Password).HasColumnName("Password").IsRequired().HasMaxLength(63);
             builder.Property(i => i.EMail).HasColumnName("EMail").IsRequired().HasMaxLength(63);

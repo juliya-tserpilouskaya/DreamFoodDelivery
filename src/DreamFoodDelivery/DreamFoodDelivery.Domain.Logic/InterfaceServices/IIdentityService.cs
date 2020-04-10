@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DreamFoodDelivery.Web
+namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface IIdentityService
     {
         Task<Result<string>> RegisterAsync(string email, string password);
+        Task<Result<string>> LoginAsync(string email, string password);
+        Task<Result> DeleteAsync(string email, string password);
     }
 }

@@ -9,5 +9,8 @@ namespace DreamFoodDelivery.Data.Models
     {
         public string Address { get; set; }
         public double PersonalDiscount { get; set; }
+        public string Login { get; set; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
     }
 }

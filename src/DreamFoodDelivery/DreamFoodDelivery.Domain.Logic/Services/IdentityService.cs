@@ -1,4 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
@@ -10,7 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DreamFoodDelivery.Web
+namespace DreamFoodDelivery.Domain.Logic.Services
 {
     public class IdentityService : IIdentityService
     {
@@ -19,6 +20,17 @@ namespace DreamFoodDelivery.Web
         {
             _userManager = userManager;
         }
+
+        public Task<Result> DeleteAsync(string email, string password)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<string>> LoginAsync(string email, string password)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Result<string>> RegisterAsync(string email, string password)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
@@ -58,6 +70,6 @@ namespace DreamFoodDelivery.Web
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return Result<string>.Ok(tokenHandler.WriteToken(token));
-        }
+        } 
     }
 }
