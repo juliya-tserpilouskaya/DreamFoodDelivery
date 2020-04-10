@@ -16,9 +16,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using TrainingProject.Domain.Logic;
+using DreamFoodDelivery.Domain.Logic;
+using NSwag.Generation.Processors.Security;
+using NSwag;
 
-namespace TrainingProject.Web
+namespace DreamFoodDelivery.Web
 {
     public class Startup
     {
@@ -46,13 +48,38 @@ namespace TrainingProject.Web
                         ValidateLifetime = true
                     };
                 });
-            //services.AddScoped<IIdentityService, IdentityService>();
+
             services.AddDomainServices(Configuration);
 
-            services.AddOpenApiDocument();
+            services.AddOpenApiDocument(config =>
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Title = "~Dream food for you~";
+                    document.Info.Description = "Intership ASP.NET Core web API";
+                    document.Info.Version = "v0.0.1";
+                    document.Info.Contact = new NSwag.OpenApiContact
+                    {
+                        Name = "Denis Makarchuk",
+                        Email = "yuliya.tserpilouskaya@gmail.com",
+                        Url = string.Empty
+                    };
+                };
+                config.DocumentProcessors.Add(
+                    new SecurityDefinitionAppender("Bearer",
+                    new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the bearer scheme",
+                        Name = "Authorization",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Type = OpenApiSecuritySchemeType.ApiKey
+                    }));
+                config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
+            });
+
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
-            services.AddSwaggerGen(c => { c.EnableAnnotations(); }); //added on 23.03; read more about
+            //services.AddSwaggerGen(c => { c.EnableAnnotations(); }); //added on 23.03; read more about
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

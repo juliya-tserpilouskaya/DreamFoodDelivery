@@ -21,6 +21,12 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
 
         /// <summary>
+        ///  Asynchronously add new account
+        /// </summary>
+        /// <param name="userIdFromIdentity">ID of user from identity</param>
+        Task<Result<UserDTO>> CreateAccountAsyncById(string userIdFromIdentity);
+
+        /// <summary>
         ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>

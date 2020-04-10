@@ -7,10 +7,11 @@ namespace DreamFoodDelivery.Domain.DTO
     public class UserDTO
     {
         public Guid Id { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
-        public string EMail { get; set; }
-        public string Role { get; set; }
+        public string IdFromIdentity { get; set; }
+        //public string Login { get; set; }
+        //public string Password { get; set; }
+        //public string EMail { get; set; }
+        //public string Role { get; set; }
         public UserInfoDTO UserInfo { get; set; }
         public Guid UserInfoId { get; set; }
         public BasketDTO Basket { get; set; }

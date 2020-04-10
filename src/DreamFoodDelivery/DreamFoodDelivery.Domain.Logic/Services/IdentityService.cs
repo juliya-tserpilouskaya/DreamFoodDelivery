@@ -1,4 +1,6 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Data.Models;
+using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -15,10 +17,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 {
     public class IdentityService : IIdentityService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        public IdentityService(UserManager<IdentityUser> userManager)
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        IUserService _service;
+        public IdentityService(UserManager<User> userManager, IUserService service, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _service = service;
+            _roleManager = roleManager;
         }
 
         public Task<Result> DeleteAsync(string email, string password)
@@ -31,45 +37,53 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Result<string>> RegisterAsync(string email, string password)
+        public async Task<Result<UserDTO>> RegisterAsync(string email, string password)
         {
+            string defaultRole = "User";
+
             var existingUser = await _userManager.FindByEmailAsync(email);
+
             if (existingUser != null)
             {
-                return Result<string>.Fail<string>("User with this e-mail already exists");
+                return Result<UserDTO>.Fail<UserDTO>("User with this Emai already exist");
             }
-            var newUser = new IdentityUser
+
+            if (!_userManager.Users.Any())
+            {
+                defaultRole = "Admin";
+            }
+
+            var newUser = new User
             {
                 Email = email,
-                UserName = email
+                UserName = email,
+                Name = defaultRole,
+                Address = "my adress",
+                PersonalDiscount = 10
             };
+
             var createUser = await _userManager.CreateAsync(newUser, password);
 
             if (!createUser.Succeeded)
             {
-                return Result<string>.Fail<string>(createUser.Errors.Select(_ => _.Description).Join("\n"));
+                return Result<UserDTO>.Fail<UserDTO>(createUser.Errors.Select(_ => _.Description).Join("\n"));
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("SECRET_KEY");
+            await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var profile = await _service.CreateAccountAsyncById(newUser.Id);
+            UserDTO result = new UserDTO()
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, newUser.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
-                    new Claim("id", newUser.Id),
-                }),
-                Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                                                            SecurityAlgorithms.HmacSha256Signature)
+                Id = profile.Data.Id,
+                IdFromIdentity = profile.Data.IdFromIdentity,
+                UserInfo = profile.Data.UserInfo,
+                UserInfoId = profile.Data.UserInfoId,
+                Basket = profile.Data.Basket,
+                BasketId = profile.Data.BasketId,
+                Orders = profile.Data.Orders,
+                Comments = profile.Data.Comments
             };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            return Result<string>.Ok(tokenHandler.WriteToken(token));
+            return Result<UserDTO>.Ok(result);
         } 
     }
 }

@@ -2,13 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamFoodDelivery.Common.Helpers;
 using DreamFoodDelivery.Domain;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class IdentityController : ControllerBase
@@ -19,13 +24,34 @@ namespace DreamFoodDelivery.Web.Controllers
             _identityService = identityService;
         }
 
+        /// <summary>
+        /// Add Identity User & Profile to the DB
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> Register([FromBody]UserToRegister userToRegister)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RegisterAsync([FromBody]UserToRegister user)
         {
-            var result = await _identityService.RegisterAsync(userToRegister.Email, userToRegister.Password);
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest()
+            //}
 
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            try
+            {
+                var result = await _identityService.RegisterAsync(user.Email, user.Password);
+
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }
