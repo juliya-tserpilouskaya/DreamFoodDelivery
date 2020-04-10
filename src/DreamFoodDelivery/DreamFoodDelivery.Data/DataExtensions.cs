@@ -22,7 +22,6 @@ namespace DreamFoodDelivery.Data
                 opt.Password.RequireDigit = false;
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireNonAlphanumeric = false;
-                //Login?
                 opt.User.RequireUniqueEmail = true;
             })
                 .AddEntityFrameworkStores<UserContext>();

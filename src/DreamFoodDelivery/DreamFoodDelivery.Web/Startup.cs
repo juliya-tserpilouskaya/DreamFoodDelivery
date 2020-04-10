@@ -60,7 +60,7 @@ namespace DreamFoodDelivery.Web
                     document.Info.Version = "v0.0.1";
                     document.Info.Contact = new NSwag.OpenApiContact
                     {
-                        Name = "Denis Makarchuk",
+                        Name = "Yuliya Tserpilouskaya",
                         Email = "yuliya.tserpilouskaya@gmail.com",
                         Url = string.Empty
                     };
@@ -79,7 +79,6 @@ namespace DreamFoodDelivery.Web
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
-            //services.AddSwaggerGen(c => { c.EnableAnnotations(); }); //added on 23.03; read more about
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

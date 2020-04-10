@@ -36,10 +36,10 @@ namespace DreamFoodDelivery.Data.Configurations
 
             builder.Property(i => i.Id).HasColumnName("Id");
             builder.Property(i => i.IdFromIdentity).HasColumnName("Identity ID");
-            builder.Property(i => i.Login).HasColumnName("Login").IsRequired().HasMaxLength(63);
+            builder.Property(i => i.Login).HasColumnName("Login")/*.IsRequired()*/.HasMaxLength(63);
             builder.Property(i => i.Password).HasColumnName("Password").IsRequired().HasMaxLength(63);
             builder.Property(i => i.EMail).HasColumnName("EMail").IsRequired().HasMaxLength(63);
-            builder.Property(i => i.Role).HasColumnName("Role").IsRequired().HasMaxLength(63);
+            builder.Property(i => i.Role).HasColumnName("Role")/*.IsRequired()*/.HasMaxLength(63);
         }
     }
 }
