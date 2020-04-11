@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Domain.Models;
+﻿using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,9 +8,9 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface ISearchService
     {
-        IEnumerable<Dish> Search(string search);
-        Task<IEnumerable<Dish>> SearchAsync(string search); //Use it
-        IEnumerable<Dish> GetIndexedCourses();
-        IEnumerable<Dish> IndexCourse(Dish dish);
+        IEnumerable<DishDTO> Search(string search);
+        Task<IEnumerable<DishDTO>> SearchAsync(string search); //Use it
+        IEnumerable<DishDTO> GetIndexedCourses();
+        IEnumerable<DishDTO> IndexCourse(DishDTO dish);
     }
 }

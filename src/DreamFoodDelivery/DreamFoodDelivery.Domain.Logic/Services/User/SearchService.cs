@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,22 +9,22 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 {
     public class SearchService : ISearchService
     {
-        public IEnumerable<Dish> GetIndexedCourses()
+        public IEnumerable<DishDTO> GetIndexedCourses()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Dish> IndexCourse(Dish dish)
+        public IEnumerable<DishDTO> IndexCourse(DishDTO dish)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Dish> Search(string search)
+        public IEnumerable<DishDTO> Search(string search)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Dish>> SearchAsync(string search)
+        public Task<IEnumerable<DishDTO>> SearchAsync(string search)
         {
             throw new NotImplementedException();
         }

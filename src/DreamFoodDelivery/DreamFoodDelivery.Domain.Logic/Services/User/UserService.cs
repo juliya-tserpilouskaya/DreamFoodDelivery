@@ -58,6 +58,40 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        ///  Asynchronously add new account
+        /// </summary>
+        /// <param name="userIdFromIdentity">ID of user from identity</param>
+        public async Task<Result<UserDTO>> CreateAccountAsyncById(string userIdFromIdentity)
+        {
+            UserGeneration newProfile = new UserGeneration()
+            {
+                IdFromIdentity = userIdFromIdentity
+            };
+            var userToAdd = _mapper.Map<UserDB>(newProfile);
+
+            _context.Users.Add(userToAdd);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                UserDB thingAfterAdding = await _context.Users.Where(_ => _.IdFromIdentity == userToAdd.IdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                return Result<UserDTO>.Ok(_mapper.Map<UserDTO>(thingAfterAdding));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<UserDTO>.Fail<UserDTO>($"Cannot save model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<UserDTO>.Fail<UserDTO>($"Cannot save model. {ex.Message}");
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<UserDTO>.Fail<UserDTO>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Asynchronously returns all users
         /// </summary>
         public async Task<Result<IEnumerable<UserDTO>>> GetAllAsync()
@@ -129,9 +163,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<UserDTO>> UpdateAsync(UserDTO user)
         {
             UserDB thingForUpdate = _mapper.Map<UserDB>(user);
-            _context.Entry(thingForUpdate).Property(c => c.Role).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.EMail).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.UserInfo).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.Role).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.EMail).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.UserInfo).IsModified = true;
 
             try
             {
