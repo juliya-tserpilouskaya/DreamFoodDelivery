@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Domain.Models;
+using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="id">dish id</param>
         /// <returns></returns>
-        Task<Result<Dish>> AddDishAsync(string id);
+        Task<Result<DishDTO>> AddDishAsync(string id);
 
         /// <summary>
         /// Removes dish from basket
@@ -27,13 +27,13 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// Get dishes from user basket
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Dish>> GetAllAsync();
+        Task<IEnumerable<DishDTO>> GetAllAsync();
 
         /// <summary>
         /// View dish details
         /// </summary>
         /// <param name="id">dish id</param>
         /// <returns></returns>
-        Task<Dish> GetByIdAsync(string id);
+        Task<DishDTO> GetByIdAsync(string id);
     }
 }

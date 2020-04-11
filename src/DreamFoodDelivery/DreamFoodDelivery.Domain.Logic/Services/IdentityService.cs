@@ -76,12 +76,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 Id = profile.Data.Id,
                 IdFromIdentity = profile.Data.IdFromIdentity,
-                UserInfo = profile.Data.UserInfo,
-                UserInfoId = profile.Data.UserInfoId,
-                Basket = profile.Data.Basket,
                 BasketId = profile.Data.BasketId,
-                Orders = profile.Data.Orders,
-                Comments = profile.Data.Comments
             };
             return Result<UserDTO>.Ok(result);
         } 

@@ -163,9 +163,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<UserDTO>> UpdateAsync(UserDTO user)
         {
             UserDB thingForUpdate = _mapper.Map<UserDB>(user);
-            _context.Entry(thingForUpdate).Property(c => c.Role).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.EMail).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.UserInfo).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.Role).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.EMail).IsModified = true;
+            //_context.Entry(thingForUpdate).Property(c => c.UserInfo).IsModified = true;
 
             try
             {
