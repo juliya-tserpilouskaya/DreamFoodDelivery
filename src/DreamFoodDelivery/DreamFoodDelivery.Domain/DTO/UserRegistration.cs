@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain
+namespace DreamFoodDelivery.Domain.DTO
 {
-    public class UserToRegister
+    public class UserRegistration
     {
         [EmailAddress]
         public string Email { get; set; }

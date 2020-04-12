@@ -33,6 +33,12 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<UserDTO>> GetByIdAsync(string id);
 
         /// <summary>
+        /// Get User idFromIdentity
+        /// </summary>
+        /// <param name="idFromIdentity"></param>
+        Task<Result<UserDTO>> GetUserByIdFromIdentityAsync(string idFromIdentity);
+
+        /// <summary>
         ///  Asynchronously update user
         /// </summary>
         /// <param name="user">Existing user to update</param>
@@ -43,5 +49,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="userId">ID of existing user</param>
         Task<Result> RemoveByIdAsync(string userId);
+
+        /// <summary>
+        /// Remove User idFromIdentity
+        /// </summary>
+        /// <param name="idFromIdentity"></param>
+        Task<Result<UserDTO>> DeleteUserByIdFromIdentityAsync(string idFromIdentity);
     }
 }

@@ -127,6 +127,28 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        /// Get User identityId
+        /// </summary>
+        /// <param name="idFromIdentity"></param>
+        public async Task<Result<UserDTO>> GetUserByIdFromIdentityAsync(string idFromIdentity)
+        {
+            try
+            {
+                var user = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).AsNoTracking().FirstOrDefaultAsync();
+                if (user is null)
+                {
+                    return Result<UserDTO>.Fail<UserDTO>($"Not found");
+                }
+                return Result<UserDTO>.Ok(_mapper.Map<UserDTO>(user));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<UserDTO>.Fail<UserDTO>($"Source is null. {ex.Message}");
+            }
+        }
+
+
+        /// <summary>
         ///  Asynchronously remove user by Id. Id must be verified
         /// </summary>
         /// <param name="userId">ID of existing user</param>
@@ -153,6 +175,33 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             catch (DbUpdateException ex)
             {
                 return await Task.FromResult(Result.Fail($"Cannot delete user. {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        /// Remove User idFromIdentity
+        /// </summary>
+        /// <param name="idFromIdentity"></param>
+        public async Task<Result> DeleteUserProfileByIdentityIdAsync(string idFromIdentity)
+        {
+            var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.IdFromIdentity == idFromIdentity);
+            if (user is null)
+            {
+                return await Task.FromResult(Result.Fail("User was not found"));
+            }
+            try
+            {
+                _context.Users.Remove(user); //Revise the lecture about the database. A moment about deleting information.
+                await _context.SaveChangesAsync();
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
             }
         }
 

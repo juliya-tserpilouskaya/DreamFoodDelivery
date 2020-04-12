@@ -19,25 +19,22 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly TokenSecret _tokenSecret;
         IUserService _service;
-        public IdentityService(UserManager<User> userManager, IUserService service, RoleManager<IdentityRole> roleManager)
+        public IdentityService(UserManager<User> userManager, IUserService service, RoleManager<IdentityRole> roleManager, TokenSecret tokenSecret)
         {
             _userManager = userManager;
             _service = service;
             _roleManager = roleManager;
+            _tokenSecret = tokenSecret;
         }
 
-        public Task<Result> DeleteAsync(string email, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result<string>> LoginAsync(string email, string password)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Result<UserDTO>> RegisterAsync(string email, string password)
+        /// <summary>
+        /// Create User
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        public async Task<Result<UserWithToken>> RegisterAsync(string email, string password)
         {
             string defaultRole = "User";
 
@@ -45,7 +42,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             if (existingUser != null)
             {
-                return Result<UserDTO>.Fail<UserDTO>("User with this Emai already exist");
+                return Result<UserWithToken>.Fail<UserWithToken>("User already exist");
             }
 
             if (!_userManager.Users.Any())
@@ -56,29 +53,145 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var newUser = new User
             {
                 Email = email,
-                UserName = email,
+                UserName = email, //replace to update
                 Name = defaultRole,
-                Address = "my adress",
-                PersonalDiscount = 10
+                Address = "my adress", //replace to update
+                PersonalDiscount = 10 //replace to update
             };
 
             var createUser = await _userManager.CreateAsync(newUser, password);
-
             if (!createUser.Succeeded)
             {
-                return Result<UserDTO>.Fail<UserDTO>(createUser.Errors.Select(_ => _.Description).Join("\n"));
+                return Result<UserWithToken>.Fail<UserWithToken>(createUser.Errors.Select(_ => _.Description).Join("\n"));
             }
-
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
             var profile = await _service.CreateAccountAsyncById(newUser.Id);
-            UserDTO result = new UserDTO()
+            var token = await GenerateToken(newUser);
+
+            UserWithToken result = new UserWithToken()
             {
-                Id = profile.Data.Id,
-                IdFromIdentity = profile.Data.IdFromIdentity,
-                BasketId = profile.Data.BasketId,
+                UserDTO = profile.Data,
+                UserToken = token.Data               
             };
-            return Result<UserDTO>.Ok(result);
-        } 
+            return Result<UserWithToken>.Ok(result);
+        }
+
+        /// <summary>
+        /// Remove user
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        public async Task<Result> DeleteAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return await Task.FromResult(Result.Fail("User dosn't exists"));
+            }
+
+            var userCheckPassword = await _userManager.CheckPasswordAsync(user, password);
+            if (!userCheckPassword)
+            {
+                return await Task.FromResult(Result.Fail("Wrong password"));
+            }
+
+            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id);
+            if (isUserDeleted.IsError)
+            {
+                return await Task.FromResult(Result.Fail(isUserDeleted.Message));
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return await Task.FromResult(Result.Fail(result.Errors.Select(x => x.Description).Join("\n")));
+            }
+
+            return await Task.FromResult(Result.Ok());
+        }
+
+        /// <summary>
+        /// Log in
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        public async Task<Result<UserWithToken>> LoginAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return Result<UserWithToken>.Fail<UserWithToken>("User dosn't exist");
+            }
+            
+            var userCheckPassword = await _userManager.CheckPasswordAsync(user, password);
+            if (!userCheckPassword)
+            {
+                return Result<string>.Fail<UserWithToken>("Wrong password");
+            }
+            
+            var profile = await _service.GetUserByIdFromIdentityAsync(user.Id);
+            var token = await GenerateToken(user);
+            if (profile.IsError || string.IsNullOrEmpty(token.Data))
+            {
+                return Result<UserWithToken>.Fail<UserWithToken>($"{profile.Message}\n" + $"or token is null"); //spilt it
+            }
+            UserWithToken result = new UserWithToken()
+            {
+                UserDTO = profile.Data,
+                UserToken = token.Data
+            };
+            return Result<UserWithToken>.Ok(result);
+        }
+
+        /// <summary>
+        /// Genetate token
+        /// </summary>
+        /// <param name="user"></param>
+        private async Task<Result<string>> GenerateToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var signingKey = Encoding.ASCII.GetBytes(_tokenSecret.SecretString);
+            var claims = new List<Claim>
+            {
+                new Claim("id", user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+            };
+            
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            claims.AddRange(userClaims);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            foreach (var userRole in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole));
+                var role = await _roleManager.FindByNameAsync(userRole);
+                if (role == null)
+                {
+                    continue;
+                }
+
+                var roleClaims = await _roleManager.GetClaimsAsync(role);
+                foreach (var roleClaim in roleClaims)
+                {
+                    if (claims.Contains(roleClaim))
+                    {
+                        continue;
+                    }
+                    claims.Add(roleClaim);
+                }
+            }
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1), //try todo update (use video example)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return Result<string>.Ok(tokenHandler.WriteToken(token));
+        }
     }
 }

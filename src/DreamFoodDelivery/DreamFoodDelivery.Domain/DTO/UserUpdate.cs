@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain
+namespace DreamFoodDelivery.Domain.DTO
 {
-    public class UserToUpdate
+    public class UserUpdate
     {
         public string Email { get; set; }
         public string Address { get; set; }
