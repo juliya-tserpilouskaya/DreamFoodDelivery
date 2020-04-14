@@ -18,7 +18,6 @@ namespace DreamFoodDelivery.Domain.Logic
             services.AddAutoMapper(typeof(MapperLogicProfile));
 
             services.AddScoped<IBasketService, BasketService>();
-            services.AddScoped<IDishService, DishService>();
             services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<ITagService, TagService>();
             services.AddScoped<ICommentService, CommentService>();

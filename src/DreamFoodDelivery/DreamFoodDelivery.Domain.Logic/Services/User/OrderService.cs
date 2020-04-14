@@ -68,6 +68,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="order">New order to add</param>
         public async Task<Result<OrderToAdd>> AddAsync(OrderToAdd order)
         {
+            //if info from profile
             var orderToAdd = _mapper.Map<OrderDB>(order);
 
             _context.Orders.Add(orderToAdd);

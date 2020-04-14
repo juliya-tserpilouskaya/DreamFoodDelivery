@@ -28,6 +28,19 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        /// Asynchronously returns menu (all dishes)
+        /// </summary>
+        public async Task<Result<IEnumerable<DishDTO>>> GetAllAsync()
+        {
+            var dishes = await _context.Dishes.AsNoTracking().ToListAsync();
+            if (!dishes.Any())
+            {
+                return Result<IEnumerable<DishDTO>>.Fail<IEnumerable<DishDTO>>("No dishes found");
+            }
+            return Result<IEnumerable<DishDTO>>.Ok(_mapper.Map<IEnumerable<DishDTO>>(dishes));
+        }
+
+        /// <summary>
         ///  Asynchronously add new dish
         /// </summary>
         /// <param name="dish">New dish to add</param>
@@ -54,19 +67,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<DishDTO>.Fail<DishDTO>($"Source is null. {ex.Message}");
             }
-        }
-
-        /// <summary>
-        /// Asynchronously returns menu
-        /// </summary>
-        public async Task<Result<IEnumerable<DishDTO>>> GetAllAsync()
-        {
-            var dishes = await _context.Dishes.AsNoTracking().ToListAsync();
-            if (!dishes.Any())
-            {
-                return Result<IEnumerable<DishDTO>>.Fail<IEnumerable<DishDTO>>("No dishes found");
-            }
-            return Result<IEnumerable<DishDTO>>.Ok(_mapper.Map<IEnumerable<DishDTO>>(dishes));
         }
 
         /// <summary>
