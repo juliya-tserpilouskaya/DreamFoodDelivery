@@ -309,7 +309,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="idFromIdentity">Existing user ID</param>
         public async Task<Result<UserProfile>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity)
         {
-
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
             userIdentity.PersonalDiscount = double.Parse(personalDiscount); //try parse
             try

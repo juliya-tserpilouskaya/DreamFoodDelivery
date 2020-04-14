@@ -26,6 +26,7 @@ namespace DreamFoodDelivery.Domain.Logic
             CreateMap<UserGeneration, UserDB>().ReverseMap();
 
             CreateMap<UserProfile, User>().ReverseMap();
+            CreateMap<OrderDTOUpdateStatus, OrderDB>().ReverseMap();
             
         }
     }

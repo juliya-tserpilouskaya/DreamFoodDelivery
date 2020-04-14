@@ -24,7 +24,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously get orders by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        Task<IEnumerable<OrderView>> GetByUserIdAsync(string userId);
+        Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId);
 
         /// <summary>
         ///  Asynchronously add new thing
@@ -47,13 +47,18 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously update order
         /// </summary>
         /// <param name="order">Existing order to update</param>
-        /// <param name="userId">ID of existing order</param>
-        Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order, Guid userId);
+        Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order);
 
         /// <summary>
         ///  Asynchronously remove all orders by user Id. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
         Task<Result> RemoveAllByUserIdAsync(string userId);
+
+        /// <summary>
+        ///  Asynchronously update order status
+        /// </summary>
+        /// <param name="order">New order status</param>
+        Task<Result<OrderView>> UpdateOrderStatusAsync(OrderDTOUpdateStatus order);
     }
 }

@@ -24,5 +24,6 @@ namespace DreamFoodDelivery.Data.Models
         public DateTime? OrderTime { get; set; } = DateTime.Now;
         public DateTime? DeliveryTime { get; set; }
         public DateTime? PaymentTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
     }
 }

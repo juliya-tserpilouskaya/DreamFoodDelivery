@@ -4,7 +4,6 @@ using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
-using DreamFoodDelivery.Domain.DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,39 +25,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             _context = context;
             _mapper = mapper;
-        }
-
-        /// <summary>
-        ///  Asynchronously add new order
-        /// </summary>
-        /// <param name="order">New order to add</param>
-        public async Task<Result<OrderToAdd>> AddAsync(OrderToAdd order)
-        {
-            var orderToAdd = _mapper.Map<OrderDB>(order);
-
-            _context.Orders.Add(orderToAdd);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-
-                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.UserId == orderToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-
-                return (Result<OrderToAdd>)Result<OrderToAdd>
-                    .Ok(_mapper.Map<OrderToAdd>(orderAfterAdding));
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
-            }
-            catch (ArgumentNullException ex)
-            {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Source is null. {ex.Message}");
-            }
         }
 
         /// <summary>
@@ -97,14 +63,113 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        ///  Asynchronously add new order
+        /// </summary>
+        /// <param name="order">New order to add</param>
+        public async Task<Result<OrderToAdd>> AddAsync(OrderToAdd order)
+        {
+            var orderToAdd = _mapper.Map<OrderDB>(order);
+
+            _context.Orders.Add(orderToAdd);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.UserId == orderToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+
+                return Result<OrderToAdd>.Ok(_mapper.Map<OrderToAdd>(orderAfterAdding));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<OrderToAdd>.Fail<OrderToAdd>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously update order
+        /// </summary>
+        /// <param name="order">Existing order to update</param>
+        /// <param name="userId">ID guid of existing order</param>
+        public async Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order)
+        {
+            OrderDB orderForUpdate = _mapper.Map<OrderDB>(order);
+            _context.Entry(orderForUpdate).Property(c => c.IsInfoFromProfile).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.PersonalDiscount).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.FinaleCost).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.OrderTime).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.DeliveryTime).IsModified = true;
+            _context.Entry(orderForUpdate).Property(c => c.PaymentTime).IsModified = true;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Result<OrderToUpdate>.Ok(order);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
+            }
+        }
+
+        /// <summary>
         ///  Asynchronously get orders by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        public async Task<IEnumerable<OrderView>> GetByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
             var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<OrderDB>, List<OrderView>>(orders);
+            if (!orders.Any())
+            {
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+            }
+            return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(orders));
+        }
+
+        /// <summary>
+        ///  Asynchronously remove order by Id. Id must be verified
+        /// </summary>
+        /// <param name="orderId">ID of existing order</param>
+        public async Task<Result> RemoveByIdAsync(string orderId)
+        {
+            Guid id = Guid.Parse(orderId);
+            var order = await _context.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+
+            if (order is null)
+            {
+                return await Task.FromResult(Result.Fail("Order was not found"));
+            }
+            try
+            {
+                _context.Orders.Remove(order);
+                await _context.SaveChangesAsync();
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
+            }
         }
 
         /// <summary>
@@ -121,7 +186,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 _context.Orders.RemoveRange(order);
                 await _context.SaveChangesAsync();
-
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
@@ -165,67 +229,29 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        ///  Asynchronously remove order by Id. Id must be verified
+        ///  Asynchronously update order status
         /// </summary>
-        /// <param name="orderId">ID of existing order</param>
-        public async Task<Result> RemoveByIdAsync(string orderId)
+        /// <param name="order">New order status</param>
+        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderDTOUpdateStatus order)
         {
-            Guid id = Guid.Parse(orderId);
-            var order = await _context.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-
-            if (order is null)
-            {
-                return await Task.FromResult(Result.Fail("Order was not found"));
-            }
-            try
-            {
-                _context.Orders.Remove(order);
-                await _context.SaveChangesAsync();
-
-                return await Task.FromResult(Result.Ok());
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
-            }
-            catch (DbUpdateException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
-            }
-        }
-
-        /// <summary>
-        ///  Asynchronously update order
-        /// </summary>
-        /// <param name="order">Existing order to update</param>
-        /// <param name="userId">ID guid of existing order</param>
-        public async Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order, Guid userId)
-        {
-            //return order by id
+            
             OrderDB orderForUpdate = _mapper.Map<OrderDB>(order);
-            _context.Entry(orderForUpdate).Property(c => c.IsInfoFromProfile).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PersonalDiscount).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.FinaleCost).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.OrderTime).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.DeliveryTime).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PaymentTime).IsModified = true;
+            orderForUpdate.UpdateTime = DateTime.Now;
+            _context.Entry(orderForUpdate).Property(c => c.Status).IsModified = true;
 
             try
             {
                 await _context.SaveChangesAsync();
-                return Result<OrderToUpdate>.Ok(order);
+                OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.UserId == orderForUpdate.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                return Result<OrderView>.Ok(_mapper.Map<OrderView>(orderAfterUpdate));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
             }
         }
     }
