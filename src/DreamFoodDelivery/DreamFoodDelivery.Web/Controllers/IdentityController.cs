@@ -25,7 +25,7 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Add Identity User & Profile to the DB
+        /// Create Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
         /// <returns></returns>
@@ -82,7 +82,6 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        /// <param name="user">User data: Email, Password</param>
         /// <returns></returns>
         [HttpPost]
         [Route("logout")]
@@ -95,7 +94,7 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Remove identity user
+        /// Remove Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
         /// <returns></returns>

@@ -12,13 +12,13 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all users
         /// </summary>
-        Task<Result<IEnumerable<UserDTO>>> GetAllAsync();
+        Task<Result<IEnumerable<UserView>>> GetAllAsync();
 
-        /// <summary>
-        ///  Asynchronously add new account
-        /// </summary>
-        /// <param name="user">New user to add</param>
-        Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
+        ///// <summary>
+        /////  Asynchronously add new account
+        ///// </summary>
+        ///// <param name="user">New user to add</param>
+        //Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
 
         /// <summary>
         ///  Asynchronously add new account
@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        Task<Result<UserDTO>> GetByIdAsync(string id);
+        Task<Result<UserViewSecondPlan>> GetByIdAsync(string userId);
 
         /// <summary>
         /// Get User idFromIdentity
@@ -42,7 +42,15 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously update user
         /// </summary>
         /// <param name="user">Existing user to update</param>
-        Task<Result<UserDTO>> UpdateAsync(UserDTO user);
+        /// <param name="idFromIdentity">Existing user ID</param>
+        Task<Result<UserProfile>> UpdateUserProfileAsync(UserProfile user, string idFromIdentity);
+
+        /// <summary>
+        ///  Asynchronously update user personal discount
+        /// </summary>
+        /// <param name="personalDiscount">New personal discount</param>
+        /// <param name="idFromIdentity">Existing user ID</param>
+        Task<Result<UserProfile>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity);
 
         /// <summary>
         ///  Asynchronously remove user by Id. Id must be verified
@@ -54,6 +62,12 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// Remove User idFromIdentity
         /// </summary>
         /// <param name="idFromIdentity"></param>
-        Task<Result<UserDTO>> DeleteUserByIdFromIdentityAsync(string idFromIdentity);
+        Task<Result> DeleteUserByIdFromIdentityAsync(string idFromIdentity);
+
+        /// <summary>
+        /// Make admin from user or vice versa
+        /// </summary>
+        /// <param name="id"></param>
+        Task<Result> ChangeRoleAsync(string id);
     }
 }

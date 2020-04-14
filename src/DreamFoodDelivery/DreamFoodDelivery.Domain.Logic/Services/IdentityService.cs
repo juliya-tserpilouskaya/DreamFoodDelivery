@@ -53,10 +53,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var newUser = new User
             {
                 Email = email,
-                UserName = email, //replace to update
                 Name = defaultRole,
-                Address = "my adress", //replace to update
-                PersonalDiscount = 10 //replace to update
             };
 
             var createUser = await _userManager.CreateAsync(newUser, password);
@@ -67,6 +64,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
             var profile = await _service.CreateAccountAsyncById(newUser.Id);
+            //basket
             var token = await GenerateToken(newUser);
 
             UserWithToken result = new UserWithToken()
@@ -96,13 +94,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return await Task.FromResult(Result.Fail("Wrong password"));
             }
 
-            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id);
+            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id); //del in DB
             if (isUserDeleted.IsError)
             {
                 return await Task.FromResult(Result.Fail(isUserDeleted.Message));
             }
 
-            var result = await _userManager.DeleteAsync(user);
+            var result = await _userManager.DeleteAsync(user); //Del in Identity db
 
             if (!result.Succeeded)
             {
