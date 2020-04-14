@@ -24,7 +24,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously get order by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        Task<IEnumerable<CommentView>> GetByUserIdAsync(string userId);
+        Task<Result<IEnumerable<CommentView>>> GetByUserIdAsync(string userId);
 
         /// <summary>
         ///  Asynchronously add new comment
@@ -36,7 +36,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously update comment
         /// </summary>
         /// <param name="comment">Existing comment to update</param>
-        Task<Result<CommentToUpdate>> UpdateAsync(CommentToUpdate comment);
+        Task<Result<CommentView>> UpdateAsync(CommentToUpdate comment);
 
         /// <summary>
         ///  Asynchronously remove comment by Id. Id must be verified
