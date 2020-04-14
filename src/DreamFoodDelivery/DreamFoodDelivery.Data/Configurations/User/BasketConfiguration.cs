@@ -13,7 +13,7 @@ namespace DreamFoodDelivery.Data.Configurations
         {
             builder.ToTable("Basket");
             builder.HasKey(i => i.Id);
-            builder.Property(_ => _.Id).ValueGeneratedOnAdd();
+            builder.Property(_ => _.Id)/*.ValueGeneratedOnAdd()*/;
 
             //
             builder.HasOne(_ => _.User).WithOne(_ => _.Basket)

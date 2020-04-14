@@ -9,8 +9,25 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface IIdentityService
     {
-        Task<Result<UserDTO>> RegisterAsync(string email, string password);
-        Task<Result<string>> LoginAsync(string email, string password);
+        /// <summary>
+        /// Create User
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        Task<Result<UserWithToken>> RegisterAsync(string email, string password);
+
+        /// <summary>
+        /// Log in
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        Task<Result<UserWithToken>> LoginAsync(string email, string password);
+
+        /// <summary>
+        /// Remove user
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
         Task<Result> DeleteAsync(string email, string password);
     }
 }

@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously remove tag by Id. Id must be verified
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
-        Task<Result> RemoveByIdAsync(string id);
+        Task<Result> RemoveByIdAsync(string tagId);
 
         /// <summary>
         ///  Asynchronously remove all tags 

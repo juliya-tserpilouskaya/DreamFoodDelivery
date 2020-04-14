@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class OrderDTO_Update_Status
+    public class UserWithToken
     {
-        public Guid Id { get; set; }
-        public string Status { get; set; }
+        public string UserToken { get; set; }
+        public UserDTO UserDTO { get; set; }
     }
 }

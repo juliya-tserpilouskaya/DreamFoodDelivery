@@ -19,10 +19,11 @@ namespace DreamFoodDelivery.Data.Models
         public string Name { get; set; }
         public double? FinaleCost { get; set; }
         public double? ShippingСost { get; set; }
-        public string Status { get; set; } //enum?
-        public bool Paid { get; set; }
+        public string Status { get; set; } //enum?  In processing/On way/Delivered
+        public bool Paid { get; set; } //PaymentTime.HasValue ?
         public DateTime? OrderTime { get; set; } = DateTime.Now;
         public DateTime? DeliveryTime { get; set; }
         public DateTime? PaymentTime { get; set; }
+        public DateTime? UpdateTime { get; set; }
     }
 }
