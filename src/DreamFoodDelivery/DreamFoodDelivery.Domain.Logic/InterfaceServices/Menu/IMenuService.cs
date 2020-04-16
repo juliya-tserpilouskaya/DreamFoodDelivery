@@ -53,7 +53,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously add new dish
         /// </summary>
         /// <param name="dish">New dish to add</param>
-        Task<Result<DishDTO>> AddAsync(DishDTO dish);
+        Task<Result<DishView>> AddAsync(DishToAdd dish);
 
         /// <summary>
         ///  Asynchronously update dish

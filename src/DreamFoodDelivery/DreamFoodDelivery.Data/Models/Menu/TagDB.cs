@@ -11,5 +11,9 @@ namespace DreamFoodDelivery.Data.Models
         //public HashSet<DishDB> Dishes { get; set; }
         public int? IndexNumber { get; set; } //Is it necessary? I can use a guid
         public HashSet<DishTagDB> DishTags { get; set; }
+        public TagDB()
+        {
+            DishTags = new HashSet<DishTagDB>();
+        }
     }
 }

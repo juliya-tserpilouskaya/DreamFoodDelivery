@@ -31,7 +31,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all tags stored</returns>
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no tags in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tags were found", typeof(IEnumerable<TagDTO>))]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tags were found", typeof(IEnumerable<TagView>))]
         public async Task<IActionResult> GetAll()
         {
             var result = await _tagService.GetAllAsync();
@@ -46,7 +46,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "tag added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid tag data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]TagDTO tag)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]TagToAdd tag)
         {
             //if (!ModelState.IsValid)
             //{
@@ -64,9 +64,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(TagDTO))]
+        [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(TagView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]TagDTO tag)
+        public async Task<IActionResult> Update([FromBody]TagToUpdate tag)
         {
 
             if (tag is null /*|| !ModelState.IsValid*/)

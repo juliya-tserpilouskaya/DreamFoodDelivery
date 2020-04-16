@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class OrderDTOUpdateStatus
+    public class TagToUpdate
     {
         public Guid Id { get; set; }
-        public string Status { get; set; }
+        public int? IndexNumber { get; set; } 
     }
 }

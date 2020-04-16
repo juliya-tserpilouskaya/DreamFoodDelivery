@@ -78,7 +78,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
-        public async Task<IActionResult> GetByLanguage(string name)
+        public async Task<IActionResult> GetByName(string name)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -199,7 +199,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]DishDTO dish)
+        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]DishToAdd dish)
         {
             //if (!ModelState.IsValid)
             //{

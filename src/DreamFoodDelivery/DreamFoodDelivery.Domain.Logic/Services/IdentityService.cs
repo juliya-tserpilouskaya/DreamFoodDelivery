@@ -52,7 +52,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var newUser = new User
             {
                 Email = user.Email,
-                UserName = user.Login
+                UserName = user.Email
             };
 
             var createUser = await _userManager.CreateAsync(newUser, user.Password);

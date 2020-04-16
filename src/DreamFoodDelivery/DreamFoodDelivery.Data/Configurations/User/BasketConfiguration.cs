@@ -20,9 +20,9 @@ namespace DreamFoodDelivery.Data.Configurations
                    .HasForeignKey<UserDB>(_ => _.BasketId)
                    .OnDelete(DeleteBehavior.Cascade);
             //
-            builder.HasMany(_ => _.Dishes).WithOne(_ => _.Basket)
-                   .HasForeignKey(_ => _.BasketId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasMany(_ => _.Dishes).WithOne(_ => _.Basket)
+            //       .HasForeignKey(_ => _.BasketId)
+            //       .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
         }

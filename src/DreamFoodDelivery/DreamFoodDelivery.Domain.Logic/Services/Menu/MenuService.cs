@@ -45,61 +45,33 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new dish
         /// </summary>
         /// <param name="dish">New dish to add</param>
-        public async Task<Result<DishDTO>> AddAsync(DishDTO dish)
+        public async Task<Result<DishView>> AddAsync(DishToAdd dish)
         {
-            Guid menuGuid = Guid.Parse(Constants.MENU_ID);
-            try
-            {
-                var menu = await _context.Baskets.Where(_ => _.Id == menuGuid).Select(_ => _).FirstAsync();
-            }
-            catch (ArgumentNullException)
-            {
-                BasketDB basketToAdd = new BasketDB() { Id = menuGuid, UserId = menuGuid }; 
-                _context.Baskets.Add(basketToAdd);
-            }
-            
-            var dishToAdd = _mapper.Map<DishDB>(dish);
+            DishDB dishToAdd = _mapper.Map<DishDB>(dish);
             dishToAdd.Added = DateTime.UtcNow;
-            dishToAdd.BasketId = menuGuid;
             _context.Dishes.Add(dishToAdd);
-
-            HashSet<DishTagDB> dishTag = dishToAdd.DishTags; //пустые таг, диш и диш ид
-
-            foreach (var item in dishTag) //для каждого тэга
-            {
-                item.DishId = dishToAdd.Id;
-                item.Dish = dishToAdd;
-                item.Tag = await _context.Tags.Where(_ => _.Id == item.TagId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                //Теперь у айтема заполнены все 4 поля
-                _context.DishTags.Add(item);
-
-
-                //Достали тэг которому надо пихнуть блюдо
-                TagDB tagToUpdate = await _context.Tags.Where(_ => _.Id == item.TagId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                tagToUpdate.DishTags.Add(item);
-
-                _context.Entry(tagToUpdate).Property(c => c.DishTags).IsModified = true;
-                await _context.SaveChangesAsync();
-            }
-            //TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
-
             try
             {
+                foreach (var item in dish.TagIndexes)
+                {
+                    TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                    dishToAdd.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dishToAdd.Id });
+                }
                 await _context.SaveChangesAsync();
-                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                return Result<DishDTO>.Ok(_mapper.Map<DishDTO>(thingAfterAdding));
+                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id)/*.Include(c => c.DishTags)*/.Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                return Result<DishView>.Ok(_mapper.Map<DishView>(thingAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Cannot save model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Cannot save model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Cannot save model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Cannot save model. {ex.Message}");
             }
             catch (ArgumentNullException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Source is null. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Source is null. {ex.Message}");
             }
         }
 

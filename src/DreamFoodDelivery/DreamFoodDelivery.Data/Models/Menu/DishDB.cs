@@ -18,8 +18,12 @@ namespace DreamFoodDelivery.Data.Models
         public Guid TagId { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
-        public BasketDB Basket { get; set; }
-        public Guid BasketId { get; set; }
+        //public BasketDB Basket { get; set; }
+        //public Guid BasketId { get; set; }
         public HashSet<DishTagDB> DishTags { get; set; }
+        public DishDB()
+        {
+            DishTags = new HashSet<DishTagDB>();
+        }
     }
 }

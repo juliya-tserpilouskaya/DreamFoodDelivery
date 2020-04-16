@@ -233,7 +233,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update order status
         /// </summary>
         /// <param name="order">New order status</param>
-        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderDTOUpdateStatus order)
+        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order)
         {
             
             OrderDB orderForUpdate = _mapper.Map<OrderDB>(order);

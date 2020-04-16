@@ -12,19 +12,19 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns all tags
         /// </summary>
-        Task<Result<IEnumerable<TagDTO>>> GetAllAsync();
+        Task<Result<IEnumerable<TagView>>> GetAllAsync();
 
         /// <summary>
         ///  Asynchronously add new tag
         /// </summary>
         /// <param name="tag">New tag to add</param>
-        Task<Result<TagDTO>> AddAsync(TagDTO tag);
+        Task<Result<TagView>> AddAsync(TagToAdd tag);
 
         /// <summary>
         ///  Asynchronously update tag
         /// </summary>
         /// <param name="tag">Existing tag to update</param>
-        Task<Result<TagDTO>> UpdateAsync(TagDTO tag);
+        Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag);
 
         /// <summary>
         ///  Asynchronously remove tag by Id. Id must be verified
@@ -41,6 +41,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously get tag by tag Id. Id must be verified 
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
-        Task<Result<TagDTO>> GetByIdAsync(string tagId);
+        Task<Result<TagView>> GetByIdAsync(string tagId);
     }
 }

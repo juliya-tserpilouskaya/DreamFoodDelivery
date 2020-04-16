@@ -132,7 +132,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount)
+        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount, string idFromIdentity)
         {
             if (personalDiscount is null /*|| !ModelState.IsValid*/)
             {
@@ -140,7 +140,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.UpdateUserPersonalDiscountAsync(personalDiscount, HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                var result = await _userService.UpdateUserPersonalDiscountAsync(personalDiscount, idFromIdentity /*HttpContext.User.Claims.Single(_ => _.Type == "id").Value*/);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

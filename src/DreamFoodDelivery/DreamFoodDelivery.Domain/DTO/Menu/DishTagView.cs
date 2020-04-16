@@ -4,11 +4,11 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class DishTagDTO
+    public class DishTagView
     {
         public Guid TagId { get; set; }
-        //public Guid DishId { get; set; }
-        //public TagDTO Tag { get; set; }
-        //public DishDTO Dish { get; set; }
+        public Guid DishId { get; set; }
+        public TagView Tag { get; set; }
+        public DishView Dish { get; set; }
     }
 }

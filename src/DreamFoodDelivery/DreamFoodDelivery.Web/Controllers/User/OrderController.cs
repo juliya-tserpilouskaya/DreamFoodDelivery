@@ -83,7 +83,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]OrderDTOUpdateStatus orderStatus)
+        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]OrderToStatusUpdate orderStatus)
         {
             if (orderStatus is null /*|| !ModelState.IsValid*/)
             {
