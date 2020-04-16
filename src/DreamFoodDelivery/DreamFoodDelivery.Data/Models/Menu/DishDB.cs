@@ -20,6 +20,6 @@ namespace DreamFoodDelivery.Data.Models
         public DateTime? Modified { get; set; }
         public BasketDB Basket { get; set; }
         public Guid BasketId { get; set; }
-        public ICollection<DishTagDB> DishTags { get; set; }
+        public HashSet<DishTagDB> DishTags { get; set; }
     }
 }

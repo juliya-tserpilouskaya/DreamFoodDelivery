@@ -107,10 +107,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 IdFromIdentity = userIdFromIdentity
             };
             var userToAdd = _mapper.Map<UserDB>(newProfile);
-            userToAdd.BasketId = new Guid();
+            userToAdd.BasketId = Guid.NewGuid();
             _context.Users.Add(userToAdd);
-            BasketDB basketToAdd = new BasketDB() {Id = userToAdd.BasketId, UserId = userToAdd.Id}; // think about it
+            BasketDB basketToAdd = new BasketDB() { Id = userToAdd.BasketId, UserId = userToAdd.Id}; // think about it
             _context.Baskets.Add(basketToAdd);
+            //userToAdd.BasketId = basketToAdd.Id;
+            //_context.Entry(userToAdd).Property(c => c.BasketId).IsModified = true;
             try
             {
                 await _context.SaveChangesAsync();

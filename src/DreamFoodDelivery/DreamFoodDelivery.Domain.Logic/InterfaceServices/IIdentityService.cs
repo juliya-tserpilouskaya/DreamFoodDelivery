@@ -12,9 +12,8 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Create User
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
-        Task<Result<UserWithToken>> RegisterAsync(string email, string password);
+        /// <param name="user">User registration data</param>
+        Task<Result<UserWithToken>> RegisterAsync(UserRegistration user);
 
         /// <summary>
         /// Log in

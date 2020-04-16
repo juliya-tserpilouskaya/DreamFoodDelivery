@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -46,9 +47,42 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="dish">New dish to add</param>
         public async Task<Result<DishDTO>> AddAsync(DishDTO dish)
         {
+            Guid menuGuid = Guid.Parse(Constants.MENU_ID);
+            try
+            {
+                var menu = await _context.Baskets.Where(_ => _.Id == menuGuid).Select(_ => _).FirstAsync();
+            }
+            catch (ArgumentNullException)
+            {
+                BasketDB basketToAdd = new BasketDB() { Id = menuGuid, UserId = menuGuid }; 
+                _context.Baskets.Add(basketToAdd);
+            }
+            
             var dishToAdd = _mapper.Map<DishDB>(dish);
-            dishToAdd.Id = Guid.NewGuid();
+            dishToAdd.Added = DateTime.UtcNow;
+            dishToAdd.BasketId = menuGuid;
             _context.Dishes.Add(dishToAdd);
+
+            HashSet<DishTagDB> dishTag = dishToAdd.DishTags; //пустые таг, диш и диш ид
+
+            foreach (var item in dishTag) //для каждого тэга
+            {
+                item.DishId = dishToAdd.Id;
+                item.Dish = dishToAdd;
+                item.Tag = await _context.Tags.Where(_ => _.Id == item.TagId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                //Теперь у айтема заполнены все 4 поля
+                _context.DishTags.Add(item);
+
+
+                //Достали тэг которому надо пихнуть блюдо
+                TagDB tagToUpdate = await _context.Tags.Where(_ => _.Id == item.TagId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                tagToUpdate.DishTags.Add(item);
+
+                _context.Entry(tagToUpdate).Property(c => c.DishTags).IsModified = true;
+                await _context.SaveChangesAsync();
+            }
+            //TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
+
             try
             {
                 await _context.SaveChangesAsync();

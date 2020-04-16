@@ -44,7 +44,7 @@ namespace DreamFoodDelivery.Web.Controllers
 
             try
             {
-                var result = await _identityService.RegisterAsync(user.Email, user.Password);
+                var result = await _identityService.RegisterAsync(user);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }

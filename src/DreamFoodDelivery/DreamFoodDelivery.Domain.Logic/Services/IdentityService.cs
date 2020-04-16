@@ -32,13 +32,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Create User
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
-        public async Task<Result<UserWithToken>> RegisterAsync(string email, string password)
+        /// <param name="user">User registration data</param>
+        public async Task<Result<UserWithToken>> RegisterAsync(UserRegistration user)
         {
             string defaultRole = "User";
 
-            var existingUser = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
             if (existingUser != null)
             {
@@ -52,11 +51,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             var newUser = new User
             {
-                Email = email,
-                Name = defaultRole,
+                Email = user.Email,
+                UserName = user.Login
             };
 
-            var createUser = await _userManager.CreateAsync(newUser, password);
+            var createUser = await _userManager.CreateAsync(newUser, user.Password);
             if (!createUser.Succeeded)
             {
                 return Result<UserWithToken>.Fail<UserWithToken>(createUser.Errors.Select(_ => _.Description).Join("\n"));
@@ -64,7 +63,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
             var profile = await _service.CreateAccountAsyncById(newUser.Id);
-            //basket
             var token = await GenerateToken(newUser);
 
             UserWithToken result = new UserWithToken()

@@ -26,7 +26,6 @@ namespace DreamFoodDelivery.Data.Context
             modelBuilder.ApplyConfiguration(new CommentConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
-            //modelBuilder.ApplyConfiguration(new UserInfoConfiguration());
         }
         public DbSet<DishDB> Dishes { get; set; }
         public DbSet<DishTagDB> DishTags { get; set; }
@@ -35,6 +34,5 @@ namespace DreamFoodDelivery.Data.Context
         public DbSet<CommentDB> Comments { get; set; }
         public DbSet<OrderDB> Orders { get; set; }
         public DbSet<UserDB> Users { get; set; }
-        //public DbSet<UserInfoDB> UsersInfo { get; set; }
     }
 }
