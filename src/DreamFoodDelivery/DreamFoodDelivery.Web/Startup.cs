@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using DreamFoodDelivery.Domain.Logic;
 using NSwag.Generation.Processors.Security;
 using NSwag;
+using FluentValidation.AspNetCore;
+using DreamFoodDelivery.Domain.Logic.Validation;
 
 namespace DreamFoodDelivery.Web
 {
@@ -55,8 +57,6 @@ namespace DreamFoodDelivery.Web
                     };
                 });
 
-            
-
             services.AddOpenApiDocument(config =>
             {
                 config.PostProcess = document =>
@@ -83,7 +83,14 @@ namespace DreamFoodDelivery.Web
                 config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(fluentValidation =>
+            {
+                fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToUpdateValidation>();
+            });
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 

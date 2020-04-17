@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using FluentValidation.AspNetCore;
 //using NSwag.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers
@@ -46,12 +47,12 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "tag added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid tag data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]TagToAdd tag)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]TagToAdd tag)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _tagService.AddAsync(tag);
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -66,10 +67,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "tag doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(TagView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]TagToUpdate tag)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]TagToUpdate tag)
         {
 
-            if (tag is null /*|| !ModelState.IsValid*/)
+            if (tag is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }

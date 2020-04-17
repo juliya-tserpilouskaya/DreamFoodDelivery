@@ -7,6 +7,7 @@ using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using FluentValidation.AspNetCore;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -172,12 +173,12 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]DishToAdd dish)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]DishToAdd dish)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _menuService.AddAsync(dish);
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -192,10 +193,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish updated", typeof(DishView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]DishToUpdate dish)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]DishToUpdate dish)
         {
-
-            if (dish is null /*|| !ModelState.IsValid*/)
+            if (dish is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
