@@ -8,7 +8,7 @@ namespace DreamFoodDelivery.Data.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Category { get; set; }
+        public int? Category { get; set; } //create enum on front
         public string Сomposition { get; set; }
         public string Description { get; set; }
         public double? Cost { get; set; }

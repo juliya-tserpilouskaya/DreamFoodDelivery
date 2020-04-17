@@ -12,42 +12,36 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Asynchronously returns menu
         /// </summary>
-        Task<Result<IEnumerable<DishDTO>>> GetAllAsync();
+        Task<Result<IEnumerable<DishView>>> GetAllAsync();
 
         /// <summary>
         ///  Asynchronously get dish by dish Id. Id must be verified 
         /// </summary>
         /// <param name="dishId">ID of existing dish</param>
-        Task<Result<DishDTO>> GetByIdAsync(string dishId);
+        Task<Result<DishView>> GetByIdAsync(string dishId);
 
         /// <summary>
         ///  Asynchronously returns dish by nam. Id must be verified 
         /// </summary>
         /// <param name="name">Dish name</param>
-        Task<IEnumerable<DishDTO>> GetByNameAsync(string name);
+        Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name);
 
         /// <summary>
         ///  Asynchronously returns dish by category. Id must be verified 
         /// </summary>
-        /// <param name="category">Dish category</param>
-        Task<IEnumerable<DishDTO>> GetByCategoryAsync(string category);
+        /// <param name="categoryString">Dish category</param>
+        Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString);
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
         /// </summary>
-        /// <param name="cost">Dish cost</param>
-        Task<IEnumerable<DishDTO>> GetByCostAsync(string cost);
+        /// <param name="priceString">Dish price</param>
+        Task<Result<IEnumerable<DishView>>> GetByPriceAsync(string priceString);
 
         /// <summary>
         /// Asynchronously returns sales
         /// </summary>
-        Task<IEnumerable<DishDTO>> GetSalesAsync();
-
-        /// <summary>
-        ///  Asynchronously returns dish by condition. Id must be verified 
-        /// </summary>
-        /// <param name="condition">Dish condition</param>
-        Task<IEnumerable<DishDTO>> GetByСonditionAsync(string condition);
+        Task<Result<IEnumerable<DishView>>> GetSalesAsync();
 
         /// <summary>
         ///  Asynchronously add new dish
@@ -59,7 +53,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously update dish
         /// </summary>
         /// <param name="dish">Existing dish to update</param>
-        Task<Result<DishDTO>> UpdateAsync(DishDTO dish);
+        Task<Result<DishView>> UpdateAsync(DishToUpdate dish);
 
         /// <summary>
         ///  Asynchronously remove dish by Id. Id must be verified

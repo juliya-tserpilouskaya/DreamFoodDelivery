@@ -31,14 +31,28 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns menu (all dishes)
         /// </summary>
-        public async Task<Result<IEnumerable<DishDTO>>> GetAllAsync()
+        public async Task<Result<IEnumerable<DishView>>> GetAllAsync()
         {
-            var dishes = await _context.Dishes.AsNoTracking().ToListAsync();
+            var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync();
             if (!dishes.Any())
             {
-                return Result<IEnumerable<DishDTO>>.Fail<IEnumerable<DishDTO>>("No dishes found");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
             }
-            return Result<IEnumerable<DishDTO>>.Ok(_mapper.Map<IEnumerable<DishDTO>>(dishes));
+
+            List<DishView> views = new List<DishView>();
+            foreach (var dish in dishes)
+            {
+                DishView viewItem = _mapper.Map<DishView>(dish);
+                viewItem.TagList = new HashSet<TagToAdd>();
+                foreach (var item in dish.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                    viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
+                views.Add(viewItem);
+            }
+
+            return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
         }
 
         /// <summary>
@@ -58,8 +72,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     dishToAdd.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dishToAdd.Id });
                 }
                 await _context.SaveChangesAsync();
-                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id)/*.Include(c => c.DishTags)*/.Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                return Result<DishView>.Ok(_mapper.Map<DishView>(thingAfterAdding));
+
+                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                DishView view = _mapper.Map<DishView>(thingAfterAdding);
+                view.TagList = new HashSet<TagToAdd>();
+                foreach (var item in thingAfterAdding.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
+                return Result<DishView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -79,21 +101,28 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get dish by dish Id. Id must be verified 
         /// </summary>
         /// <param name="dishId">ID of existing dish</param>
-        public async Task<Result<DishDTO>> GetByIdAsync(string dishId)
+        public async Task<Result<DishView>> GetByIdAsync(string dishId)
         {
             Guid id = Guid.Parse(dishId); 
             try
             {
-                var dish = await _context.Dishes.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                DishDB dish = await _context.Dishes.Where(_ => _.Id == id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync();
+                DishView view = _mapper.Map<DishView>(dish);
+                view.TagList = new HashSet<TagToAdd>();
+                foreach (var item in dish.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
                 if (dish is null)
                 {
-                    return Result<DishDTO>.Fail<DishDTO>($"Dish was not found");
+                    return Result<DishView>.Fail<DishView>($"Dish was not found");
                 }
-                return Result<DishDTO>.Ok(_mapper.Map<DishDTO>(dish));
+                return Result<DishView>.Ok(view);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Source is null. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Source is null. {ex.Message}");
             }
         }
 
@@ -101,50 +130,137 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously returns dish by name. Id must be verified 
         /// </summary>
         /// <param name="name">Dish name</param>
-        public async Task<IEnumerable<DishDTO>> GetByNameAsync(string name)
+        public async Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name)
         {
-            var dish = await _context.Dishes.Where(_ => _.Name.Equals(name, StringComparison.OrdinalIgnoreCase)).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<DishDB>, List<DishDTO>>(dish);
+            try
+            {
+                var dishes = await _context.Dishes.Where(_ => _.Name.Contains(name)).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
+                if (!dishes.Any())
+                {
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                }
+
+                List<DishView> views = new List<DishView>();
+                foreach (var dish in dishes)
+                {
+                    DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.TagList = new HashSet<TagToAdd>();
+                    foreach (var item in dish.DishTags)
+                    {
+                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+            }
         }
 
         /// <summary>
         ///  Asynchronously returns dish by category. Id must be verified 
         /// </summary>
-        /// <param name="category">Dish category</param>
-        public async Task<IEnumerable<DishDTO>> GetByCategoryAsync(string category)
+        /// <param name="categoryString">Dish category</param>
+        public async Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString)
         {
-            var dish = await _context.Dishes.Where(_ => _.Category.Equals(category, StringComparison.OrdinalIgnoreCase)).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<DishDB>, List<DishDTO>>(dish);
+            var category = double.Parse(categoryString); //make tryParse
+            try
+            {
+                var dishes = await  _context.Dishes.Where(_ => _.Category == category).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
+                if (!dishes.Any())
+                {
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                }
+
+                List<DishView> views = new List<DishView>();
+                foreach (var dish in dishes)
+                {
+                    DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.TagList = new HashSet<TagToAdd>();
+                    foreach (var item in dish.DishTags)
+                    {
+                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+            }
         }
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
         /// </summary>
-        /// <param name="cost">Dish cost</param>
-        public async Task<IEnumerable<DishDTO>> GetByCostAsync(string cost)
+        /// <param name="priceString">Dish price</param>
+        public async Task<Result<IEnumerable<DishView>>> GetByPriceAsync(string priceString)
         {
-            var price = double.Parse(cost); //make tryParse
-            var dish = await _context.Dishes.Where(_ => _.Cost == price).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<DishDB>, List<DishDTO>>(dish);
+            var price = double.Parse(priceString); //make tryParse
+            try
+            {
+                var dishes = await _context.Dishes.Where(_ => _.Cost == price).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
+                if (!dishes.Any())
+                {
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                }
+
+                List<DishView> views = new List<DishView>();
+                foreach (var dish in dishes)
+                {
+                    DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.TagList = new HashSet<TagToAdd>();
+                    foreach (var item in dish.DishTags)
+                    {
+                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+            }
         }
 
         /// <summary>
         /// Asynchronously returns sales
         /// </summary>
-        public async Task<IEnumerable<DishDTO>> GetSalesAsync()
+        public async Task<Result<IEnumerable<DishView>>> GetSalesAsync()
         {
-            var dishes = await _context.Dishes.Where(_ => _.Sale > 0).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<DishDB>, List<DishDTO>>(dishes);
-        }
+            try
+            {
+                var dishes = await _context.Dishes.Where(_ => _.Sale > 0).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
+                if (!dishes.Any())
+                {
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                }
 
-        /// <summary>
-        ///  Asynchronously returns dish by condition. Id must be verified 
-        /// </summary>
-        /// <param name="condition">Dish condition</param>
-        public async Task<IEnumerable<DishDTO>> GetByСonditionAsync(string condition)
-        {
-            var dish = await _context.Dishes.Where(_ => _.Category.Equals(condition, StringComparison.OrdinalIgnoreCase)).Select(_ => _).ToListAsync();
-            return _mapper.Map<IEnumerable<DishDB>, List<DishDTO>>(dish);
+                List<DishView> views = new List<DishView>();
+                foreach (var dish in dishes)
+                {
+                    DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.TagList = new HashSet<TagToAdd>();
+                    foreach (var item in dish.DishTags)
+                    {
+                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -152,16 +268,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         public async Task<Result> RemoveAllAsync()
         {
-            var dish = await _context.Dishes.ToListAsync();
-            if (dish is null)
+            var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync();
+            if (dishes is null)
             {
                 return await Task.FromResult(Result.Fail("Dishes were not found"));
             }
             try
             {
-                _context.Dishes.RemoveRange(dish);
-                await _context.SaveChangesAsync();
-
+                foreach (var dish in dishes)
+                {
+                    var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync();
+                    _context.DishTags.RemoveRange(dishTagList);
+                    dish.DishTags.Clear();
+                    if (dish is null)
+                    {
+                        return await Task.FromResult(Result.Fail("Dish was not found"));
+                    }
+                        _context.Dishes.Remove(dish);
+                        await _context.SaveChangesAsync();
+                }
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
@@ -181,8 +306,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result> RemoveByIdAsync(string dishId)
         {
             Guid id = Guid.Parse(dishId);
-            var dish = await _context.Dishes.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-
+            var dish = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == id);
+            var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync();
+            _context.DishTags.RemoveRange(dishTagList);
+            dish.DishTags.Clear();
             if (dish is null)
             {
                 return await Task.FromResult(Result.Fail("Dish was not found"));
@@ -191,7 +318,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 _context.Dishes.Remove(dish);
                 await _context.SaveChangesAsync();
-
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
@@ -208,9 +334,19 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update dish
         /// </summary>
         /// <param name="dish">Existing dish to update</param>
-        public async Task<Result<DishDTO>> UpdateAsync(DishDTO thing)
+        public async Task<Result<DishView>> UpdateAsync(DishToUpdate dish)
         {
-            DishDB thingForUpdate = _mapper.Map<DishDB>(thing);
+            DishDB thingForUpdate = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == dish.Id);
+
+            var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync();
+            _context.DishTags.RemoveRange(dishTagList);
+            thingForUpdate.DishTags.Clear();
+            //_context.Entry(thingForUpdate).Collection(c => c.DishTags).IsModified = true;
+            await _context.SaveChangesAsync();
+
+            thingForUpdate = _mapper.Map<DishDB>(dish);
+            thingForUpdate.Modified = DateTime.Now;
+
             _context.Entry(thingForUpdate).Property(c => c.Name).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Category).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Сomposition).IsModified = true;
@@ -218,18 +354,35 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _context.Entry(thingForUpdate).Property(c => c.Cost).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Weigh).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Sale).IsModified = true;
+            _context.Entry(thingForUpdate).Property(c => c.Modified).IsModified = true;
+
+            foreach (var item in dish.TagIndexes)
+            {
+                TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
+            }
+
             try
             {
                 await _context.SaveChangesAsync();
-                return Result<DishDTO>.Ok(thing);
+
+                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == thingForUpdate.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                DishView view = _mapper.Map<DishView>(thingAfterAdding);
+                view.TagList = new HashSet<TagToAdd>();
+                foreach (var item in thingAfterAdding.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
+                return Result<DishView>.Ok(_mapper.Map<DishView>(view));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Cannot update model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Cannot update model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<DishDTO>.Fail<DishDTO>($"Cannot update model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>($"Cannot update model. {ex.Message}");
             }
         }
     }

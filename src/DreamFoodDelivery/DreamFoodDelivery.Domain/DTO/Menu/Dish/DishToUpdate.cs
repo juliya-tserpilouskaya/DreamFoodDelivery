@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class DishView
+    public class DishToUpdate
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -14,8 +14,6 @@ namespace DreamFoodDelivery.Domain.DTO
         public double? Cost { get; set; }
         public string Weigh { get; set; }
         public int? Sale { get; set; }
-        public DateTime? Added { get; set; }
-        public DateTime? Modified { get; set; }
-        public HashSet<TagToAdd> TagList { get; set; }
+        public HashSet<TagToAdd> TagIndexes { get; set; }
     }
 }

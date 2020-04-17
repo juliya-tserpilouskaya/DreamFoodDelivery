@@ -39,7 +39,8 @@ namespace DreamFoodDelivery.Domain.Logic
             #region Dish
             CreateMap<DishDTO, DishDB>().ReverseMap();
             CreateMap<DishToAdd, DishDB>().ReverseMap();
-            CreateMap<DishView, TagDB>().ReverseMap();
+            CreateMap<DishView, DishDB>().ReverseMap();
+            CreateMap<DishToUpdate, DishDB>().ReverseMap();
             #endregion
 
             #region DishTag
