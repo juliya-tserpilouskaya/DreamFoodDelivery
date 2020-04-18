@@ -33,7 +33,7 @@ namespace DreamFoodDelivery.Domain.Logic
             #endregion
 
             #region Basket
-            CreateMap<BasketDB, BasketDTO>().ReverseMap();
+            CreateMap<BasketDB, BasketView>().ReverseMap();
             #endregion
 
             #region Dish

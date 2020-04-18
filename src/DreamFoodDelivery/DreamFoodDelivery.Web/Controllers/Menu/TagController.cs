@@ -45,7 +45,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="tag"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tag added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tag added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid tag data")]
         public async Task<IActionResult> Create([FromBody, CustomizeValidator]TagToAdd tag)
         {
@@ -64,8 +64,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>tag</returns>
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tag updated", typeof(TagView))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Tag doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tag updated", typeof(TagView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         public async Task<IActionResult> Update([FromBody, CustomizeValidator]TagToUpdate tag)
         {
@@ -92,8 +92,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tag deleted")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Tag doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tag deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> RemoveById(string id)
         {
@@ -117,7 +117,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "tags removed")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Tags removed")]
         public async Task<IActionResult> RemoveAllAsync()
         {
             await _tagService.RemoveAllAsync();

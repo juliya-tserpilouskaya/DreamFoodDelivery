@@ -4,11 +4,10 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class BasketDTO
+    public class BasketView
     {
         public Guid Id { get; set; }
-        public HashSet<DishDTO> Dishes { get; set; }
+        public HashSet<DishView> Dishes { get; set; }
         public DateTime? ModificationTime { get; set; }
-        public Guid UserId { get; set; }
     }
 }

@@ -17,5 +17,6 @@ namespace DreamFoodDelivery.Domain.DTO
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
         public HashSet<TagToAdd> TagList { get; set; }
+        public int? Quantity { get; set; }
     }
 }

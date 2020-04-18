@@ -49,8 +49,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpGet, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish was found", typeof(DishView))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish was found", typeof(DishView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetById(string id)
         {
@@ -171,7 +171,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="dish"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
         public async Task<IActionResult> Create([FromBody, CustomizeValidator]DishToAdd dish)
         {
@@ -190,8 +190,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Dishes</returns>
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish updated", typeof(DishView))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish updated", typeof(DishView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         public async Task<IActionResult> Update([FromBody, CustomizeValidator]DishToUpdate dish)
         {
@@ -217,8 +217,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish deleted")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> RemoveById(string id)
         {
