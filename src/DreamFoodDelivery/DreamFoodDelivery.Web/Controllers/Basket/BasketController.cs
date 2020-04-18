@@ -54,18 +54,18 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id or wrong quantity")]
         public async Task<IActionResult> AddDish([FromBody]string dishId/*, string userId*/, int quantity) 
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
-            bool isUser = HttpContext.User.Identity.IsAuthenticated;
-            var userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
+            if (Guid.TryParse(dishId, out var _) && quantity > 0)
+            {
+                bool isUser = HttpContext.User.Identity.IsAuthenticated;
+                var userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
+                var result = await _basketService.AddUpdateDishAsync(dishId, userIdFromIdentity, quantity);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            return BadRequest(ModelState);
 
-            var result = await _basketService.AddUpdateDishAsync(dishId, userIdFromIdentity, quantity);
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> RemoveById(string dishId)
         {
-            if (!Guid.TryParse(dishId, out var _) /*|| _orderService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
+            if (!Guid.TryParse(dishId, out var _))
             {
                 return BadRequest();
             }
