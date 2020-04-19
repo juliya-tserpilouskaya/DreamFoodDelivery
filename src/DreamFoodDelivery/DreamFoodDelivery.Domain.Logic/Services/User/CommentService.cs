@@ -223,7 +223,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             try
             {
-                await _context.SaveChangesAsync();;
+                await _context.SaveChangesAsync();
                 var commentAfterUpdate = await _context.Comments.Where(_ => _.Id == comment.Id).AsNoTracking().FirstOrDefaultAsync();
                 if (commentAfterUpdate is null)
                 {

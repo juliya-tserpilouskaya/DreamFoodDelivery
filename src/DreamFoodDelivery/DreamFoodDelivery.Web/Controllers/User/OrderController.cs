@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -83,9 +84,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> UpdateStatus([FromBody]OrderToStatusUpdate orderStatus)
+        public async Task<IActionResult> UpdateStatus([FromBody, CustomizeValidator]OrderToStatusUpdate orderStatus)
         {
-            if (orderStatus is null /*|| !ModelState.IsValid*/)
+            if (orderStatus is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -109,12 +110,12 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "order added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]OrderToAdd order)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]OrderToAdd order)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var result = await _orderService.AddAsync(order);
@@ -136,9 +137,9 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Order updated", typeof(OrderToUpdate))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]OrderToUpdate order)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]OrderToUpdate order)
         {
-            if (order is null /*|| !ModelState.IsValid*/)
+            if (order is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -195,7 +196,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> RemoveById(string id)
         {
-            if (!Guid.TryParse(id, out var _) /*|| _orderService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
+            if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }

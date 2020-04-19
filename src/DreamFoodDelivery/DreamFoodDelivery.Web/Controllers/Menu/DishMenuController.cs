@@ -54,7 +54,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         public async Task<IActionResult> GetById(string id)
         {
-            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }

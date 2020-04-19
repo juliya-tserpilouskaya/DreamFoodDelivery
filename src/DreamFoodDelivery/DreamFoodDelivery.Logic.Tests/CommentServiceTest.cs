@@ -3,6 +3,7 @@ using Bogus;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.Logic.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace DreamFoodDelivery.Logic.Tests
             .RuleFor(x => x.Content, y => y.Random.Words());
         readonly List<CommentDB> _comments;
         readonly IMapper _mapper;
+        readonly IOrderService _orderService;
 
         public CommentServiceTest()
         {
@@ -52,7 +54,7 @@ namespace DreamFoodDelivery.Logic.Tests
             // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var service = new CommentService(_mapper, context);
+                var service = new CommentService(_mapper, context, _orderService);
                 var result = await service.GetAllAsync();
 
                 foreach (var item in _comments)
