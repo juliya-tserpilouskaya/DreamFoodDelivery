@@ -327,6 +327,32 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         //        return await Task.FromResult(Result.Fail(ex.Message));
         //    }
         //}
+        //public async Task<Result> RemoveAllAsync()
+        //{
+        //    var comment = await _commentContext.Comments.ToListAsync();
+        //    if (comment is null)
+        //    {
+        //        return await Task.FromResult(Result.Fail("Comments were not found"));
+        //    }
+        //    try
+        //    {
+        //        _commentContext.Comments.RemoveRange(comment);
+        //        await _commentContext.SaveChangesAsync();
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //}
+
+        //      List<CommentView> views = new List<CommentView>();
+        //      return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+
 
         ///// <summary>
         /////  Asynchronously remove all orders by user Id. Id must be verified 
@@ -356,6 +382,30 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         //    catch (DbUpdateException ex)
         //    {
         //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+        //    }
+        //}
+
+        //public async Task<Result> RemoveAllByUserIdAsync(string userId)
+        //{
+        //    Guid id = Guid.Parse(userId);
+        //    var comment = _commentContext.Comments.Where(_ => _.UserId == id).Select(_ => _);
+        //    if (comment is null)
+        //    {
+        //        return await Task.FromResult(Result.Fail("Commenst were not found"));
+        //    }
+        //    try
+        //    {
+        //        _commentContext.Comments.RemoveRange(comment);
+        //        await _commentContext.SaveChangesAsync();
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
         //    }
         //}
 

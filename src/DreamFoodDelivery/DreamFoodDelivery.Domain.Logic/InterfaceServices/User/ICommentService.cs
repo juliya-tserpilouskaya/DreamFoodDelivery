@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously add new comment
         /// </summary>
         /// <param name="comment">New comment to add</param>
-        Task<Result<CommentToAdd>> AddAsync(CommentToAdd comment);
+        Task<Result<CommentView>> AddAsync(CommentToAdd comment);
 
         /// <summary>
         ///  Asynchronously update comment
