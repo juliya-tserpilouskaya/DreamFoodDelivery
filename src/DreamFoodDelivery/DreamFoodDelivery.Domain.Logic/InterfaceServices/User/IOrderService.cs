@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Common.Helpers;
+﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously add new thing
         /// </summary>
         /// <param name="order">New order to add</param>
-        Task<Result<OrderToAdd>> AddAsync(OrderToAdd order);
+        Task<Result<OrderView>> AddAsync(OrderToAdd order);
 
         /// <summary>
         ///  Asynchronously remove order by Id. Id must be verified
@@ -38,22 +38,22 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="orderId">ID of existing order</param>
         Task<Result> RemoveByIdAsync(string orderId);
 
-        /// <summary>
-        ///  Asynchronously remove all orders 
-        /// </summary>
-        Task<Result> RemoveAllAsync();
+        ///// <summary>
+        /////  Asynchronously remove all orders 
+        ///// </summary>
+        //Task<Result> RemoveAllAsync();
 
         /// <summary>
         ///  Asynchronously update order
         /// </summary>
         /// <param name="order">Existing order to update</param>
-        Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order);
+        Task<Result<OrderView>> UpdateAsync(OrderToUpdate order);
 
-        /// <summary>
-        ///  Asynchronously remove all orders by user Id. Id must be verified 
-        /// </summary>
-        /// <param name="userId">ID of user</param>
-        Task<Result> RemoveAllByUserIdAsync(string userId);
+        ///// <summary>
+        /////  Asynchronously remove all orders by user Id. Id must be verified 
+        ///// </summary>
+        ///// <param name="userId">ID of user</param>
+        //Task<Result> RemoveAllByUserIdAsync(string userId);
 
         /// <summary>
         ///  Asynchronously update order status

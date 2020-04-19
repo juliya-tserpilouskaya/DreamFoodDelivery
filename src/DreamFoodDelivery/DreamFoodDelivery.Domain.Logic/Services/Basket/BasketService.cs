@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -85,7 +85,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     dish.Data.Quantity = dishListItem.Quantity;
                     view.Dishes.Add(dish.Data);
                 }
-                return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
+                return Result<BasketView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -169,7 +169,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
-            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync();
+            BasketDB basket = await _context.Baskets.Where(_ => _.Id == user.BasketId).AsNoTracking().FirstOrDefaultAsync();
             if (basket is null )
             {
                 return Result<BasketView>.Fail<BasketView>($"Basket was not found");

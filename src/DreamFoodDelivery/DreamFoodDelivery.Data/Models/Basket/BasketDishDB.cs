@@ -10,5 +10,6 @@ namespace DreamFoodDelivery.Data.Models
         public Guid ConnectionId { get; set; }
         public Guid DishId { get; set; }
         public int? Quantity { get; set; }
+        public Guid? OrderId { get; set; }
     }
 }

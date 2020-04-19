@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DreamFoodDelivery.Common.Helpers;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
@@ -284,8 +283,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return await Task.FromResult(Result.Fail("Dish was not found"));
                     }
-                        _context.Dishes.Remove(dish);
-                        await _context.SaveChangesAsync();
+                    _context.Dishes.Remove(dish);
+                    await _context.SaveChangesAsync();
                 }
                 return await Task.FromResult(Result.Ok());
             }

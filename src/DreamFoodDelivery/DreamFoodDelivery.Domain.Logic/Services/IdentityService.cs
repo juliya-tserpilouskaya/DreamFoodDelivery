@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Common.Helpers;
+﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
@@ -52,7 +52,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var newUser = new User
             {
                 Email = user.Email,
-                UserName = user.Email
+                UserName = user.Email,
+                PersonalDiscount = 0
             };
 
             var createUser = await _userManager.CreateAsync(newUser, user.Password);

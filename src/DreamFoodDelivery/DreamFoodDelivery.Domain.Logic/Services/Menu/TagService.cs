@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
