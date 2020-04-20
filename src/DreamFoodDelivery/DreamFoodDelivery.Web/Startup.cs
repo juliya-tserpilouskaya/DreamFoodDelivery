@@ -19,6 +19,8 @@ using Microsoft.IdentityModel.Tokens;
 using DreamFoodDelivery.Domain.Logic;
 using NSwag.Generation.Processors.Security;
 using NSwag;
+using FluentValidation.AspNetCore;
+using DreamFoodDelivery.Domain.Logic.Validation;
 
 namespace DreamFoodDelivery.Web
 {
@@ -34,9 +36,12 @@ namespace DreamFoodDelivery.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var signingKey = new TokenSecret();
-            Configuration.Bind(nameof(signingKey), signingKey);
-            services.AddSingleton(signingKey);
+            services.AddDomainServices(Configuration);
+
+            var tokenSecret = new TokenSecret();
+            Configuration.Bind(nameof(tokenSecret), tokenSecret);
+            services.AddSingleton(tokenSecret);
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -44,15 +49,13 @@ namespace DreamFoodDelivery.Web
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(signingKey.SecretString)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenSecret.SecretString)),
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         RequireExpirationTime = false,
                         ValidateLifetime = true
                     };
                 });
-
-            services.AddDomainServices(Configuration);
 
             services.AddOpenApiDocument(config =>
             {
@@ -80,7 +83,14 @@ namespace DreamFoodDelivery.Web
                 config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
-            services.AddControllers();
+            services.AddControllers().AddFluentValidation(fluentValidation =>
+            {
+                fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToUpdateValidation>();
+            });
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 

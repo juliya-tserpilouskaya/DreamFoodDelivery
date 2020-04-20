@@ -8,6 +8,7 @@ namespace DreamFoodDelivery.Common.NotesForFront
     {
         enum DishTags
         {
+            None,
             New,
             Pop,
             Hot,

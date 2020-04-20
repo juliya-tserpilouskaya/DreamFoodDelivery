@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
@@ -31,6 +33,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no comments in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments were found", typeof(IEnumerable<CommentView>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -54,6 +57,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment was found", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
@@ -80,10 +84,14 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment wasn't found")]
         [SwaggerResponse(StatusCodes.Status200OK, "ID users comments were found", typeof(IEnumerable<CommentView>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> GetByUserId(string id)
         {
-            //if (User.Identity.IsAuthenticated)
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id) && Guid.TryParse(id, out var _))
+            {
+                return BadRequest();
+            }
+            else
             {
                 try
                 {
@@ -94,10 +102,6 @@ namespace DreamFoodDelivery.Web.Controllers
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
                 }
-            }
-            else
-            {
-                return BadRequest();
             }
         }
 
@@ -110,12 +114,13 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Comment added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody/*, CustomizeValidator*/]CommentToAdd comment)
+        [LoggerAttribute]
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]CommentToAdd comment)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest(ModelState);
-            //}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var result = await _commentService.AddAsync(comment);
@@ -137,10 +142,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment updated", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        public async Task<IActionResult> Update([FromBody]CommentToUpdate comment)
+        [LoggerAttribute]
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]CommentToUpdate comment)
         {
 
-            if (comment is null /*|| !ModelState.IsValid*/)
+            if (comment is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -165,9 +171,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string id)
         {
-            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _)/* || _commentService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _)) //check it
             {
                 return BadRequest();
             }
@@ -192,9 +199,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAllByUserId(string id)
         {
-            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _) /*|| _commentService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }
@@ -215,6 +223,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments removed")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAll()
         {
             await _commentService.RemoveAllAsync();

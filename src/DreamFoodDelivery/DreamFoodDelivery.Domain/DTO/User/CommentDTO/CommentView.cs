@@ -8,7 +8,6 @@ namespace DreamFoodDelivery.Domain.DTO
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public UserDTO User { get; set; }
         public Guid OrderId { get; set; }
         public OrderView Order { get; set; }
         public string Headline { get; set; }

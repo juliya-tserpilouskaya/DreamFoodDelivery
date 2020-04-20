@@ -7,6 +7,6 @@ namespace DreamFoodDelivery.Domain.DTO
     public class UserWithToken
     {
         public string UserToken { get; set; }
-        public UserDTO UserDTO { get; set; }
+        public UserView UserView { get; set; }
     }
 }

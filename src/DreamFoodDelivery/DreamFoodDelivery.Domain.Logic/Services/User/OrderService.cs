@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,31 +20,64 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     public class OrderService : IOrderService
     {
         private readonly DreamFoodDeliveryContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        IMenuService _menuService;
 
-        public OrderService(IMapper mapper, DreamFoodDeliveryContext context)
+        public OrderService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IMenuService menuService)
         {
             _context = context;
+            _userManager = userManager;
             _mapper = mapper;
+            _menuService = menuService;
         }
 
         /// <summary>
         /// Asynchronously returns all orders
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<OrderView>>> GetAllAsync()
         {
-            var orders = await _context.Orders.AsNoTracking().ToListAsync();
-            if (!orders.Any())
+            try
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                var orders = await _context.Orders.AsNoTracking().ToListAsync();
+                if (!orders.Any())
+                {
+                    return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                }
+
+                List<OrderView> views = new List<OrderView>();
+                foreach (var order in orders)
+                {
+                    OrderView viewItem = _mapper.Map<OrderView>(order);
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                    viewItem.Dishes = new HashSet<DishView>();
+                    foreach (var dishListItem in dishList)
+                    {
+                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        if (dish.IsError)
+                        {
+                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
+                        }
+                        dish.Data.Quantity = dishListItem.Quantity;
+                        viewItem.Dishes.Add(dish.Data);
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(views));
             }
-            return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(orders));
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
+            }
+
         }
 
         /// <summary>
         ///  Asynchronously get order by order Id. Id must be verified 
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
+        [LoggerAttribute]
         public async Task<Result<OrderView>> GetByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
@@ -54,7 +88,20 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 {
                     return Result<OrderView>.Fail<OrderView>($"Order was not found");
                 }
-                return Result<OrderView>.Ok(_mapper.Map<OrderView>(order));
+                OrderView view = _mapper.Map<OrderView>(order);
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                view.Dishes = new HashSet<DishView>();
+                foreach (var dishListItem in dishList)
+                {
+                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    if (dish.IsError)
+                    {
+                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                    }
+                    dish.Data.Quantity = dishListItem.Quantity;
+                    view.Dishes.Add(dish.Data);
+                }
+                return Result<OrderView>.Ok(view);
             }
             catch (ArgumentNullException ex)
             {
@@ -66,32 +113,65 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new order
         /// </summary>
         /// <param name="order">New order to add</param>
-        public async Task<Result<OrderToAdd>> AddAsync(OrderToAdd order)
+        [LoggerAttribute]
+        public async Task<Result<OrderView>> AddAsync(OrderToAdd order)
         {
-            //if info from profile
-            var orderToAdd = _mapper.Map<OrderDB>(order);
+            UserDB userDB = await _context.Users.Where(_ => _.BasketId == order.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            User userIdentity = await _userManager.FindByIdAsync(userDB.IdFromIdentity);
+            if (userDB is null || userIdentity is null)
+            {
+                return Result<OrderView>.Fail<OrderView>("User not found");
+            }
 
+            OrderDB orderToAdd = _mapper.Map<OrderDB>(order);
+            if (orderToAdd.IsInfoFromProfile)
+            {
+                orderToAdd.Address = userIdentity.Address;
+                orderToAdd.PersonalDiscount = userIdentity.PersonalDiscount;
+                orderToAdd.PhoneNumber = userIdentity.PhoneNumber;
+                orderToAdd.Name = userIdentity.Name;
+            }
+            orderToAdd.UserId = userDB.Id;
+            orderToAdd.Status = Enum.GetName(typeof(OrderStatuses), 0);
+            orderToAdd.UpdateTime = DateTime.Now;
             _context.Orders.Add(orderToAdd);
+
+            var connection = await _context.BasketDishes.Where(_ => _.BasketId == order.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            connection.OrderId = orderToAdd.Id;
+            connection.BasketId = Guid.Empty;
+            _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
+            _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
 
             try
             {
                 await _context.SaveChangesAsync();
-
-                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.UserId == orderToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-
-                return Result<OrderToAdd>.Ok(_mapper.Map<OrderToAdd>(orderAfterAdding));
+                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync();
+                OrderView view = _mapper.Map<OrderView>(orderAfterAdding);
+                view.Dishes = new HashSet<DishView>();
+                foreach (var dishListItem in dishList)
+                {
+                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    if (dish.IsError)
+                    {
+                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                    }
+                    dish.Data.Quantity = dishListItem.Quantity;
+                    view.Dishes.Add(dish.Data);
+                }
+                return Result<OrderView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>($"Cannot save model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Cannot save model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>($"Cannot save model. {ex.Message}");
             }
             catch (ArgumentNullException ex)
             {
-                return Result<OrderToAdd>.Fail<OrderToAdd>($"Source is null. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>($"Source is null. {ex.Message}");
             }
         }
 
@@ -99,33 +179,50 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update order
         /// </summary>
         /// <param name="order">Existing order to update</param>
-        /// <param name="userId">ID guid of existing order</param>
-        public async Task<Result<OrderToUpdate>> UpdateAsync(OrderToUpdate order)
+        [LoggerAttribute]
+        public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order)
         {
-            OrderDB orderForUpdate = _mapper.Map<OrderDB>(order);
-            _context.Entry(orderForUpdate).Property(c => c.IsInfoFromProfile).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PersonalDiscount).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.FinaleCost).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.OrderTime).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.DeliveryTime).IsModified = true;
-            _context.Entry(orderForUpdate).Property(c => c.PaymentTime).IsModified = true;
-
-            try
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(15))///////////////////////////////////////////////////////////////////
             {
-                await _context.SaveChangesAsync();
-                return Result<OrderToUpdate>.Ok(order);
+                orderForUpdate = _mapper.Map<OrderDB>(order);
+                orderForUpdate.UpdateTime = DateTime.Now;
+                _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync();
+                    OrderView view = _mapper.Map<OrderView>(orderAfterAdding);
+                    view.Dishes = new HashSet<DishView>();
+                    foreach (var dishListItem in dishList)
+                    {
+                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        if (dish.IsError)
+                        {
+                            return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                        }
+                        dish.Data.Quantity = dishListItem.Quantity;
+                        view.Dishes.Add(dish.Data);
+                    }
+                    return Result<OrderView>.Ok(view);
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                }
+                catch (DbUpdateException ex)
+                {
+                    return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                }
             }
-            catch (DbUpdateConcurrencyException ex)
+            else
             {
-                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                return Result<OrderToUpdate>.Fail<OrderToUpdate>($"Cannot update model. {ex.Message}");
+                return Result<OrderView>.Warning("Time is over.");
             }
         }
 
@@ -133,32 +230,55 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get orders by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
-            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).ToListAsync();
+            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
             if (!orders.Any())
             {
                 return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
             }
-            return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(orders));
+
+            List<OrderView> views = new List<OrderView>();
+            foreach (var order in orders)
+            {
+                OrderView viewItem = _mapper.Map<OrderView>(order);
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                viewItem.Dishes = new HashSet<DishView>();
+                foreach (var dishListItem in dishList)
+                {
+                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    if (dish.IsError)
+                    {
+                        return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>($"Unable to retrieve data");
+                    }
+                    dish.Data.Quantity = dishListItem.Quantity;
+                    viewItem.Dishes.Add(dish.Data);
+                }
+                views.Add(viewItem);
+            }
+            return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(views));
         }
 
         /// <summary>
         ///  Asynchronously remove order by Id. Id must be verified
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
             var order = await _context.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-
             if (order is null)
             {
                 return await Task.FromResult(Result.Fail("Order was not found"));
             }
+
+            var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
             try
             {
+                _context.BasketDishes.RemoveRange(dishList);
                 _context.Orders.Remove(order);
                 await _context.SaveChangesAsync();
                 return await Task.FromResult(Result.Ok());
@@ -173,78 +293,191 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
-        /// <summary>
-        ///  Asynchronously remove all orders 
-        /// </summary>
-        public async Task<Result> RemoveAllAsync()
-        {
-            var order = await _context.Orders.ToListAsync();
-            if (order is null)
-            {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
-            }
-            try
-            {
-                _context.Orders.RemoveRange(order);
-                await _context.SaveChangesAsync();
-                return await Task.FromResult(Result.Ok());
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-            }
-            catch (DbUpdateException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-            }
-        }
+        ///// <summary>
+        /////  Asynchronously remove all orders 
+        ///// </summary>
+        //public async Task<Result> RemoveAllAsync()
+        //{
+        //    var orders = await _context.Orders.Select(_ => _).AsNoTracking().ToListAsync();
+        //    if (!orders.Any())
+        //    {
+        //        return await Task.FromResult(Result.Fail("Orders were not found"));
+        //    }
+        //    //foreach (var order in orders)
+        //    //{
+        //    //    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).ToListAsync();
+        //    //    _context.BasketDishes.RemoveRange(dishList);
+        //    //    _context.SaveChanges();
+        //    //    _context.Orders.Remove(order);
+        //    //}
+        //    try
+        //    {
+        //        _context.Orders.RemoveRange(orders);
+        //        await _context.SaveChangesAsync();
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+        //    }
+        //    catch (ObjectDisposedException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail(ex.Message));
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail(ex.Message));
+        //    }
+        //}
+        //public async Task<Result> RemoveAllAsync()
+        //{
+        //    var comment = await _commentContext.Comments.ToListAsync();
+        //    if (comment is null)
+        //    {
+        //        return await Task.FromResult(Result.Fail("Comments were not found"));
+        //    }
+        //    try
+        //    {
+        //        _commentContext.Comments.RemoveRange(comment);
+        //        await _commentContext.SaveChangesAsync();
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //}
 
-        /// <summary>
-        ///  Asynchronously remove all orders by user Id. Id must be verified 
-        /// </summary>
-        /// <param name="userId">ID of user</param>
-        public async Task<Result> RemoveAllByUserIdAsync(string userId)
-        {
-            Guid id = Guid.Parse(userId);
-            var order = _context.Orders.Where(_ => _.UserId == id).Select(_ => _);
+        //      List<CommentView> views = new List<CommentView>();
+        //      return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
 
-            if (order is null)
-            {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
-            }
-            try
-            {
-                _context.Orders.RemoveRange(order);
-                await _context.SaveChangesAsync();
 
-                return await Task.FromResult(Result.Ok());
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-            }
-            catch (DbUpdateException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-            }
-        }
+        ///// <summary>
+        /////  Asynchronously remove all orders by user Id. Id must be verified 
+        ///// </summary>
+        ///// <param name="userId">ID of user</param>
+        //public async Task<Result> RemoveAllByUserIdAsync(string userId)
+        //{
+        //    Guid id = Guid.Parse(userId);
+        //    var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
+        //    if (!orders.Any())
+        //    {
+        //        return await Task.FromResult(Result.Fail("Orders were not found"));
+        //    }
+        //    try
+        //    {
+        //        foreach (var order in orders)
+        //        {
+        //            RemoveByIdAsync(order.Id.ToString());
+        //        }
+
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+        //    }
+        //}
+
+        //public async Task<Result> RemoveAllByUserIdAsync(string userId)
+        //{
+        //    Guid id = Guid.Parse(userId);
+        //    var comment = _commentContext.Comments.Where(_ => _.UserId == id).Select(_ => _);
+        //    if (comment is null)
+        //    {
+        //        return await Task.FromResult(Result.Fail("Commenst were not found"));
+        //    }
+        //    try
+        //    {
+        //        _commentContext.Comments.RemoveRange(comment);
+        //        await _commentContext.SaveChangesAsync();
+        //        return await Task.FromResult(Result.Ok());
+        //    }
+        //    catch (DbUpdateConcurrencyException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+        //    }
+        //}
 
         /// <summary>
         ///  Asynchronously update order status
         /// </summary>
         /// <param name="order">New order status</param>
-        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderDTOUpdateStatus order)
+        [LoggerAttribute]
+        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order)
         {
-            
-            OrderDB orderForUpdate = _mapper.Map<OrderDB>(order);
-            orderForUpdate.UpdateTime = DateTime.Now;
-            _context.Entry(orderForUpdate).Property(c => c.Status).IsModified = true;
-
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            string orderStatus = Enum.GetName(typeof(OrderStatuses), order.StatusIndex);
+            switch (orderStatus)
+            {
+                case "OnWay":
+                    orderForUpdate.Status = "OnWay";
+                    orderForUpdate.UpdateTime = DateTime.Now;
+                    _context.Entry(orderForUpdate).Property(c => c.Status).IsModified = true;
+                    _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
+                    break;
+                case "Delivered":
+                    if (orderForUpdate.PaymentTime.HasValue)
+                    {
+                        orderForUpdate.Status = "Delivered";
+                        orderForUpdate.DeliveryTime = DateTime.Now;
+                        orderForUpdate.UpdateTime = DateTime.Now;
+                        _context.Entry(orderForUpdate).Property(c => c.Status).IsModified = true;
+                        _context.Entry(orderForUpdate).Property(c => c.DeliveryTime).IsModified = true;
+                        _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
+                    }
+                    else
+                    {
+                        return Result<OrderView>.Warning("Waiting for payment.");
+                    }
+                    break;
+                case "Canceled":
+                    orderForUpdate.Status = "Canceled";
+                    orderForUpdate.UpdateTime = DateTime.Now;
+                    _context.Entry(orderForUpdate).Property(c => c.Status).IsModified = true;
+                    _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
+                    break;
+                case "Paid":
+                    orderForUpdate.PaymentTime = DateTime.Now;
+                    _context.Entry(orderForUpdate).Property(c => c.PaymentTime).IsModified = true;
+                    break;
+                default:
+                    return Result<OrderView>.Warning("There is nothing to change.");
+            }
             try
             {
                 await _context.SaveChangesAsync();
-                OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.UserId == orderForUpdate.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                return Result<OrderView>.Ok(_mapper.Map<OrderView>(orderAfterUpdate));
+                OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterUpdate.Id).AsNoTracking().ToListAsync();
+                OrderView view = _mapper.Map<OrderView>(orderAfterUpdate);
+                view.Dishes = new HashSet<DishView>();
+                foreach (var dishListItem in dishList)
+                {
+                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    if (dish.IsError)
+                    {
+                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                    }
+                    dish.Data.Quantity = dishListItem.Quantity;
+                    view.Dishes.Add(dish.Data);
+                }
+                return Result<OrderView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
             {

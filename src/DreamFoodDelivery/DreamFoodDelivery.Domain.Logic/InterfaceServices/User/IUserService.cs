@@ -1,4 +1,4 @@
-﻿using DreamFoodDelivery.Common.Helpers;
+﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
@@ -14,43 +14,43 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         Task<Result<IEnumerable<UserView>>> GetAllAsync();
 
-        ///// <summary>
-        /////  Asynchronously add new account
-        ///// </summary>
-        ///// <param name="user">New user to add</param>
-        //Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
-
         /// <summary>
         ///  Asynchronously add new account
         /// </summary>
         /// <param name="userIdFromIdentity">ID of user from identity</param>
-        Task<Result<UserDTO>> CreateAccountAsyncById(string userIdFromIdentity);
+        Task<Result<UserView>> CreateAccountAsyncById(string userIdFromIdentity);
 
         /// <summary>
         ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
-        Task<Result<UserViewSecondPlan>> GetByIdAsync(string userId);
+        Task<Result<UserView>> GetByIdAsync(string userId);
+
+        /// <summary>
+        /// Get User Profile by idFromIdentity. Helper
+        /// </summary>
+        /// <param name="idFromIdentity"></param>
+        Task<Result<UserProfile>> GetUserProfileByIdFromIdentityAsync(string idFromIdentity);
 
         /// <summary>
         /// Get User idFromIdentity
         /// </summary>
         /// <param name="idFromIdentity"></param>
-        Task<Result<UserDTO>> GetUserByIdFromIdentityAsync(string idFromIdentity);
+        Task<Result<UserView>> GetUserByIdFromIdentityAsync(string idFromIdentity);
 
         /// <summary>
         ///  Asynchronously update user
         /// </summary>
-        /// <param name="user">Existing user to update</param>
+        /// <param name="userToUpdate">User data to update</param>
         /// <param name="idFromIdentity">Existing user ID</param>
-        Task<Result<UserProfile>> UpdateUserProfileAsync(UserProfile user, string idFromIdentity);
+        Task<Result<UserView>> UpdateUserProfileAsync(UserToUpdate userToUpdate, string idFromIdentity);
 
         /// <summary>
         ///  Asynchronously update user personal discount
         /// </summary>
         /// <param name="personalDiscount">New personal discount</param>
         /// <param name="idFromIdentity">Existing user ID</param>
-        Task<Result<UserProfile>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity);
+        Task<Result<UserView>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity);
 
         /// <summary>
         ///  Asynchronously remove user by Id. Id must be verified
@@ -69,5 +69,17 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="id"></param>
         Task<Result> ChangeRoleAsync(string id);
+
+        /// <summary>
+        ///  Asynchronously update user password
+        /// </summary>
+        /// <param name="userInfo">User data to update</param>
+        Task<Result<UserView>> UpdatePasswordAsync(UserPasswordToChange userInfo);
+
+        ///// <summary>
+        /////  Asynchronously update user email
+        ///// </summary>
+        ///// <param name="userInfo">User data to update</param>
+        //Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo);
     }
 }

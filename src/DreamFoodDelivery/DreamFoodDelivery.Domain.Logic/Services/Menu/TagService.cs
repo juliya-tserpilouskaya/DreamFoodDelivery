@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -31,7 +31,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new tag
         /// </summary>
         /// <param name="tag">New tag to add</param>
-        public async Task<Result<TagDTO>> AddAsync(TagDTO tag)
+        [LoggerAttribute]
+        public async Task<Result<TagView>> AddAsync(TagToAdd tag)
         {
             var tagToAdd = _mapper.Map<TagDB>(tag);
             _context.Tags.Add(tagToAdd);
@@ -40,40 +41,42 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 await _context.SaveChangesAsync();
                 TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                return Result<TagDTO>.Ok(_mapper.Map<TagDTO>(tagAfterAdding));
+                return Result<TagView>.Ok(_mapper.Map<TagView>(tagAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Cannot save model. {ex.Message}");
+                return Result<TagView>.Fail<TagView>($"Cannot save model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Cannot save model. {ex.Message}");
+                return Result<TagView>.Fail<TagView>($"Cannot save model. {ex.Message}");
             }
             catch (ArgumentNullException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Source is null. {ex.Message}");
+                return Result<TagView>.Fail<TagView>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Asynchronously returns all tags
         /// </summary>
-        public async Task<Result<IEnumerable<TagDTO>>> GetAllAsync()
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<TagView>>> GetAllAsync()
         {
             var tags = await _context.Tags.AsNoTracking().ToListAsync();
             if (!tags.Any())
             {
-                return Result<IEnumerable<TagDTO>>.Fail<IEnumerable<TagDTO>>("No tags found");
+                return Result<IEnumerable<TagView>>.Fail<IEnumerable<TagView>>("No tags found");
             }
-            return Result<IEnumerable<TagDTO>>.Ok(_mapper.Map<IEnumerable<TagDTO>>(tags));
+            return Result<IEnumerable<TagView>>.Ok(_mapper.Map<IEnumerable<TagView>>(tags));
         }
 
         /// <summary>
         ///  Asynchronously get tag by tag Id. Id must be verified 
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
-        public async Task<Result<TagDTO>> GetByIdAsync(string tagId)
+        [LoggerAttribute]
+        public async Task<Result<TagView>> GetByIdAsync(string tagId)
         {
             Guid id = Guid.Parse(tagId);
             try
@@ -81,19 +84,20 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var tag = await _context.Tags.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
                 if (tag is null)
                 {
-                    return Result<TagDTO>.Fail<TagDTO>($"Tag was not found");
+                    return Result<TagView>.Fail<TagView>($"Tag was not found");
                 }
-                return Result<TagDTO>.Ok(_mapper.Map<TagDTO>(tag));
+                return Result<TagView>.Ok(_mapper.Map<TagView>(tag));
             }
             catch (ArgumentNullException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Source is null. {ex.Message}");
+                return Result<TagView>.Fail<TagView>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         ///  Asynchronously remove all tags 
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllAsync()
         {
             var tag = await _context.Tags.ToListAsync();
@@ -122,6 +126,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove tag by Id. Id must be verified
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string tagId)
         {
             Guid id = Guid.Parse(tagId);
@@ -150,7 +155,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update tag
         /// </summary>
         /// <param name="tag">Existing tag to update</param>
-        public async Task<Result<TagDTO>> UpdateAsync(TagDTO tag)
+        [LoggerAttribute]
+        public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
             _context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
@@ -158,15 +164,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync();
-                return Result<TagDTO>.Ok(tag);
+                return Result<TagToUpdate>.Ok(tag);
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Cannot update model. {ex.Message}");
+                return Result<TagToUpdate>.Fail<TagToUpdate>($"Cannot update model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
-                return Result<TagDTO>.Fail<TagDTO>($"Cannot update model. {ex.Message}");
+                return Result<TagToUpdate>.Fail<TagToUpdate>($"Cannot update model. {ex.Message}");
             }
         }
     }

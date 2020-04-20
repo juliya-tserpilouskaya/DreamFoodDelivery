@@ -15,9 +15,9 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.HasKey(i => i.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
             //
-            builder.HasOne(_ => _.Basket).WithMany(_ => _.Dishes)
-                   .HasForeignKey(_ => _.BasketId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(_ => _.Basket).WithMany(_ => _.Dishes)
+            //       .HasForeignKey(_ => _.BasketId)
+            //       .OnDelete(DeleteBehavior.Restrict);
             //
             builder.HasMany(_ => _.DishTags).WithOne(_ => _.Dish).HasForeignKey(_ => _.DishId).OnDelete(DeleteBehavior.Restrict);
 

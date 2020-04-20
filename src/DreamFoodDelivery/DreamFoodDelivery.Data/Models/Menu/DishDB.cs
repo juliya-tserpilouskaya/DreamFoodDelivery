@@ -8,7 +8,7 @@ namespace DreamFoodDelivery.Data.Models
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Category { get; set; }
+        public int? Category { get; set; } //create enum on front
         public string Сomposition { get; set; }
         public string Description { get; set; }
         public double? Cost { get; set; }
@@ -18,8 +18,12 @@ namespace DreamFoodDelivery.Data.Models
         public Guid TagId { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
-        public BasketDB Basket { get; set; }
-        public Guid BasketId { get; set; }
-        public ICollection<DishTagDB> DishTags { get; set; }
+        //public BasketDB Basket { get; set; }
+        //public Guid BasketId { get; set; }
+        public HashSet<DishTagDB> DishTags { get; set; }
+        public DishDB()
+        {
+            DishTags = new HashSet<DishTagDB>();
+        }
     }
 }
