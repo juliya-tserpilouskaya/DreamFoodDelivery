@@ -16,7 +16,7 @@ namespace DreamFoodDelivery.Domain.Logic
             CreateMap<UserDB, UserDTO>().ReverseMap();
             CreateMap<UserGeneration, UserDB>().ReverseMap();
             CreateMap<UserProfile, User>().ReverseMap();
-            CreateMap<UserUpdate, User>().ReverseMap();
+            CreateMap<UserToUpdate, User>().ReverseMap();
             #endregion
 
             #region Comment

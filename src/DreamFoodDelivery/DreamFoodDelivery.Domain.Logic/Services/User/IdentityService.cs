@@ -54,7 +54,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 Email = user.Email,
                 UserName = user.Email,
-                PersonalDiscount = 0
+                PersonalDiscount = 0,
+                Role = defaultRole
             };
 
             var createUser = await _userManager.CreateAsync(newUser, user.Password);
@@ -69,7 +70,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             UserWithToken result = new UserWithToken()
             {
-                UserDTO = profile.Data,
+                UserView = profile.Data,
                 UserToken = token.Data               
             };
             return Result<UserWithToken>.Ok(result);
@@ -137,9 +138,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<UserWithToken>.Fail<UserWithToken>($"{profile.Message}\n" + $"or token is null"); //spilt it
             }
+
             UserWithToken result = new UserWithToken()
             {
-                UserDTO = profile.Data,
+                UserView = profile.Data,
                 UserToken = token.Data
             };
             return Result<UserWithToken>.Ok(result);

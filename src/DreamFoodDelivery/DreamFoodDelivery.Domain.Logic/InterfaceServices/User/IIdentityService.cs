@@ -1,4 +1,5 @@
 ﻿using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;

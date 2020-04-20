@@ -38,11 +38,6 @@ namespace DreamFoodDelivery.Web.Controllers
         [LoggerAttribute]
         public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return BadRequest()
-            //}
-
             try
             {
                 var result = await _identityService.RegisterAsync(user);
@@ -91,7 +86,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [LoggerAttribute]
         public async Task<IActionResult> LogOut()
         {
-            HttpContext.Session.Clear();
+            HttpContext.Session.Clear(); //deal with it
 
             return Ok(await Task.FromResult(Result.Ok()));
         }

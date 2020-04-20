@@ -128,7 +128,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 orderToAdd.Address = userIdentity.Address;
                 orderToAdd.PersonalDiscount = userIdentity.PersonalDiscount;
-                orderToAdd.Phone = userIdentity.PhoneNumber;
+                orderToAdd.PhoneNumber = userIdentity.PhoneNumber;
                 orderToAdd.Name = userIdentity.Name;
             }
             orderToAdd.UserId = userDB.Id;
@@ -183,12 +183,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order)
         {
             OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(1))///////////////////////////////////////////////////////////////////
+            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(15))///////////////////////////////////////////////////////////////////
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
                 orderForUpdate.UpdateTime = DateTime.Now;
                 _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
-                _context.Entry(orderForUpdate).Property(c => c.Phone).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
