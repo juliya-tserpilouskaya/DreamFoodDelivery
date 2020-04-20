@@ -33,6 +33,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Create User
         /// </summary>
         /// <param name="user">User registration data</param>
+        [LoggerAttribute]
         public async Task<Result<UserWithToken>> RegisterAsync(UserRegistration user)
         {
             string defaultRole = "User";
@@ -79,6 +80,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
+        [LoggerAttribute]
         public async Task<Result> DeleteAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -114,6 +116,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
+        [LoggerAttribute]
         public async Task<Result<UserWithToken>> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -146,6 +149,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Genetate token
         /// </summary>
         /// <param name="user"></param>
+        [LoggerAttribute]
         private async Task<Result<string>> GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

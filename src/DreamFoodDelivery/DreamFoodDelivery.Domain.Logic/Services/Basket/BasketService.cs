@@ -35,6 +35,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="dishId">Existing dish Id to add</param>
         /// <param name="quantity">Dish quantity to add</param>
         /// <param name="userIdFromIdentity">Existing user Id to add</param>
+        [LoggerAttribute]
         public async Task<Result<BasketView>> AddUpdateDishAsync(string dishId, string userIdFromIdentity, int quantity)
         {
             DishDB dishToAdd = await _context.Dishes.Where(_ => _.Id == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
@@ -106,6 +107,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="dishId">Existing dish Id to remove</param>
         /// <param name="userIdFromIdentity">Existing user Id to remove</param>
+        [LoggerAttribute]
         public async Task<Result<BasketView>> RemoveDishByIdAsync(string dishId, string userIdFromIdentity)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
@@ -162,6 +164,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Asynchronously get all dishes by user Id. Id must be verified
         /// </summary>
         /// <param name="userIdFromIdentity"></param>
+        [LoggerAttribute]
         public async Task<Result<BasketView>> GetAllDishesByUserIdAsync(string userIdFromIdentity)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
@@ -201,6 +204,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  Asynchronously remove all dishes from basket by user Id
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllByUserIdAsync(string userIdFromIdentity)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();

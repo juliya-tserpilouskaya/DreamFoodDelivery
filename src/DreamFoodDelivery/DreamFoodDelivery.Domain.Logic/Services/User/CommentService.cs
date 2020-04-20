@@ -29,6 +29,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns all comments
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<CommentView>>> GetAllAsync()
         {
             var comments = await _context.Comments.AsNoTracking().ToListAsync();
@@ -51,6 +52,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get comment by comment Id. Id must be verified 
         /// </summary>
         /// <param name="commentId">ID of existing comment</param>
+        [LoggerAttribute]
         public async Task<Result<CommentView>> GetByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -76,6 +78,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new comment
         /// </summary>
         /// <param name="comment">New comment to add</param>
+        [LoggerAttribute]
         public async Task<Result<CommentView>> AddAsync(CommentToAdd comment)
         {
             var commentToAdd = _mapper.Map<CommentDB>(comment);
@@ -107,6 +110,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get comment by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -129,6 +133,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  Asynchronously remove all comments 
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllAsync()
         {
             var comment = await _context.Comments.ToListAsync();
@@ -156,6 +161,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove all comments by user Id. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -184,6 +190,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove comment by Id. Id must be verified
         /// </summary>
         /// <param name="commentId">ID of existing comment</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -212,6 +219,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update comment
         /// </summary>
         /// <param name="comment">Existing comment to update</param>
+        [LoggerAttribute]
         public async Task<Result<CommentView>> UpdateAsync(CommentToUpdate comment)
         {
             CommentDB commentForUpdate = _mapper.Map<CommentDB>(comment);

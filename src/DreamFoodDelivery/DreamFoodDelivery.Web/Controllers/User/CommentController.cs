@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using FluentValidation.AspNetCore;
@@ -32,6 +33,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no comments in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments were found", typeof(IEnumerable<CommentView>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -55,6 +57,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment was found", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
@@ -81,6 +84,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment wasn't found")]
         [SwaggerResponse(StatusCodes.Status200OK, "ID users comments were found", typeof(IEnumerable<CommentView>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> GetByUserId(string id)
         {
             if (string.IsNullOrEmpty(id) && Guid.TryParse(id, out var _))
@@ -110,6 +114,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Comment added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> Create([FromBody, CustomizeValidator]CommentToAdd comment)
         {
             if (!ModelState.IsValid)
@@ -137,6 +142,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment updated", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> Update([FromBody, CustomizeValidator]CommentToUpdate comment)
         {
 
@@ -165,6 +171,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _)) //check it
@@ -192,6 +199,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAllByUserId(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
@@ -215,6 +223,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments removed")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAll()
         {
             await _commentService.RemoveAllAsync();

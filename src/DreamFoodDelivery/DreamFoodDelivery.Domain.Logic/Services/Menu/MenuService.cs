@@ -30,6 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns menu (all dishes)
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetAllAsync()
         {
             var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync();
@@ -58,6 +59,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new dish
         /// </summary>
         /// <param name="dish">New dish to add</param>
+        [LoggerAttribute]
         public async Task<Result<DishView>> AddAsync(DishToAdd dish)
         {
             DishDB dishToAdd = _mapper.Map<DishDB>(dish);
@@ -100,6 +102,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get dish by dish Id. Id must be verified 
         /// </summary>
         /// <param name="dishId">ID of existing dish</param>
+        [LoggerAttribute]
         public async Task<Result<DishView>> GetByIdAsync(string dishId)
         {
             Guid id = Guid.Parse(dishId); 
@@ -129,6 +132,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously returns dish by name. Id must be verified 
         /// </summary>
         /// <param name="name">Dish name</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name)
         {
             try
@@ -163,6 +167,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously returns dish by category. Id must be verified 
         /// </summary>
         /// <param name="categoryString">Dish category</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString)
         {
             var category = double.Parse(categoryString); //make tryParse
@@ -198,6 +203,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously returns dish by cost. Id must be verified 
         /// </summary>
         /// <param name="priceString">Dish price</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetByPriceAsync(string priceString)
         {
             var price = double.Parse(priceString); //make tryParse
@@ -232,6 +238,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns sales
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetSalesAsync()
         {
             try
@@ -265,6 +272,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  Asynchronously remove all dishes 
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllAsync()
         {
             var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync();
@@ -302,6 +310,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove dish by Id. Id must be verified
         /// </summary>
         /// <param name="dishId">ID of existing dish</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string dishId)
         {
             Guid id = Guid.Parse(dishId);
@@ -333,6 +342,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update dish
         /// </summary>
         /// <param name="dish">Existing dish to update</param>
+        [LoggerAttribute]
         public async Task<Result<DishView>> UpdateAsync(DishToUpdate dish)
         {
             DishDB thingForUpdate = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == dish.Id);

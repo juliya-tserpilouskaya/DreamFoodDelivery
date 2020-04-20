@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using DreamFoodDelivery.Common;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -33,6 +34,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no users in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Users were found", typeof(IEnumerable<UserDTO>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -46,25 +48,6 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
-        //Useless
-        ///// <summary>
-        ///// Create new account
-        ///// </summary>
-        ///// <param name="user">user</param>
-        ///// <returns></returns>
-        //[HttpPost, Route("")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "User added")]
-        //[SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid user data")]
-        //public async Task<IActionResult> CreateAsync([FromBody] UserDTO user)
-        //{
-        //    if (user is null /*|| ModelState.IsValid*/)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    var result = await _userService.CreateAccountAsync(user);
-        //    return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
-        //}
-
         //User/Admin
         /// <summary>
         /// Get user account by Id
@@ -76,6 +59,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User was found", typeof(UserDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> GetById(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
@@ -104,6 +88,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserProfile))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> Update([FromBody]UserProfile user)
         {
             if (user is null /*|| !ModelState.IsValid*/)
@@ -132,6 +117,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount, string idFromIdentity)
         {
             if (personalDiscount is null /*|| !ModelState.IsValid*/)
@@ -159,6 +145,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string id)
         {
             if (!Guid.TryParse(id, out var _) /*|| _orderService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
@@ -187,6 +174,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> ChangeRoleToAsync(string id)
         {
             if (id == null)

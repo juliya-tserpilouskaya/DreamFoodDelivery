@@ -34,6 +34,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns all users
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<UserView>>> GetAllAsync()
         {
             var usersDB = await _context.Users.AsNoTracking().ToListAsync();
@@ -66,40 +67,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             return Result<IEnumerable<UserView>>.Ok(_mapper.Map<IEnumerable<UserView>>(users));
         }
 
-        ///// <summary>
-        /////  Asynchronously add new account
-        ///// </summary>
-        ///// <param name="user">New user to add</param>
-        //public async Task<Result<UserDTO>> CreateAccountAsync(UserDTO user)
-        //{
-        //    var userToAdd = _mapper.Map<UserDB>(user);
-        //    userToAdd.Id = Guid.NewGuid();
-        //    _context.Users.Add(userToAdd);
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //        UserDB thingAfterAdding = await _context.Users.Where(_ => _.Id == userToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-        //        return Result<UserDTO>.Ok(_mapper.Map<UserDTO>(thingAfterAdding));
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return Result<UserDTO>.Fail<UserDTO>($"Cannot save model. {ex.Message}");
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return Result<UserDTO>.Fail<UserDTO>($"Cannot save model. {ex.Message}");
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        return Result<UserDTO>.Fail<UserDTO>($"Source is null. {ex.Message}");
-        //    }
-        //}
-
         /// <summary>
         ///  Asynchronously add new account
         /// </summary>
         /// <param name="userIdFromIdentity">ID of user from identity</param>
+        [LoggerAttribute]
         public async Task<Result<UserDTO>> CreateAccountAsyncById(string userIdFromIdentity)
         {
             UserGeneration newProfile = new UserGeneration()
@@ -137,6 +109,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
         public async Task<Result<UserViewSecondPlan>> GetByIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -176,6 +149,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  UserService helper - move it! 
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<UserProfile>> GetUserProfileByIdFromIdentityAsync(string idFromIdentity)
         {
             try
@@ -198,6 +172,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Get User identityId. Used in Identity service. Aslo helper - move it
         /// </summary>
         /// <param name="idFromIdentity"></param>
+        [LoggerAttribute]
         public async Task<Result<UserDTO>> GetUserByIdFromIdentityAsync(string idFromIdentity)
         {
             try
@@ -220,6 +195,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove user by Id. Id must be verified
         /// </summary>
         /// <param name="userId">ID of existing user</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -255,6 +231,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Remove user by idFromIdentity
         /// </summary>
         /// <param name="idFromIdentity"></param>
+        [LoggerAttribute]
         public async Task<Result> DeleteUserByIdFromIdentityAsync(string idFromIdentity)
         {
             var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.IdFromIdentity == idFromIdentity);
@@ -283,6 +260,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="user">Existing user to update</param>
         /// <param name="idFromIdentity">Existing user ID</param>
+        [LoggerAttribute]
         public async Task<Result<UserProfile>> UpdateUserProfileAsync(UserProfile user, string idFromIdentity)
         {
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
@@ -310,6 +288,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="personalDiscount">New personal discount</param>
         /// <param name="idFromIdentity">Existing user ID</param>
+        [LoggerAttribute]
         public async Task<Result<UserProfile>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity)
         {
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
@@ -329,6 +308,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
+        /// <summary>
+        /// Make admin from user or vice versa
+        /// </summary>
+        /// <param name="id"></param>
+        [LoggerAttribute]
         public async Task<Result> ChangeRoleAsync(string idFromIdentity)
         {
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);

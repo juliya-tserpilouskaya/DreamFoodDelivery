@@ -35,6 +35,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns all orders
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<OrderView>>> GetAllAsync()
         {
             try
@@ -76,6 +77,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get order by order Id. Id must be verified 
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
+        [LoggerAttribute]
         public async Task<Result<OrderView>> GetByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
@@ -111,6 +113,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new order
         /// </summary>
         /// <param name="order">New order to add</param>
+        [LoggerAttribute]
         public async Task<Result<OrderView>> AddAsync(OrderToAdd order)
         {
             UserDB userDB = await _context.Users.Where(_ => _.BasketId == order.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
@@ -176,6 +179,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update order
         /// </summary>
         /// <param name="order">Existing order to update</param>
+        [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order)
         {
             OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
@@ -226,6 +230,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get orders by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
@@ -260,6 +265,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove order by Id. Id must be verified
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
@@ -413,6 +419,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update order status
         /// </summary>
         /// <param name="order">New order status</param>
+        [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order)
         {
             OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();

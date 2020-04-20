@@ -35,6 +35,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user)
         {
             //if (!ModelState.IsValid)
@@ -65,6 +66,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user)
         {
             try
@@ -86,6 +88,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost]
         [Route("logout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [LoggerAttribute]
         public async Task<IActionResult> LogOut()
         {
             HttpContext.Session.Clear();
@@ -103,6 +106,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user)
         {
             try

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using DreamFoodDelivery.Common;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -32,6 +33,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> GetAll()
         {
             try
@@ -55,6 +57,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id or wrong quantity")]
+        [LoggerAttribute]
         public async Task<IActionResult> AddDish([FromBody]string dishId/*, string userId*/, int quantity) 
         {
             if (Guid.TryParse(dishId, out var _) && quantity > 0)
@@ -78,6 +81,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string dishId)
         {
             if (!Guid.TryParse(dishId, out var _))
@@ -101,6 +105,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpDelete, Route("")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes removed")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAllAsync()
         {
             try

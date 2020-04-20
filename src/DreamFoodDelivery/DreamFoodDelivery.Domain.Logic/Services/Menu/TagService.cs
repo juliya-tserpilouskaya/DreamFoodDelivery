@@ -31,6 +31,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new tag
         /// </summary>
         /// <param name="tag">New tag to add</param>
+        [LoggerAttribute]
         public async Task<Result<TagView>> AddAsync(TagToAdd tag)
         {
             var tagToAdd = _mapper.Map<TagDB>(tag);
@@ -59,6 +60,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns all tags
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result<IEnumerable<TagView>>> GetAllAsync()
         {
             var tags = await _context.Tags.AsNoTracking().ToListAsync();
@@ -73,6 +75,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get tag by tag Id. Id must be verified 
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
+        [LoggerAttribute]
         public async Task<Result<TagView>> GetByIdAsync(string tagId)
         {
             Guid id = Guid.Parse(tagId);
@@ -94,6 +97,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  Asynchronously remove all tags 
         /// </summary>
+        [LoggerAttribute]
         public async Task<Result> RemoveAllAsync()
         {
             var tag = await _context.Tags.ToListAsync();
@@ -122,6 +126,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove tag by Id. Id must be verified
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
+        [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string tagId)
         {
             Guid id = Guid.Parse(tagId);
@@ -150,6 +155,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update tag
         /// </summary>
         /// <param name="tag">Existing tag to update</param>
+        [LoggerAttribute]
         public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);

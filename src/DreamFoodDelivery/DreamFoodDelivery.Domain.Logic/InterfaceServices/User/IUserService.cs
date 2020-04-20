@@ -14,12 +14,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         Task<Result<IEnumerable<UserView>>> GetAllAsync();
 
-        ///// <summary>
-        /////  Asynchronously add new account
-        ///// </summary>
-        ///// <param name="user">New user to add</param>
-        //Task<Result<UserDTO>> CreateAccountAsync(UserDTO user);
-
         /// <summary>
         ///  Asynchronously add new account
         /// </summary>
