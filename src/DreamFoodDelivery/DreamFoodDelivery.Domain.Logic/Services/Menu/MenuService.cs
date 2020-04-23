@@ -378,7 +378,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             foreach (var item in dish.TagIndexes)
             {
                 TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
+                if (tag is null)
+                {
+                    var tagAfter = await _tagService.AddTagDBAsync(item);
+                    thingForUpdate.DishTags.Add(new DishTagDB { TagId = tagAfter.Data.Id, DishId = thingForUpdate.Id });
+                }
+                else
+                {
+                    thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
+                }
+                //thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
             }
 
             try

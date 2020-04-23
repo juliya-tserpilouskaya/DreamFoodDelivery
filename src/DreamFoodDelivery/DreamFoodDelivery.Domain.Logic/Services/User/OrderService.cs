@@ -113,11 +113,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new order
         /// </summary>
         /// <param name="order">New order to add</param>
+        /// <param name="userIdFromIdentity">Existing user Id to add</param>
         [LoggerAttribute]
-        public async Task<Result<OrderView>> AddAsync(OrderToAdd order)
+        public async Task<Result<OrderView>> AddAsync(OrderToAdd order, string userIdFromIdentity)
         {
-            UserDB userDB = await _context.Users.Where(_ => _.BasketId == order.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-            User userIdentity = await _userManager.FindByIdAsync(userDB.IdFromIdentity);
+            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            UserDB userDB = await _context.Users.Where(_ => _.IdFromIdentity == userIdentity.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            
             if (userDB is null || userIdentity is null)
             {
                 return Result<OrderView>.Fail<OrderView>("User not found");
@@ -136,7 +138,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             orderToAdd.UpdateTime = DateTime.Now;
             _context.Orders.Add(orderToAdd);
 
-            var connection = await _context.BasketDishes.Where(_ => _.BasketId == order.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            var connection = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
             connection.OrderId = orderToAdd.Id;
             connection.BasketId = Guid.Empty;
             _context.Entry(connection).Property(c => c.OrderId).IsModified = true;

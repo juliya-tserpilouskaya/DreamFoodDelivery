@@ -30,7 +30,8 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously add new thing
         /// </summary>
         /// <param name="order">New order to add</param>
-        Task<Result<OrderView>> AddAsync(OrderToAdd order);
+        /// <param name="userIdFromIdentity">Existing user Id to add</param>
+        Task<Result<OrderView>> AddAsync(OrderToAdd order, string userIdFromIdentity);
 
         /// <summary>
         ///  Asynchronously remove order by Id. Id must be verified
