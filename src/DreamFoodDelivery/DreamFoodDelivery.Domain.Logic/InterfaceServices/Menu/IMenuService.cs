@@ -35,8 +35,9 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
         /// </summary>
-        /// <param name="priceString">Dish price</param>
-        Task<Result<IEnumerable<DishView>>> GetByPriceAsync(string priceString);
+        /// <param name="lowerPrice">Dish lower price</param>
+        /// <param name="upperPrice">Dish upper price</param>
+        Task<Result<IEnumerable<DishView>>> GetByPriceAsync(double lowerPrice, double upperPrice);
 
         /// <summary>
         /// Asynchronously returns sales
@@ -65,5 +66,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously remove all dishes 
         /// </summary>
         Task<Result> RemoveAllAsync();
+
+        /// <summary>
+        ///  Asynchronously get dishes by tag index. Id must be verified 
+        /// </summary>
+        /// <param name="tagIndex">Index of existing tag</param>
+        Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(int tagIndex);
     }
 }

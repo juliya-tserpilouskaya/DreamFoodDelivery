@@ -21,6 +21,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly TokenSecret _tokenSecret;
         IUserService _service;
+
         public IdentityService(UserManager<User> userManager, IUserService service, RoleManager<IdentityRole> roleManager, TokenSecret tokenSecret)
         {
             _userManager = userManager;
@@ -67,7 +68,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             var profile = await _service.CreateAccountAsyncById(newUser.Id);
             var token = await GenerateToken(newUser);
-
+            //EmailSenderService.SendMail(newUser.Email, "Registration", "Thanks");
             UserWithToken result = new UserWithToken()
             {
                 UserView = profile.Data,

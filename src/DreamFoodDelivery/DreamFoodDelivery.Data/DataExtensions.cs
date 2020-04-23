@@ -24,7 +24,8 @@ namespace DreamFoodDelivery.Data
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.User.RequireUniqueEmail = true;
             })
-                .AddEntityFrameworkStores<UserContext>();
+                .AddEntityFrameworkStores<UserContext>()
+                .AddDefaultTokenProviders();
 
             return services;
         }

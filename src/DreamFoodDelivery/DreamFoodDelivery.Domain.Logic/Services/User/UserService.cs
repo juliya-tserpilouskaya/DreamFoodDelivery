@@ -468,48 +468,96 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
-        ///// <summary>
-        /////  Asynchronously update user email
-        ///// </summary>
-        ///// <param name="userInfo">User data to update</param>
-        //[LoggerAttribute]
-        //public async Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo)
-        //{
-        //    User usersIdentity = await _userManager.FindByIdAsync(userInfo.IdFromIdentity);
-        //    if (usersIdentity is null)
-        //    {
-        //        return Result<UserView>.Fail<UserView>($"User was not found");
-        //    }
-        //    try
-        //    {
-        //        await _userManager.ChangeEmailAsync(usersIdentity, userInfo.NewEmail, userInfo.Token);
+        /// <summary>
+        ///  Asynchronously update user email
+        /// </summary>
+        /// <param name="userInfo">User data to update</param>
+        [LoggerAttribute]
+        public async Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo)
+        {
+            User usersIdentity = await _userManager.FindByIdAsync(userInfo.IdFromIdentity);
+            if (usersIdentity is null)
+            {
+                return Result<UserView>.Fail<UserView>($"User was not found");
+            }
+            try
+            {
+                var myToken = await _userManager.GenerateChangeEmailTokenAsync(usersIdentity, userInfo.NewEmail);
+                await _userManager.ChangeEmailAsync(usersIdentity, userInfo.NewEmail, myToken);
+                //var myToken = _userManager.GenerateEmailConfirmationTokenAsync()
+                //_userManager.ConfirmEmailAsync(usersIdentity,)
 
-        //        var userProfile = await GetUserProfileByIdFromIdentityAsync(userInfo.IdFromIdentity);
-        //        UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userInfo.IdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-        //        if (userProfile.IsError)
-        //        {
-        //            UserView failProfile = new UserView()
-        //            {
-        //                UserProfile = null,
-        //                UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-        //            };
-        //            return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
-        //        }
-        //        UserView view = new UserView()
-        //        {
-        //            UserProfile = userProfile.Data,
-        //            UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-        //        };
-        //        return Result<UserView>.Ok(view);
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-        //    }
-        //}
+                var userProfile = await GetUserProfileByIdFromIdentityAsync(userInfo.IdFromIdentity);
+                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userInfo.IdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                if (userProfile.IsError)
+                {
+                    UserView failProfile = new UserView()
+                    {
+                        UserProfile = null,
+                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                    };
+                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                }
+                UserView view = new UserView()
+                {
+                    UserProfile = userProfile.Data,
+                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                };
+                return Result<UserView>.Ok(view);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        [LoggerAttribute]
+        public async Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity)
+        {
+            User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
+            if (usersIdentity is null)
+            {
+                return Result<UserView>.Fail<UserView>($"User was not found");
+            }
+            try
+            {
+                var myToken = await _userManager.GenerateEmailConfirmationTokenAsync(usersIdentity);
+                await _userManager.ConfirmEmailAsync(usersIdentity, myToken);
+
+                var userProfile = await GetUserProfileByIdFromIdentityAsync(idFromIdentity);
+                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                if (userProfile.IsError)
+                {
+                    UserView failProfile = new UserView()
+                    {
+                        UserProfile = null,
+                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                    };
+                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                }
+                UserView view = new UserView()
+                {
+                    UserProfile = userProfile.Data,
+                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                };
+                return Result<UserView>.Ok(view);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+            }
+        }
     }
 }

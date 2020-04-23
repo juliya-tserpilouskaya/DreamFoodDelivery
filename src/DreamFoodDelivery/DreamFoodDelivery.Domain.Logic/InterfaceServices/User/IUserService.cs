@@ -76,10 +76,16 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="userInfo">User data to update</param>
         Task<Result<UserView>> UpdatePasswordAsync(UserPasswordToChange userInfo);
 
-        ///// <summary>
-        /////  Asynchronously update user email
-        ///// </summary>
-        ///// <param name="userInfo">User data to update</param>
-        //Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo);
+        /// <summary>
+        ///  Asynchronously update user email
+        /// </summary>
+        /// <param name="userInfo">User data to update</param>
+        Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo);
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity);
     }
 }

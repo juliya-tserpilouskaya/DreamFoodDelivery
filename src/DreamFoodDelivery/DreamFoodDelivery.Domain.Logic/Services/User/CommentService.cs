@@ -114,7 +114,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
-            var comments = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).ToListAsync();
+            var comments = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
             if (!comments.Any())
             {
                 return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
@@ -136,7 +136,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result> RemoveAllAsync()
         {
-            var comment = await _context.Comments.ToListAsync();
+            var comment = await _context.Comments.AsNoTracking().ToListAsync();
             if (comment is null)
             {
                 return await Task.FromResult(Result.Fail("Comments were not found"));
@@ -165,7 +165,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result> RemoveAllByUserIdAsync(string userId)
         {
             Guid id = Guid.Parse(userId);
-            var comment = _context.Comments.Where(_ => _.UserId == id).Select(_ => _);
+            var comment = _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().FirstOrDefault();
             if (comment is null)
             {
                 return await Task.FromResult(Result.Fail("Commenst were not found"));

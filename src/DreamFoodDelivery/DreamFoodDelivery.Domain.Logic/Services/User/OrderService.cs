@@ -293,127 +293,87 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
-        ///// <summary>
-        /////  Asynchronously remove all orders 
-        ///// </summary>
-        //public async Task<Result> RemoveAllAsync()
-        //{
-        //    var orders = await _context.Orders.Select(_ => _).AsNoTracking().ToListAsync();
-        //    if (!orders.Any())
-        //    {
-        //        return await Task.FromResult(Result.Fail("Orders were not found"));
-        //    }
-        //    //foreach (var order in orders)
-        //    //{
-        //    //    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).ToListAsync();
-        //    //    _context.BasketDishes.RemoveRange(dishList);
-        //    //    _context.SaveChanges();
-        //    //    _context.Orders.Remove(order);
-        //    //}
-        //    try
-        //    {
-        //        _context.Orders.RemoveRange(orders);
-        //        await _context.SaveChangesAsync();
-        //        return await Task.FromResult(Result.Ok());
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-        //    }
-        //    catch (ObjectDisposedException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail(ex.Message));
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail(ex.Message));
-        //    }
-        //}
-        //public async Task<Result> RemoveAllAsync()
-        //{
-        //    var comment = await _commentContext.Comments.ToListAsync();
-        //    if (comment is null)
-        //    {
-        //        return await Task.FromResult(Result.Fail("Comments were not found"));
-        //    }
-        //    try
-        //    {
-        //        _commentContext.Comments.RemoveRange(comment);
-        //        await _commentContext.SaveChangesAsync();
-        //        return await Task.FromResult(Result.Ok());
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
-        //    }
-        //}
+        /// <summary>
+        ///  Asynchronously remove all orders 
+        /// </summary>
+        public async Task<Result> RemoveAll()
+        {
+            var orders = _context.Orders.AsNoTracking().ToList();
+            if (!orders.Any())
+            {
+                return await Task.FromResult(Result.Fail("Orders were not found"));
+            }
+            try
+            {
+                foreach (var order in orders)
+                {
+                    if (order is null)
+                    {
+                        return await Task.FromResult(Result.Fail("Order was not found"));
+                    }
+                    var dishList = _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToList();
+                    _context.BasketDishes.RemoveRange(dishList);
+                    _context.Orders.Remove(order);
+                }
+                _context.SaveChanges();
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+            catch (ObjectDisposedException ex)
+            {
 
-        //      List<CommentView> views = new List<CommentView>();
-        //      return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+        }
 
+        /// <summary>
+        ///  Asynchronously remove all orders by user Id. Id must be verified 
+        /// </summary>
+        /// <param name="userId">ID of user</param>
+        public async Task<Result> RemoveAllByUserId(string userId)
+        {
+            Guid id = Guid.Parse(userId);
+            var orders = _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToList();
+            if (orders is null)
+            {
+                return await Task.FromResult(Result.Fail("Orders were not found"));
+            }
+            try
+            {
+                foreach (var order in orders)
+                {
+                    if (order is null)
+                    {
+                        return await Task.FromResult(Result.Fail("Order was not found"));
+                    }
+                    var dishList = _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToList();
+                    _context.BasketDishes.RemoveRange(dishList);
+                    _context.Orders.Remove(order);
+                }
+                _context.SaveChanges();
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (ObjectDisposedException ex)
+            {
 
-        ///// <summary>
-        /////  Asynchronously remove all orders by user Id. Id must be verified 
-        ///// </summary>
-        ///// <param name="userId">ID of user</param>
-        //public async Task<Result> RemoveAllByUserIdAsync(string userId)
-        //{
-        //    Guid id = Guid.Parse(userId);
-        //    var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
-        //    if (!orders.Any())
-        //    {
-        //        return await Task.FromResult(Result.Fail("Orders were not found"));
-        //    }
-        //    try
-        //    {
-        //        foreach (var order in orders)
-        //        {
-        //            RemoveByIdAsync(order.Id.ToString());
-        //        }
-
-        //        return await Task.FromResult(Result.Ok());
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
-        //    }
-        //}
-
-        //public async Task<Result> RemoveAllByUserIdAsync(string userId)
-        //{
-        //    Guid id = Guid.Parse(userId);
-        //    var comment = _commentContext.Comments.Where(_ => _.UserId == id).Select(_ => _);
-        //    if (comment is null)
-        //    {
-        //        return await Task.FromResult(Result.Fail("Commenst were not found"));
-        //    }
-        //    try
-        //    {
-        //        _commentContext.Comments.RemoveRange(comment);
-        //        await _commentContext.SaveChangesAsync();
-        //        return await Task.FromResult(Result.Ok());
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
-        //    }
-        //    catch (DbUpdateException ex)
-        //    {
-        //        return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
-        //    }
-        //}
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+            }
+        }
 
         /// <summary>
         ///  Asynchronously update order status

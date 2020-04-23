@@ -6,9 +6,9 @@ namespace DreamFoodDelivery.Data.Models
 {
     public class BasketDishDB
     {
-        public Guid BasketId { get; set; }
-        public Guid ConnectionId { get; set; }
-        public Guid DishId { get; set; }
+        public Guid Id { get; set; }
+        public Guid? BasketId { get; set; }
+        public Guid? DishId { get; set; }
         public int? Quantity { get; set; }
         public Guid? OrderId { get; set; }
     }

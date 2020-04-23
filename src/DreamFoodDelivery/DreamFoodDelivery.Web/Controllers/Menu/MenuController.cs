@@ -77,7 +77,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="name"></param>
         /// <returns>Dishes</returns>
-        [HttpGet, Route("dishes/name/{name}")]
+        [HttpGet, Route("dishes/{name}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
@@ -111,6 +111,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         [LoggerAttribute]
+        [ObsoleteAttribute]
         public async Task<IActionResult> GetByCategory(string categoryString)
         {
             if (string.IsNullOrEmpty(categoryString))
@@ -147,8 +148,26 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByPriceAsync(priceString);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                string[] priceSplited = priceString.Split('_');
+                double lowerPrice = double.Parse(priceSplited[0]);
+                double upperPrice = double.Parse(priceSplited[1]);
+                if (lowerPrice > 0 && lowerPrice < upperPrice && upperPrice > 0)
+                {
+                    var result = await _menuService.GetByPriceAsync(lowerPrice, upperPrice);
+                    return result == null ? NotFound() : (IActionResult)Ok(result);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message); //check number
+            } 
+            catch (ArgumentException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message); //check number
             }
             catch (InvalidOperationException ex)
             {
@@ -170,6 +189,28 @@ namespace DreamFoodDelivery.Web.Controllers
         {
             var result = await _menuService.GetSalesAsync();
             return result == null ? NotFound() : (IActionResult)Ok(result);
+        }
+
+        /// <summary>
+        /// Returns dishes by tag index
+        /// </summary>
+        /// <returns>Returns dishes by tag index</returns>
+        [HttpGet, Route("tag/{tagIndex}")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "There are no dishes in list")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetByTagIndex(int tagIndex)
+        {
+            try
+            {
+                var result = await _menuService.GetByTagIndexAsync(tagIndex);
+                return result == null ? NotFound() : (IActionResult)Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

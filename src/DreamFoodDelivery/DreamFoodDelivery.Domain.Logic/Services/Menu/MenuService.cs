@@ -20,11 +20,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     {
         private readonly DreamFoodDeliveryContext _context;
         private readonly IMapper _mapper;
+        ITagService _tagService;
 
-        public MenuService(IMapper mapper, DreamFoodDeliveryContext context)
+        public MenuService(IMapper mapper, DreamFoodDeliveryContext context, ITagService tagService)
         {
             _context = context;
             _mapper = mapper;
+            _tagService = tagService;
         }
 
         /// <summary>
@@ -70,7 +72,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 foreach (var item in dish.TagIndexes)
                 {
                     TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                    dishToAdd.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dishToAdd.Id });
+                    if (tag is null)
+                    {
+                        var tagAfter = await _tagService.AddTagDBAsync(item);
+                        dishToAdd.DishTags.Add(new DishTagDB { TagId = tagAfter.Data.Id, DishId = dishToAdd.Id });
+                    }
+                    else
+                    {
+                        dishToAdd.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dishToAdd.Id });
+                    }
                 }
                 await _context.SaveChangesAsync();
 
@@ -202,14 +212,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
         /// </summary>
-        /// <param name="priceString">Dish price</param>
+        /// <param name="lowerPrice">Dish lower price</param>
+        /// <param name="upperPrice">Dish upper price</param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<DishView>>> GetByPriceAsync(string priceString)
-        {
-            var price = double.Parse(priceString); //make tryParse
+        public async Task<Result<IEnumerable<DishView>>> GetByPriceAsync(double lowerPrice, double upperPrice)
+        {           
             try
             {
-                var dishes = await _context.Dishes.Where(_ => _.Cost == price).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
+                var dishes = await _context.Dishes.Where(_ => _.Cost >= lowerPrice).Where(_ => _.Cost <= upperPrice).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync();
                 if (!dishes.Any())
                 {
                     return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
@@ -393,6 +403,39 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<DishView>.Fail<DishView>($"Cannot update model. {ex.Message}");
             }
+        }
+
+        /// <summary>
+        ///  Asynchronously get dishes by tag index. Id must be verified 
+        /// </summary>
+        /// <param name="tagIndex">Index of existing tag</param>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(int tagIndex)
+        {
+            TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == tagIndex).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            var dishTags = await _context.DishTags.Where(_ => _.TagId  == tag.Id).AsNoTracking().ToListAsync();
+            if (!dishTags.Any())
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+            }
+
+            List<DishView> views = new List<DishView>();
+            foreach (var dishTag in dishTags)
+            {
+                DishDB dish = await _context.Dishes.Where(_ => _.Id == dishTag.DishId).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                DishView viewItem = _mapper.Map<DishView>(dish);
+
+                viewItem.TagList = new HashSet<TagToAdd>();
+                foreach (var item in dish.DishTags)
+                {
+                    var tagItem = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync();
+                    viewItem.TagList.Add(_mapper.Map<TagToAdd>(tagItem));
+                }
+                views.Add(viewItem);
+            }
+
+            return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+
         }
     }
 }

@@ -204,7 +204,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string id)
         {
-            if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _)) //проверить везде
             {
                 return BadRequest();
             }
@@ -219,44 +219,51 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
-        ///// <summary>
-        ///// Delete orders
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpDelete, Route("")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "orders removed")]
-        //public IActionResult RemoveAll()
-        //{
-        //    _orderService.RemoveAllAsync();
-        //    return Ok();
-        //}
+        /// <summary>
+        /// Delete orders
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete, Route("")]
+        [SwaggerResponse(StatusCodes.Status200OK, "orders removed")]
+        public IActionResult RemoveAll()
+        {
+            try
+            {
+                _orderService.RemoveAll(); //use Result
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
 
-        ///// <summary>
-        ///// Delete orders by user id
-        ///// </summary>
-        ///// <param name="id">user id</param>
-        ///// <returns></returns>
-        //[HttpDelete, Route("user/{id}")]
-        //[SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        //[SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
-        //[SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
-        //public IActionResult RemoveAllByUserId(string id)
-        //{
-        //    if (!Guid.TryParse(id, out var _) /*|| _commentService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    try
-        //    {
-        //        _orderService.RemoveAllByUserIdAsync(id);
-        //        return Ok();
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        /// <summary>
+        /// Delete orders by user id
+        /// </summary>
+        /// <param name="id">user id</param>
+        /// <returns></returns>
+        [HttpDelete, Route("user/{id}")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
+        public IActionResult RemoveAllByUserId(string id)
+        {
+            if (!Guid.TryParse(id, out var _))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                _orderService.RemoveAllByUserId(id); //use Result
+                return Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

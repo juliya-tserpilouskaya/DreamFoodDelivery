@@ -1,4 +1,5 @@
 ﻿using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,13 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="tag">New tag to add</param>
         Task<Result<TagView>> AddAsync(TagToAdd tag);
+
+        /// <summary>
+        ///  Asynchronously add new tag 
+        /// </summary>
+        /// <param name="tag">New tag to add</param>
+        /// <returns>TagDB</returns>
+        Task<Result<TagDB>> AddTagDBAsync(TagToAdd tag);
 
         /// <summary>
         ///  Asynchronously update tag

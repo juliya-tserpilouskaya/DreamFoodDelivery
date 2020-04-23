@@ -38,10 +38,10 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="orderId">ID of existing order</param>
         Task<Result> RemoveByIdAsync(string orderId);
 
-        ///// <summary>
-        /////  Asynchronously remove all orders 
-        ///// </summary>
-        //Task<Result> RemoveAllAsync();
+        /// <summary>
+        ///  Asynchronously remove all orders 
+        /// </summary>
+        Task<Result> RemoveAll();
 
         /// <summary>
         ///  Asynchronously update order
@@ -49,11 +49,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="order">Existing order to update</param>
         Task<Result<OrderView>> UpdateAsync(OrderToUpdate order);
 
-        ///// <summary>
-        /////  Asynchronously remove all orders by user Id. Id must be verified 
-        ///// </summary>
-        ///// <param name="userId">ID of user</param>
-        //Task<Result> RemoveAllByUserIdAsync(string userId);
+        /// <summary>
+        ///  Asynchronously remove all orders by user Id. Id must be verified 
+        /// </summary>
+        /// <param name="userId">ID of user</param>
+        Task<Result> RemoveAllByUserId(string userId);
 
         /// <summary>
         ///  Asynchronously update order status

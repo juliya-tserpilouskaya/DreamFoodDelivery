@@ -114,7 +114,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="personalDiscount">New personal discount</param>
         /// <returns></returns>
-        [HttpPost, Route("сhangediscount")]
+        [HttpPost, Route("сhange_discount")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
@@ -170,7 +170,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpPost]
-        [Route("сhangerole/{identityId}")]
+        [Route("сhange_role/{identityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -195,35 +195,60 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
-        ////User/Admin
-        ///// <summary>
-        ///// Update the user email
-        ///// </summary>
-        ///// <param name="userInfo">user</param>
-        ///// <returns></returns>
-        //[HttpPost, Route("email")]
-        //[SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        //[SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
-        //[SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
-        //[LoggerAttribute]
-        //public async Task<IActionResult> UpdateUserEmail([FromBody]UserEmailToChange userInfo)
-        //{
-        //    if (userInfo is null /*|| !ModelState.IsValid*/)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    try
-        //    {
-        //        //var accessToken = HttpContext.Request.Headers[HeaderNames.Authorization];
-        //        var result = await _userService.UpdateEmailAsync(userInfo);
-        //        return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        //User/Admin
+        /// <summary>
+        /// Update the user email
+        /// </summary>
+        /// <param name="userInfo">user</param>
+        /// <returns></returns>
+        [HttpPost, Route("change_email")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
+        public async Task<IActionResult> UpdateUserEmail([FromBody]UserEmailToChange userInfo)
+        {
+            if (userInfo is null /*|| !ModelState.IsValid*/)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                //var accessToken = HttpContext.Request.Headers[HeaderNames.Authorization];
+                var result = await _userService.UpdateEmailAsync(userInfo);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        //User/Admin
+        /// <summary>
+        /// Update the user email
+        /// </summary>
+        /// <param name="userInfo">user</param>
+        /// <returns></returns>
+        [HttpPost, Route("email")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
+        public async Task<IActionResult> ConfirmUserEmail()
+        {
+            try
+            {
+                var result = await _userService.ConfirmEmailAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
         //User/Admin
         /// <summary>

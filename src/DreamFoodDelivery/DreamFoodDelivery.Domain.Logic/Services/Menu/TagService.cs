@@ -58,6 +58,37 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        ///  Asynchronously add new tag 
+        /// </summary>
+        /// <param name="tag">New tag to add</param>
+        /// <returns>TagDB</returns>
+        [LoggerAttribute]
+        public async Task<Result<TagDB>> AddTagDBAsync(TagToAdd tag)
+        {
+            var tagToAdd = _mapper.Map<TagDB>(tag);
+            _context.Tags.Add(tagToAdd);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                return Result<TagDB>.Ok(tagAfterAdding);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<TagDB>.Fail<TagDB>($"Cannot save model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<TagDB>.Fail<TagDB>($"Cannot save model. {ex.Message}");
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<TagDB>.Fail<TagDB>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Asynchronously returns all tags
         /// </summary>
         [LoggerAttribute]
