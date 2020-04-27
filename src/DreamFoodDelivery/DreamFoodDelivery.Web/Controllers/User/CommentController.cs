@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
@@ -14,7 +15,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentController : ControllerBase
@@ -28,18 +29,21 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Get all comments
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns>Returns all comments stored</returns>
+        [Authorize(Roles = "Admin")]
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no comments in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments were found", typeof(IEnumerable<CommentView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of comments is empty")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _commentService.GetAllAsync();
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _commentService.GetAllAsync(cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -56,9 +60,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment was found", typeof(CommentView))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Comment is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -66,8 +71,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.GetByIdAsync(id);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _commentService.GetByIdAsync(id, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -83,9 +88,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid UserId")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment wasn't found")]
         [SwaggerResponse(StatusCodes.Status200OK, "ID users comments were found", typeof(IEnumerable<CommentView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of comments is empty")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByUserId(string id)
+        public async Task<IActionResult> GetByUserId(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) && Guid.TryParse(id, out var _))
             {
@@ -95,8 +101,8 @@ namespace DreamFoodDelivery.Web.Controllers
             {
                 try
                 {
-                    var result = await _commentService.GetByUserIdAsync(id);
-                    return result == null ? NotFound() : (IActionResult)Ok(result);
+                    var result = await _commentService.GetByUserIdAsync(id, cancellationToken);
+                    return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -115,7 +121,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Create([FromBody, CustomizeValidator]CommentToAdd comment)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]CommentToAdd comment, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -123,7 +129,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.AddAsync(comment);
+                var result = await _commentService.AddAsync(comment, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -135,7 +141,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Update comment
         /// </summary>
-        /// <param name="comment">Comment</param>
+        /// <param name="comment">Comment to update</param>
         /// <returns>Comments</returns>
         [HttpPut, Route("")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
@@ -143,7 +149,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Comment updated", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> Update([FromBody, CustomizeValidator]CommentToUpdate comment)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]CommentToUpdate comment, CancellationToken cancellationToken = default)
         {
 
             if (comment is null || !ModelState.IsValid)
@@ -152,7 +158,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.UpdateAsync(comment);
+                var result = await _commentService.UpdateAsync(comment, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -164,15 +170,16 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Delete comment
         /// </summary>
-        /// <param name="id">comment id</param>
+        /// <param name="id">Comment id</param>
         /// <returns></returns>
         [HttpDelete, Route("{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comment doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comment deleted")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Comment is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string id)
+        public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _)) //check it
             {
@@ -180,8 +187,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.RemoveByIdAsync(id);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _commentService.RemoveByIdAsync(id, cancellationToken);
+                return result.IsError ? BadRequest(result.Message) : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -192,15 +199,17 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Delete comments by user id
         /// </summary>
-        /// <param name="id">user id</param>
+        /// <param name="id">User id</param>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete, Route("user/{id}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of comments is empty")]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveAllByUserId(string id)
+        public async Task<IActionResult> RemoveAllByUserId(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -208,8 +217,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                await _commentService.RemoveAllByUserIdAsync(id);
-                return Ok();
+                var result = await _commentService.RemoveAllByUserIdAsync(id, cancellationToken);
+                return result.IsError ? BadRequest(result.Message) : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -221,13 +230,24 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Delete comments
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete, Route("")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid request")]
         [SwaggerResponse(StatusCodes.Status200OK, "Comments removed")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of comments is empty")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveAll()
+        public async Task<IActionResult> RemoveAll(CancellationToken cancellationToken = default)
         {
-            await _commentService.RemoveAllAsync();
-            return Ok();
+            try
+            {
+                var result = await _commentService.RemoveAllAsync(cancellationToken);
+                return result.IsError ? BadRequest(result.Message) : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

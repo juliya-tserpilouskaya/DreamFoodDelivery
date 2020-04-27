@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DreamFoodDelivery.Common;
 using Microsoft.Net.Http.Headers;
 using FluentValidation.AspNetCore;
+using System.Threading;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -27,7 +28,7 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         //Admin only
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         /// <summary>
         /// Get all users
         /// </summary>
@@ -35,14 +36,15 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no users in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Users were found", typeof(IEnumerable<UserView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of users is empty")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _userService.GetAllAsync();
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _userService.GetAllAsync(cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -60,9 +62,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid user id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User was found", typeof(UserView))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "User is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -70,8 +73,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.GetByIdAsync(id);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _userService.GetByIdAsync(id, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -91,7 +94,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdateUserProfile([FromBody, CustomizeValidator]UserToUpdate user)
+        public async Task<IActionResult> UpdateUserProfile([FromBody, CustomizeValidator]UserToUpdate user, CancellationToken cancellationToken = default)
         {
             if (user is null || !ModelState.IsValid)
             {
@@ -99,7 +102,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.UpdateUserProfileAsync(user, HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                var result = await _userService.UpdateUserProfileAsync(user, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -109,6 +112,7 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         //Admin
+        [Authorize(Roles = "Admin")]
         /// <summary>
         /// Asynchronously update user personal discount
         /// </summary>
@@ -120,7 +124,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount, string idFromIdentity)
+        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default)
         {
             if (personalDiscount is null || idFromIdentity is null)
             {
@@ -128,7 +132,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.UpdateUserPersonalDiscountAsync(personalDiscount, idFromIdentity);
+                var result = await _userService.UpdateUserPersonalDiscountAsync(personalDiscount, idFromIdentity, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -137,6 +141,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         /// <summary>
         /// Remove user by userid
         /// </summary>
@@ -146,9 +151,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "User deleted")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "User is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string id)
+        public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -156,8 +162,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.RemoveByIdAsync(id);
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _userService.RemoveByIdAsync(id, cancellationToken);
+                return result.IsError ? NotFound(result.Message) : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -165,10 +171,11 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         /// <summary>
         /// Make admin from user or vice versa
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
         [HttpPost]
         [Route("сhange_role/{identityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -207,7 +214,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdateUserEmail([FromBody]UserEmailToChange userInfo)
+        public async Task<IActionResult> UpdateUserEmail([FromBody]UserEmailToChange userInfo, CancellationToken cancellationToken = default)
         {
             if (userInfo is null /*|| !ModelState.IsValid*/)
             {
@@ -216,7 +223,7 @@ namespace DreamFoodDelivery.Web.Controllers
             try
             {
                 //var accessToken = HttpContext.Request.Headers[HeaderNames.Authorization];
-                var result = await _userService.UpdateEmailAsync(userInfo);
+                var result = await _userService.UpdateEmailAsync(userInfo, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -229,7 +236,6 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Update the user email
         /// </summary>
-        /// <param name="userInfo">user</param>
         /// <returns></returns>
         [HttpPost, Route("email")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
@@ -237,11 +243,64 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> ConfirmUserEmail()
+        public async Task<IActionResult> ConfirmUserEmail(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _userService.ConfirmEmailAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                var result = await _userService.ConfirmEmailAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        //User/Admin
+        /// <summary>
+        /// Update the user email
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, Route("email/sendToken")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
+        public async Task<IActionResult> ConfirmUserEmailSend()
+        {
+            try
+            {
+                var result = await _userService.ConfirmEmailSendAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        //User/Admin
+        /// <summary>
+        /// Update the user email
+        /// </summary>
+        /// <param name="token">user token</param>
+        /// <returns></returns>
+        [HttpPost, Route("email/get/{token}")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
+        [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [LoggerAttribute]
+        public async Task<IActionResult> ConfirmUserEmailGet(string token, CancellationToken cancellationToken = default)
+        {
+            if (token is null)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var result = await _userService.ConfirmEmailGetAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, token, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -254,7 +313,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Update the user password
         /// </summary>
-        /// <param name="user">user</param>
+        /// <param name="userInfo">userInfo</param>
         /// <returns></returns>
         [HttpPost, Route("password")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
@@ -262,7 +321,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "User updated", typeof(UserView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdateUserPassword([FromBody, CustomizeValidator]UserPasswordToChange userInfo)
+        public async Task<IActionResult> UpdateUserPassword([FromBody, CustomizeValidator]UserPasswordToChange userInfo, CancellationToken cancellationToken = default)
         {
             if (userInfo is null || !ModelState.IsValid)
             {
@@ -270,7 +329,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _userService.UpdatePasswordAsync(userInfo);
+                var result = await _userService.UpdatePasswordAsync(userInfo, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

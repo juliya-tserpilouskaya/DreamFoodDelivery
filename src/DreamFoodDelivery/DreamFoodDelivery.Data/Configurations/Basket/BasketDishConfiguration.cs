@@ -14,6 +14,9 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.ToTable("BasketDishes");
             builder.HasKey(i => i.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
+
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }

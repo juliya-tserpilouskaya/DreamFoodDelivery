@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
@@ -36,11 +37,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Asynchronously returns all orders
         /// </summary>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> GetAllAsync()
+        public async Task<Result<IEnumerable<OrderView>>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var orders = await _context.Orders.AsNoTracking().ToListAsync();
+                var orders = await _context.Orders.AsNoTracking().ToListAsync(cancellationToken);
                 if (!orders.Any())
                 {
                     return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
@@ -50,7 +51,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 foreach (var order in orders)
                 {
                     OrderView viewItem = _mapper.Map<OrderView>(order);
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                     viewItem.Dishes = new HashSet<DishView>();
                     foreach (var dishListItem in dishList)
                     {
@@ -78,18 +79,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
         [LoggerAttribute]
-        public async Task<Result<OrderView>> GetByIdAsync(string orderId)
+        public async Task<Result<OrderView>> GetByIdAsync(string orderId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(orderId);
             try
             {
-                var order = await _context.Orders.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                var order = await _context.Orders.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (order is null)
                 {
                     return Result<OrderView>.Fail<OrderView>($"Order was not found");
                 }
                 OrderView view = _mapper.Map<OrderView>(order);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
@@ -115,10 +116,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="order">New order to add</param>
         /// <param name="userIdFromIdentity">Existing user Id to add</param>
         [LoggerAttribute]
-        public async Task<Result<OrderView>> AddAsync(OrderToAdd order, string userIdFromIdentity)
+        public async Task<Result<OrderView>> AddAsync(OrderToAdd order, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
             User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
-            UserDB userDB = await _context.Users.Where(_ => _.IdFromIdentity == userIdentity.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            UserDB userDB = await _context.Users.Where(_ => _.IdFromIdentity == userIdentity.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             
             if (userDB is null || userIdentity is null)
             {
@@ -138,7 +139,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             orderToAdd.UpdateTime = DateTime.Now;
             _context.Orders.Add(orderToAdd);
 
-            var connection = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            var connection = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             connection.OrderId = orderToAdd.Id;
             connection.BasketId = Guid.Empty;
             _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
@@ -147,8 +148,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync();
-                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync();
+                OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync(cancellationToken);
                 OrderView view = _mapper.Map<OrderView>(orderAfterAdding);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
@@ -182,9 +183,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="order">Existing order to update</param>
         [LoggerAttribute]
-        public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order)
+        public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(15))///////////////////////////////////////////////////////////////////
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
@@ -197,8 +198,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 try
                 {
                     await _context.SaveChangesAsync();
-                    OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync();
+                    OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync(cancellationToken);
                     OrderView view = _mapper.Map<OrderView>(orderAfterAdding);
                     view.Dishes = new HashSet<DishView>();
                     foreach (var dishListItem in dishList)
@@ -233,10 +234,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="userId">ID of user</param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
-            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
+            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!orders.Any())
             {
                 return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
@@ -246,7 +247,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             foreach (var order in orders)
             {
                 OrderView viewItem = _mapper.Map<OrderView>(order);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                 viewItem.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
@@ -268,7 +269,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="orderId">ID of existing order</param>
         [LoggerAttribute]
-        public async Task<Result> RemoveByIdAsync(string orderId)
+        public async Task<Result> RemoveByIdAsync(string orderId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(orderId);
             var order = await _context.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
@@ -277,12 +278,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return await Task.FromResult(Result.Fail("Order was not found"));
             }
 
-            var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+            var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
             try
             {
                 _context.BasketDishes.RemoveRange(dishList);
                 _context.Orders.Remove(order);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
@@ -296,7 +297,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        ///  Asynchronously remove all orders 
+        ///  Remove all orders 
         /// </summary>
         public async Task<Result> RemoveAll()
         {
@@ -382,9 +383,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="order">New order status</param>
         [LoggerAttribute]
-        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order)
+        public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             string orderStatus = Enum.GetName(typeof(OrderStatuses), order.StatusIndex);
             switch (orderStatus)
             {
@@ -424,9 +425,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             try
             {
-                await _context.SaveChangesAsync();
-                OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterUpdate.Id).AsNoTracking().ToListAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterUpdate.Id).AsNoTracking().ToListAsync(cancellationToken);
                 OrderView view = _mapper.Map<OrderView>(orderAfterUpdate);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
@@ -448,6 +449,72 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             catch (DbUpdateException ex)
             {
                 return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously remove all orders 
+        /// </summary>
+        [LoggerAttribute]
+        public async Task<Result> RemoveAllAsync(CancellationToken cancellationToken = default)
+        {
+            var orders = await _context.Orders.AsNoTracking().ToListAsync(cancellationToken);
+            if (!orders.Any())
+            {
+                return await Task.FromResult(Result.Fail("Orders were not found"));
+            }
+            try
+            {
+                foreach (var order in orders)
+                {
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    _context.BasketDishes.RemoveRange(dishList);
+                    _context.Orders.Remove(order);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously remove all orders by user Id. Id must be verified 
+        /// </summary>
+        /// <param name="userId">ID of user</param>
+        [LoggerAttribute]
+        public async Task<Result> RemoveAllByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            Guid id = Guid.Parse(userId);
+            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
+            if (!orders.Any())
+            {
+                return await Task.FromResult(Result.Fail("Orders were not found"));
+            }
+            try
+            {
+                foreach (var order in orders)
+                {
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    _context.BasketDishes.RemoveRange(dishList);
+                    _context.Orders.Remove(order);
+                    await _context.SaveChangesAsync(cancellationToken);
+                }
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
             }
         }
     }

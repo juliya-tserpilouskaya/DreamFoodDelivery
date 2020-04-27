@@ -10,7 +10,7 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
     {
         public OrderToAddValidation()
         {
-            RuleFor(_ => _.BasketId).NotEmpty().WithMessage("You must enter basket Id");
+            //RuleFor(_ => _.BasketId).NotEmpty().WithMessage("You must enter basket Id");
             When(_ => _.IsInfoFromProfile == false, () => {
                 RuleFor(_ => _.Address).MinimumLength(3).MaximumLength(90)
                     .WithMessage("Address must contain from 3 to 90 characters.");

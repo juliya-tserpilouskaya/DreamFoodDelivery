@@ -4,6 +4,7 @@ using DreamFoodDelivery.Domain.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
@@ -14,20 +15,20 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// Create User
         /// </summary>
         /// <param name="user">User registration data</param>
-        Task<Result<UserWithToken>> RegisterAsync(UserRegistration user);
+        Task<Result<UserWithToken>> RegisterAsync(UserRegistration user, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Log in
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
-        Task<Result<UserWithToken>> LoginAsync(string email, string password);
+        Task<Result<UserWithToken>> LoginAsync(string email, string password, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Remove user
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
-        Task<Result> DeleteAsync(string email, string password);
+        Task<Result> DeleteAsync(string email, string password, CancellationToken cancellationToken = default);
     }
 }

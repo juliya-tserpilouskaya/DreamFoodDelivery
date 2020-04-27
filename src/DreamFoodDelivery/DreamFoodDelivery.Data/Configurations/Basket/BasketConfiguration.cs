@@ -25,6 +25,9 @@ namespace DreamFoodDelivery.Data.Configurations
             //       .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
+
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }

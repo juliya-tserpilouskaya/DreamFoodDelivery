@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
@@ -35,7 +36,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="user">User registration data</param>
         [LoggerAttribute]
-        public async Task<Result<UserWithToken>> RegisterAsync(UserRegistration user)
+        public async Task<Result<UserWithToken>> RegisterAsync(UserRegistration user, CancellationToken cancellationToken = default)
         {
             string defaultRole = "User";
 
@@ -66,7 +67,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var profile = await _service.CreateAccountAsyncById(newUser.Id);
+            var profile = await _service.CreateAccountAsyncById(newUser.Id, cancellationToken);
             var token = await GenerateToken(newUser);
             //EmailSenderService.SendMail(newUser.Email, "Registration", "Thanks");
             UserWithToken result = new UserWithToken()
@@ -83,7 +84,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="email"></param>
         /// <param name="password"></param>
         [LoggerAttribute]
-        public async Task<Result> DeleteAsync(string email, string password)
+        public async Task<Result> DeleteAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -97,7 +98,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return await Task.FromResult(Result.Fail("Wrong password"));
             }
 
-            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id); //del in DB
+            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id, cancellationToken); //del in DB
             if (isUserDeleted.IsError)
             {
                 return await Task.FromResult(Result.Fail(isUserDeleted.Message));
@@ -119,7 +120,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="email"></param>
         /// <param name="password"></param>
         [LoggerAttribute]
-        public async Task<Result<UserWithToken>> LoginAsync(string email, string password)
+        public async Task<Result<UserWithToken>> LoginAsync(string email, string password, CancellationToken cancellationToken = default)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -133,7 +134,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return Result<string>.Fail<UserWithToken>("Wrong password");
             }
             
-            var profile = await _service.GetUserByIdFromIdentityAsync(user.Id);
+            var profile = await _service.GetUserByIdFromIdentityAsync(user.Id, cancellationToken);
             var token = await GenerateToken(user);
             if (profile.IsError || string.IsNullOrEmpty(token.Data))
             {

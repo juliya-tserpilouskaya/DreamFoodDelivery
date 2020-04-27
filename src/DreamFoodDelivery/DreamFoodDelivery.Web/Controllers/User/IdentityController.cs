@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
@@ -36,11 +37,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _identityService.RegisterAsync(user);
+                var result = await _identityService.RegisterAsync(user, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -62,11 +63,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _identityService.LoginAsync(user.Email, user.Password);
+                var result = await _identityService.LoginAsync(user.Email, user.Password, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -102,11 +103,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _identityService.DeleteAsync(user.Email, user.Password);
+                var result = await _identityService.DeleteAsync(user.Email, user.Password, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
             }

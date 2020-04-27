@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Common;
+using System.Threading;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -29,14 +30,15 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no dishes in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _menuService.GetAllAsync();
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetAllAsync(cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -53,9 +55,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dish was found", typeof(DishView))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Dish is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
             if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -63,8 +66,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByIdAsync(id);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByIdAsync(id, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -75,15 +78,16 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Get dish by name
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">Dish name</param>
         /// <returns>Dishes</returns>
         [HttpGet, Route("dishes/{name}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByName(string name)
+        public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -91,8 +95,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByNameAsync(name);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByNameAsync(name, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -109,10 +113,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         [LoggerAttribute]
         [ObsoleteAttribute]
-        public async Task<IActionResult> GetByCategory(string categoryString)
+        public async Task<IActionResult> GetByCategory(string categoryString, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(categoryString))
             {
@@ -120,8 +125,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByCategoryAsync(categoryString);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByCategoryAsync(categoryString, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -138,9 +143,10 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByCost(string priceString)
+        public async Task<IActionResult> GetByCost(string priceString, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(priceString))
             {
@@ -153,8 +159,8 @@ namespace DreamFoodDelivery.Web.Controllers
                 double upperPrice = double.Parse(priceSplited[1]);
                 if (lowerPrice > 0 && lowerPrice < upperPrice && upperPrice > 0)
                 {
-                    var result = await _menuService.GetByPriceAsync(lowerPrice, upperPrice);
-                    return result == null ? NotFound() : (IActionResult)Ok(result);
+                    var result = await _menuService.GetByPriceAsync(lowerPrice, upperPrice, cancellationToken);
+                    return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
                 }
                 else
                 {
@@ -183,12 +189,13 @@ namespace DreamFoodDelivery.Web.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
         [LoggerAttribute]
-        public async Task<IActionResult> GetSales()
+        public async Task<IActionResult> GetSales(CancellationToken cancellationToken = default)
         {
-            var result = await _menuService.GetSalesAsync();
-            return result == null ? NotFound() : (IActionResult)Ok(result);
+            var result = await _menuService.GetSalesAsync(cancellationToken);
+            return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
         }
 
         /// <summary>
@@ -198,14 +205,15 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpGet, Route("tag/{tagIndex}")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "There are no dishes in list")]
         [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<DishView>))]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "List of dishes is empty")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByTagIndex(int tagIndex)
+        public async Task<IActionResult> GetByTagIndex(int tagIndex, CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _menuService.GetByTagIndexAsync(tagIndex);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByTagIndexAsync(tagIndex, cancellationToken);
+                return result == null ? NotFound() : result.IsSuccess ? (IActionResult)Ok(result) : NoContent();
             }
             catch (InvalidOperationException ex)
             {

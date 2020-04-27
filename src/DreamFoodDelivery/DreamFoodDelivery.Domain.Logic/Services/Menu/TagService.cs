@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
@@ -32,15 +33,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="tag">New tag to add</param>
         [LoggerAttribute]
-        public async Task<Result<TagView>> AddAsync(TagToAdd tag)
+        public async Task<Result<TagView>> AddAsync(TagToAdd tag, CancellationToken cancellationToken = default)
         {
             var tagToAdd = _mapper.Map<TagDB>(tag);
             _context.Tags.Add(tagToAdd);
 
             try
             {
-                await _context.SaveChangesAsync();
-                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagView>.Ok(_mapper.Map<TagView>(tagAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -63,15 +64,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="tag">New tag to add</param>
         /// <returns>TagDB</returns>
         [LoggerAttribute]
-        public async Task<Result<TagDB>> AddTagDBAsync(TagToAdd tag)
+        public async Task<Result<TagDB>> AddTagDBAsync(TagToAdd tag, CancellationToken cancellationToken = default)
         {
             var tagToAdd = _mapper.Map<TagDB>(tag);
             _context.Tags.Add(tagToAdd);
 
             try
             {
-                await _context.SaveChangesAsync();
-                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagDB>.Ok(tagAfterAdding);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -92,9 +93,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Asynchronously returns all tags
         /// </summary>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<TagView>>> GetAllAsync()
+        public async Task<Result<IEnumerable<TagView>>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var tags = await _context.Tags.AsNoTracking().ToListAsync();
+            var tags = await _context.Tags.AsNoTracking().ToListAsync(cancellationToken);
             if (!tags.Any())
             {
                 return Result<IEnumerable<TagView>>.Fail<IEnumerable<TagView>>("No tags found");
@@ -107,12 +108,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
         [LoggerAttribute]
-        public async Task<Result<TagView>> GetByIdAsync(string tagId)
+        public async Task<Result<TagView>> GetByIdAsync(string tagId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(tagId);
             try
             {
-                var tag = await _context.Tags.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                var tag = await _context.Tags.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (tag is null)
                 {
                     return Result<TagView>.Fail<TagView>($"Tag was not found");
@@ -129,9 +130,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove all tags 
         /// </summary>
         [LoggerAttribute]
-        public async Task<Result> RemoveAllAsync()
+        public async Task<Result> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
-            var tag = await _context.Tags.ToListAsync();
+            var tag = await _context.Tags.ToListAsync(cancellationToken);
             if (tag is null)
             {
                 return await Task.FromResult(Result.Fail("Tags were not found"));
@@ -139,7 +140,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 _context.Tags.RemoveRange(tag);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }
@@ -158,7 +159,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
         [LoggerAttribute]
-        public async Task<Result> RemoveByIdAsync(string tagId)
+        public async Task<Result> RemoveByIdAsync(string tagId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(tagId);
             var tag = await _context.Tags.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
@@ -169,7 +170,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 _context.Tags.Remove(tag);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
@@ -187,14 +188,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="tag">Existing tag to update</param>
         [LoggerAttribute]
-        public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag)
+        public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag, CancellationToken cancellationToken = default)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
             _context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 return Result<TagToUpdate>.Ok(tag);
             }
             catch (DbUpdateConcurrencyException ex)

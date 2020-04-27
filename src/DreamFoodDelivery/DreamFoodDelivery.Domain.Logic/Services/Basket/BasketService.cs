@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
@@ -36,25 +37,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="quantity">Dish quantity to add</param>
         /// <param name="userIdFromIdentity">Existing user Id to add</param>
         [LoggerAttribute]
-        public async Task<Result<BasketView>> AddUpdateDishAsync(string dishId, string userIdFromIdentity, int quantity)
+        public async Task<Result<BasketView>> AddUpdateDishAsync(string dishId, string userIdFromIdentity, int quantity, CancellationToken cancellationToken = default)
         {
-            DishDB dishToAdd = await _context.Dishes.Where(_ => _.Id == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            DishDB dishToAdd = await _context.Dishes.Where(_ => _.Id == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (dishToAdd is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"Dish was not found");
             }
-            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
-            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync();
+            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (basket is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"Basket was not found");
             }
 
-            var connection = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id && _.DishId == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            var connection = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id && _.DishId == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             
             if (connection is null)
             {
@@ -72,8 +73,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             
             try
             {
-                await _context.SaveChangesAsync();
-                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
                 BasketView view = _mapper.Map<BasketView>(basket);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
@@ -108,19 +109,19 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="dishId">Existing dish Id to remove</param>
         /// <param name="userIdFromIdentity">Existing user Id to remove</param>
         [LoggerAttribute]
-        public async Task<Result<BasketView>> RemoveDishByIdAsync(string dishId, string userIdFromIdentity)
+        public async Task<Result<BasketView>> RemoveDishByIdAsync(string dishId, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
-            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
-            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync();
+            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (basket is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"Basket was not found");
             }
-            BasketDishDB connection = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id && _.DishId == Guid.Parse(dishId)).AsNoTracking().FirstOrDefaultAsync();
+            BasketDishDB connection = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id && _.DishId == Guid.Parse(dishId)).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (connection is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"Connection was not found");
@@ -130,8 +131,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _context.BasketDishes.Remove(connection);
             try
             {
-                await _context.SaveChangesAsync();
-                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync();
+                await _context.SaveChangesAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
                 BasketView view = _mapper.Map<BasketView>(basket);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
@@ -165,21 +166,21 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="userIdFromIdentity"></param>
         [LoggerAttribute]
-        public async Task<Result<BasketView>> GetAllDishesByUserIdAsync(string userIdFromIdentity)
+        public async Task<Result<BasketView>> GetAllDishesByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
-            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
-            BasketDB basket = await _context.Baskets.Where(_ => _.Id == user.BasketId).AsNoTracking().FirstOrDefaultAsync();
+            BasketDB basket = await _context.Baskets.Where(_ => _.Id == user.BasketId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (basket is null )
             {
                 return Result<BasketView>.Fail<BasketView>($"Basket was not found");
             }
             try
             {
-                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync();
+                var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
                 BasketView view = _mapper.Map<BasketView>(basket);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
@@ -205,19 +206,19 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove all dishes from basket by user Id
         /// </summary>
         [LoggerAttribute]
-        public async Task<Result> RemoveAllByUserIdAsync(string userIdFromIdentity)
+        public async Task<Result> RemoveAllByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
-            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync();
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
-            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync();
+            BasketDB basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (basket is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"Basket was not found");
             }
-            var connections = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync();
+            var connections = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
             if (!connections.Any())
             {
                 return Result<BasketView>.Fail<BasketView>($"Connections was not found");
@@ -228,7 +229,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
                 BasketView view = _mapper.Map<BasketView>(basket);
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }
