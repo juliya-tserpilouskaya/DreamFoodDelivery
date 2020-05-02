@@ -33,7 +33,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
@@ -59,7 +59,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
@@ -83,13 +83,13 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("logout")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [LoggerAttribute]
-        public async Task<IActionResult> LogOut()
+        public IActionResult LogOut()
         {
             HttpContext.Session.Clear(); //deal with it
 
-            return Ok(await Task.FromResult(Result.Ok()));
+            return NoContent();
         }
 
         /// <summary>

@@ -32,7 +32,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         /// <param name="dish"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish added", typeof(DishView))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
         [LoggerAttribute]
         public async Task<IActionResult> Create([FromBody, CustomizeValidator]DishToAdd dish, CancellationToken cancellationToken = default)

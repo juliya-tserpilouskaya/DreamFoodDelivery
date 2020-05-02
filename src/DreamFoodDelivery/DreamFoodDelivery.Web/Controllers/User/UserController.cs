@@ -178,7 +178,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="identityId"></param>
         [HttpPost]
         [Route("сhange_role/{identityId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

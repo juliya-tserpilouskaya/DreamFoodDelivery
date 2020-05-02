@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         [HttpGet]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +57,7 @@ namespace DreamFoodDelivery.Web.Controllers
         ///// <param name="userId">user id</param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "dish added", typeof(BasketView))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id or wrong quantity")]
         [LoggerAttribute]
         public async Task<IActionResult> AddDish([FromBody]string dishId/*, string userId*/, int quantity, CancellationToken cancellationToken = default) 
@@ -81,7 +81,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpDelete, Route("{dishId}")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted", typeof(BasketView))]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Dish is missing")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]

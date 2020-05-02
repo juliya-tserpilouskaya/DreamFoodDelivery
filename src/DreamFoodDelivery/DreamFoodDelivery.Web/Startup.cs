@@ -99,6 +99,8 @@ namespace DreamFoodDelivery.Web
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
             });
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -117,6 +119,11 @@ namespace DreamFoodDelivery.Web
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

@@ -90,7 +90,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPut, Route("status")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Order updated")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Order updated", typeof(OrderView))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
         [LoggerAttribute]
         public async Task<IActionResult> UpdateStatus([FromBody, CustomizeValidator]OrderToStatusUpdate orderStatus, CancellationToken cancellationToken = default)
@@ -116,7 +116,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="order"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Order added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Order added", typeof(OrderView))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]

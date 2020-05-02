@@ -117,7 +117,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="comment"></param>
         /// <returns></returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Comment added")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Comment added", typeof(CommentView))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid comment data")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
