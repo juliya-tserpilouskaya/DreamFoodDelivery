@@ -1,0 +1,24 @@
+<div>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <h3>Please enter information to sigh in</h3>
+        <div class="form-group">
+            <label for="inputEmail">Email</label>
+            <input type="email" class="form-control" id="inputEmail" formControlName="name" placeholder="Enter email" required>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" id="inputPassword" class="form-control" formControlName="password" placeholder="Password" required>
+        </div>
+        <div class="checkbox mb-3">
+          <label>
+            <!-- Is it usefull? -->
+            <input type="checkbox" value="remember-me"> Remember me
+          </label>
+        </div>
+        <div>
+          <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+          <a  class="btn btn-link" [routerLink]="['/register']">Register</a>
+        </div>
+        <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
+    </form>
+</div>
