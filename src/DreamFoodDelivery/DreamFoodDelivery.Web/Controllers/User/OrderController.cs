@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
@@ -10,11 +11,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    /// <summary>
+    /// Work with orders
+    /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
@@ -25,22 +28,25 @@ namespace DreamFoodDelivery.Web.Controllers
             _orderService = orderService;
         }
 
-        //Admin
         /// <summary>
         /// Get all orders
         /// </summary>
         /// <returns>Returns all orders stored</returns>
-        [HttpGet, Route("")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "There are no orders in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Orders were found", typeof(IEnumerable<OrderView>))]
+        [Authorize(Roles = "Admin")]
+        [HttpGet, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _orderService.GetAllAsync();
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _orderService.GetAllAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -49,17 +55,18 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Asynchronously get order by order Id
+        /// Get order by order Id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Order id</param>
+        /// <returns>Returns ID matching order</returns>
         [HttpGet, Route("{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order id")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "order was found", typeof(OrderView))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -67,8 +74,10 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _orderService.GetByIdAsync(id);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _orderService.GetByIdAsync(id, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -76,19 +85,19 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
-        //Admin
         /// <summary>
         /// Asynchronously update order status
         /// </summary>
-        /// <param name="orderStatus">New personal discount</param>
-        /// <returns></returns>
+        /// <param name="orderStatus">New order status</param>
+        /// <returns>Returns order information</returns>
+        [Authorize(Roles = "Admin")]
         [HttpPut, Route("status")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "User doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "User updated")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdateStatus([FromBody, CustomizeValidator]OrderToStatusUpdate orderStatus)
+        public async Task<IActionResult> UpdateStatus([FromBody, CustomizeValidator]OrderToStatusUpdate orderStatus, CancellationToken cancellationToken = default)
         {
             if (orderStatus is null || !ModelState.IsValid)
             {
@@ -96,8 +105,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _orderService.UpdateOrderStatusAsync(orderStatus);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                var result = await _orderService.UpdateOrderStatusAsync(orderStatus, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -106,16 +115,17 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Asynchronously create new order
+        /// Create new order
         /// </summary>
-        /// <param name="order"></param>
-        /// <returns></returns>
+        /// <param name="order">New comment to add</param>
+        /// <returns>Comment info after adding</returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "order added")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid order data")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Create([FromBody, CustomizeValidator]OrderToAdd order)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]OrderToAdd order, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -123,8 +133,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _orderService.AddAsync(order);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                var result = await _orderService.AddAsync(order, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -135,15 +145,15 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Update order
         /// </summary>
-        /// <param name="order">order</param>
-        /// <returns>order</returns>
+        /// <param name="order">Order to update</param>
+        /// <returns>Order info after updatting</returns>
         [HttpPut, Route("")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Order updated", typeof(OrderToUpdate))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderToUpdate))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Update([FromBody, CustomizeValidator]OrderToUpdate order)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]OrderToUpdate order, CancellationToken cancellationToken = default)
         {
             if (order is null || !ModelState.IsValid)
             {
@@ -151,8 +161,8 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _orderService.UpdateAsync(order);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                var result = await _orderService.UpdateAsync(order, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -161,57 +171,88 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get user orders
+        /// Get user orders for administration
         /// </summary>
-        /// <returns></returns>
+        /// <param name="id">User id</param>
+        /// <returns>Returns users orders for administration</returns>
+        [Authorize(Roles = "Admin")]
         [HttpGet, Route("user/{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid UserId")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "orders wasn't found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "ID users orders were found", typeof(IEnumerable<OrderView>))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByUserId(string id)
+        public async Task<IActionResult> GetByUserIdAdmin(string id, CancellationToken cancellationToken = default)
         {
-            //if (User.Identity.IsAuthenticated)
-            if (!string.IsNullOrEmpty(id))
-            {
-                try
-                {
-                    var result = await _orderService.GetByUserIdAsync(id);
-                    return result == null ? NotFound() : (IActionResult)Ok(result);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-                }
-            }
-            else
+            if (string.IsNullOrEmpty(id))
             {
                 return BadRequest();
+            }
+            try
+            {
+                var result = await _orderService.GetByUserIdAdminAsync(id, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get users orders for users actions
+        /// </summary>
+        /// <returns>Returns users orders for users actions</returns>
+        [HttpGet, Route("")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetByUserId(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                string userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
+                var result = await _orderService.GetByUserIdAsync(userIdFromIdentity, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
 
         /// <summary>
         /// Delete order
         /// </summary>
-        /// <param name="id">order id</param>
-        /// <returns></returns>
+        /// <param name="id">Order id to delete</param>
+        /// <returns>Result information</returns>
+        [Authorize(Roles = "Admin")]
         [HttpDelete, Route("{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "order doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "order deleted")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string id)
+        public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
-            if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }
             try
             {
-                var result = await _orderService.RemoveByIdAsync(id);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _orderService.RemoveByIdAsync(id, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
+                     : NotFound();
             }
             catch (InvalidOperationException ex)
             {
@@ -219,44 +260,61 @@ namespace DreamFoodDelivery.Web.Controllers
             }
         }
 
-        ///// <summary>
-        ///// Delete orders
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpDelete, Route("")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "orders removed")]
-        //public IActionResult RemoveAll()
-        //{
-        //    _orderService.RemoveAllAsync();
-        //    return Ok();
-        //}
+        /// <summary>
+        /// Delete orders
+        /// </summary>
+        /// <returns>Result information</returns>
+        [Authorize(Roles = "Admin")]
+        [HttpDelete, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemoveAll(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _orderService.RemoveAllAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
+                     : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
-
-        ///// <summary>
-        ///// Delete orders by user id
-        ///// </summary>
-        ///// <param name="id">user id</param>
-        ///// <returns></returns>
-        //[HttpDelete, Route("user/{id}")]
-        //[SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        //[SwaggerResponse(StatusCodes.Status404NotFound, "Comments doesn't exists")]
-        //[SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Comments deleted")]
-        //public IActionResult RemoveAllByUserId(string id)
-        //{
-        //    if (!Guid.TryParse(id, out var _) /*|| _commentService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    try
-        //    {
-        //        _orderService.RemoveAllByUserIdAsync(id);
-        //        return Ok();
-        //    }
-        //    catch (InvalidOperationException ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        /// <summary>
+        /// Delete orders by user id
+        /// </summary>
+        /// <param name="id">User id</param>
+        /// <returns>Result information</returns>
+        [Authorize(Roles = "Admin")]
+        [HttpDelete, Route("user/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> RemoveAllByUserId(string id, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _orderService.RemoveAllByUserIdAsync(id, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
+                     : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

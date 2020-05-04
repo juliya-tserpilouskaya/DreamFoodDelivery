@@ -9,7 +9,7 @@ namespace DreamFoodDelivery.Data.Models
         public Guid? Id { get; set; }
         public Guid UserId { get; set; }
         public UserDB User { get; set; }
-        public Guid BasketId { get; set; }
+        public Guid? BasketId { get; set; }
         public CommentDB Comment { get; set; }
         public Guid? CommentId { get; set; }
 
@@ -20,8 +20,8 @@ namespace DreamFoodDelivery.Data.Models
         public string Name { get; set; }
         public string Surname { get; set; }
 
-        public double? OrderСost { get; set; }
-        public double? ShippingСost { get; set; }
+        public double OrderСost { get; set; }
+        public double ShippingСost { get; set; }
         public string Status { get; set; } 
         public DateTime? OrderTime { get; set; } = DateTime.Now;
         public DateTime? DeliveryTime { get; set; }

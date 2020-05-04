@@ -6,13 +6,17 @@ using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DreamFoodDelivery.Common;
+using System.Threading;
+using FluentValidation.AspNetCore;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    /// <summary>
+    /// Work with own basket
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -25,21 +29,23 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get all dishes by user Id. Id must be verified
+        /// Get all dishes in the basket
         /// </summary>
+        /// <returns>Returns all dishes in the basket</returns>
         [HttpGet]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _basketService.GetAllDishesByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                var result = await _basketService.GetAllDishesByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -48,41 +54,49 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Add or updated dish to basket
+        /// Add or update dish into basket
         /// </summary>
-        /// <param name="dishId">dish id</param>
-        /// <param name="quantity">dish quantity</param>
-        ///// <param name="userId">user id</param>
-        /// <returns></returns>
+        /// <param name="dishInfo">Dish id and quantity</param>
+        /// <returns>Returns all dishes in the basket</returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "dish added")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id or wrong quantity")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> AddDish([FromBody]string dishId/*, string userId*/, int quantity) 
+        public async Task<IActionResult> AddDish([FromBody, CustomizeValidator]DishToBasketAdd dishInfo, CancellationToken cancellationToken = default) 
         {
-            if (Guid.TryParse(dishId, out var _) && quantity > 0)
+            if (dishInfo is null || !ModelState.IsValid)
             {
-                bool isUser = HttpContext.User.Identity.IsAuthenticated;
-                var userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
-                var result = await _basketService.AddUpdateDishAsync(dishId, userIdFromIdentity, quantity);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return BadRequest(ModelState);
             }
-            return BadRequest(ModelState);
-
+            try
+            {
+                //bool isUser = HttpContext.User.Identity.IsAuthenticated;
+                var userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
+                var result = await _basketService.AddUpdateDishAsync(dishInfo.DishId, userIdFromIdentity, dishInfo.Quantity, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         /// <summary>
         /// Delete dish from basket
         /// </summary>
-        /// <param name="dishId">dish id</param>
-        /// <returns></returns>
+        /// <param name="dishId">Dish id</param>
+        /// <returns>Returns all dishes in the basket</returns>
         [HttpDelete, Route("{dishId}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string dishId)
+        public async Task<IActionResult> RemoveById(string dishId, CancellationToken cancellationToken = default)
         {
             if (!Guid.TryParse(dishId, out var _))
             {
@@ -90,8 +104,10 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _basketService.RemoveDishByIdAsync(dishId, HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result);
+                var result = await _basketService.RemoveDishByIdAsync(dishId, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -102,16 +118,20 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         ///  Remove all dishes from basket by user Id
         /// </summary>
+        /// <returns>Returns information about basket action</returns>
         [HttpDelete, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes removed")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveAllAsync()
+        public async Task<IActionResult> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _basketService.RemoveAllByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                var result = await _basketService.RemoveAllByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) 
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {

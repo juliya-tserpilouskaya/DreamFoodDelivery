@@ -4,21 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Data.Context
 {
     public class DreamFoodDeliveryContext : DbContext
     {
-        public DreamFoodDeliveryContext()
-        {
-
-        }
         public DreamFoodDeliveryContext(DbContextOptions<DreamFoodDeliveryContext> options) : base(options)
         {
             Database.EnsureCreated();
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new DishConfiguration());
             modelBuilder.ApplyConfiguration(new DishTagConfiguration());
             modelBuilder.ApplyConfiguration(new TagConfiguration());
@@ -36,5 +35,44 @@ namespace DreamFoodDelivery.Data.Context
         public DbSet<OrderDB> Orders { get; set; }
         public DbSet<UserDB> Users { get; set; }
         public DbSet<BasketDishDB> BasketDishes { get; set; }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            OnBeforeSaving();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            OnBeforeSaving();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void OnBeforeSaving()
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is User ||
+                    entry.Entity is UserDB ||
+                    entry.Entity is CommentDB /*||*/
+                    //entry.Entity is OrderDB ||
+                    /*entry.Entity is DishDB*/)
+                {
+                    continue;
+                };
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.CurrentValues["IsDeleted"] = false;
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified;
+                        entry.CurrentValues["IsDeleted"] = true;
+                        break;
+                }
+            }
+        }
     }
 }

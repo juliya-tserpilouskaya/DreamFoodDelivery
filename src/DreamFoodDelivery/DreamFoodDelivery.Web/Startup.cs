@@ -37,12 +37,19 @@ namespace DreamFoodDelivery.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDomainServices(Configuration);
-
+            //In-Memory
+            services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
+            services.AddSession();
             var tokenSecret = new TokenSecret();
             Configuration.Bind(nameof(tokenSecret), tokenSecret);
             services.AddSingleton(tokenSecret);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(auth =>
+            {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
@@ -86,12 +93,29 @@ namespace DreamFoodDelivery.Web
             services.AddControllers().AddFluentValidation(fluentValidation =>
             {
                 fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToBasketAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishByCostValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<CommentToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<CommentToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToStatusUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<UserPasswordToChangeValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
             });
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -102,7 +126,7 @@ namespace DreamFoodDelivery.Web
                 app.UseDeveloperExceptionPage();
                 app.UseOpenApi().UseSwaggerUi3();
             }
-
+            app.UseSession(); // use this before .UseEndpoints
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -110,6 +134,12 @@ namespace DreamFoodDelivery.Web
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseCors("CorsPolicy");
+            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

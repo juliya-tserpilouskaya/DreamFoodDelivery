@@ -27,6 +27,8 @@ namespace DreamFoodDelivery.Data.Configurations
             //builder.Property(i => i.Headline).HasColumnName("Headline")/*.IsRequired()*/.HasMaxLength(63);
             //builder.Property(i => i.Rating).HasColumnName("Rating")/*.IsRequired()*/;
             //builder.Property(i => i.Content).HasColumnName("Content")/*.IsRequired()*/.HasMaxLength(511);
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }

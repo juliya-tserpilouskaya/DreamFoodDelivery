@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers.Menu
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    /// <summary>
+    /// Work with dishes database, for Admins only
+    /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class DishController : ControllerBase
@@ -24,36 +29,47 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         }
 
         /// <summary>
-        /// Add dish
+        /// Add new dish with tags
         /// </summary>
-        /// <param name="dish"></param>
-        /// <returns></returns>
+        /// <param name="dish">New dish to add</param>
+        /// <returns>Dish info after adding</returns>
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish added")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish data")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DishView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Create([FromBody, CustomizeValidator]DishToAdd dish)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]DishToAdd dish, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var result = await _menuService.AddAsync(dish);
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            try
+            {
+                var result = await _menuService.AddAsync(dish, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         /// <summary>
-        /// Update dish
+        /// Update dish with tags
         /// </summary>
-        /// <param name="dish">dish</param>
-        /// <returns>Dishes</returns>
+        /// <param name="dish">Dish to update</param>
+        /// <returns>Dish info after updating</returns>
         [HttpPut, Route("")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish updated", typeof(DishView))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DishView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Update([FromBody, CustomizeValidator]DishToUpdate dish)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]DishToUpdate dish, CancellationToken cancellationToken = default)
         {
             if (dish is null || !ModelState.IsValid)
             {
@@ -61,8 +77,10 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             }
             try
             {
-                var result = await _menuService.UpdateAsync(dish);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                var result = await _menuService.UpdateAsync(dish, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -73,15 +91,16 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         /// <summary>
         /// Delete dish
         /// </summary>
-        /// <param name="id">dish id</param>
-        /// <returns></returns>
+        /// <param name="id">Dish id to delete</param>
+        /// <returns>Result information</returns>
         [HttpDelete, Route("{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish deleted")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string id)
+        public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -89,8 +108,10 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             }
             try
             {
-                var result = await _menuService.RemoveByIdAsync(id);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _menuService.RemoveByIdAsync(id, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) 
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -101,14 +122,27 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         /// <summary>
         /// Delete dishes
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Result information</returns>
         [HttpDelete, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes removed")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveAllAsync()
+        public async Task<IActionResult> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
-            await _menuService.RemoveAllAsync();
-            return Ok();
+            try
+            {
+                var result = await _menuService.RemoveAllAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

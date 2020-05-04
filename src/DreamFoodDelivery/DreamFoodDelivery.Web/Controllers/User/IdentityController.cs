@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
@@ -13,6 +14,9 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    /// <summary>
+    /// Users Identity sighin/up and delete actions
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -28,21 +32,26 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Create Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
         [HttpPost]
-        [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Route("registration")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
-                var result = await _identityService.RegisterAsync(user);
-
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                var result = await _identityService.RegisterAsync(user, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -54,21 +63,27 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Log in
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
-                var result = await _identityService.LoginAsync(user.Email, user.Password);
+                var result = await _identityService.LoginAsync(user.Email, user.Password, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -79,36 +94,43 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        /// <returns></returns>
         [HttpPost]
         [Route("logout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LoggerAttribute]
-        public async Task<IActionResult> LogOut()
+        public IActionResult LogOut()
         {
-            HttpContext.Session.Clear(); //deal with it
-
-            return Ok(await Task.FromResult(Result.Ok()));
+            
+            HttpContext.Session.Clear();
+            return Ok();
         }
 
         /// <summary>
         /// Remove Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>Result information</returns>
         [HttpDelete]
         [Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user)
+        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
-                var result = await _identityService.DeleteAsync(user.Email, user.Password);
-
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _identityService.DeleteAsync(user.Email, user.Password, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess? (IActionResult)Ok(result.IsSuccess) 
+                     : NotFound(); 
             }
             catch (InvalidOperationException ex)
             {

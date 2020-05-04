@@ -18,6 +18,10 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.HasMany(_ => _.DishTags).WithOne(_ => _.Tag).HasForeignKey(_ => _.TagId).OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
+
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
+
             //builder.Property(i => i.IndexNumber).HasColumnName("IndexNumber").IsRequired();
         }
     }

@@ -6,16 +6,18 @@ using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Common;
-//using NSwag.Annotations;
+using System.Threading;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    /// <summary>
+    /// Work with tags
+    /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class TagController : ControllerBase
@@ -26,52 +28,68 @@ namespace DreamFoodDelivery.Web.Controllers
             _tagService = tagService;
         }
 
-        [AllowAnonymous]
+
         /// <summary>
         /// Get all tags
         /// </summary>
         /// <returns>Returns all tags stored</returns>
+        [AllowAnonymous]
         [HttpGet, Route("")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "There are no tags in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tags were found", typeof(IEnumerable<TagView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TagView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
-            var result = await _tagService.GetAllAsync();
-            return result == null ? NotFound() : (IActionResult)Ok(result);
+            try
+            {
+                var result = await _tagService.GetAllAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         /// <summary>
         /// Create tag
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tag"></param>
         /// <returns></returns>
+        [ObsoleteAttribute]
         [HttpPost, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tag added")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid tag data")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TagView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [LoggerAttribute]
-        public async Task<IActionResult> Create([FromBody, CustomizeValidator]TagToAdd tag)
+        public async Task<IActionResult> Create([FromBody, CustomizeValidator]TagToAdd tag, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var result = await _tagService.AddAsync(tag);
+            var result = await _tagService.AddAsync(tag, cancellationToken);
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
         /// <summary>
         /// Update tag
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tag">tag</param>
         /// <returns>tag</returns>
+        [ObsoleteAttribute]
         [HttpPut, Route("")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid paramater format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tag updated", typeof(TagView))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TagView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> Update([FromBody, CustomizeValidator]TagToUpdate tag)
+        public async Task<IActionResult> Update([FromBody, CustomizeValidator]TagToUpdate tag, CancellationToken cancellationToken = default)
         {
 
             if (tag is null || !ModelState.IsValid)
@@ -80,7 +98,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _tagService.UpdateAsync(tag);
+                var result = await _tagService.UpdateAsync(tag, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -91,24 +109,26 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Delete tag
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="id">tag id</param>
         /// <returns></returns>
         [HttpDelete, Route("{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid ID")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Tag doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tag deleted")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveById(string id)
+        [ObsoleteAttribute]
+        public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
-            if (!Guid.TryParse(id, out var _) /*|| _orderService.GetById(id) == null*/ /*|| _commentService.GetById(id).UserId != UserId*/)
+            if (!Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }
             try
             {
-                var result = await _tagService.RemoveByIdAsync(id);
+                var result = await _tagService.RemoveByIdAsync(id, cancellationToken);
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
             }
             catch (InvalidOperationException ex)
@@ -119,14 +139,16 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Delete tags
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <returns></returns>
         [HttpDelete, Route("")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Tags removed")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [LoggerAttribute]
-        public async Task<IActionResult> RemoveAllAsync()
+        [ObsoleteAttribute]
+        public async Task<IActionResult> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
-            await _tagService.RemoveAllAsync();
+            await _tagService.RemoveAllAsync(cancellationToken);
             return Ok();
         }
     }

@@ -11,10 +11,6 @@ namespace DreamFoodDelivery.Data.Context
 {
     public class UserContext : IdentityDbContext<User>
     {
-        public UserContext()
-        {
-
-        }
         public UserContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();

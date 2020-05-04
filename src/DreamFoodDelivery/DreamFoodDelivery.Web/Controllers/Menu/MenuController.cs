@@ -6,12 +6,15 @@ using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.DTO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Swashbuckle.AspNetCore.Annotations;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Common;
+using System.Threading;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    /// <summary>
+    /// Work with menu, allowed for all
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class MenuController : ControllerBase
@@ -25,18 +28,20 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Returns menu (all dishes)
         /// </summary>
-        /// <returns>Returns all dishes stored</returns>
+        /// <returns>Returns all dishes in menu</returns>
         [HttpGet, Route("")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "There are no dishes in list")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes were found", typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _menuService.GetAllAsync();
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetAllAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -45,26 +50,28 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get dish
+        /// Get dish by id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">Dish id</param>
+        /// <returns>Returns ID matching dish</returns>
         [HttpGet, Route("{id}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid dish id")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dish doesn't exists")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dish was found", typeof(DishView))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something goes wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DishView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
-            if (!string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }
             try
             {
-                var result = await _menuService.GetByIdAsync(id);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByIdAsync(id, cancellationToken);
+                return result == null ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -73,17 +80,17 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get dish by name
+        /// Get dishes by name
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns>Dishes</returns>
-        [HttpGet, Route("dishes/name/{name}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
+        /// <param name="name">Dish name</param>
+        /// <returns>Returns name matching dishes</returns>
+        [HttpGet, Route("dishes/{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByName(string name)
+        public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -91,8 +98,10 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByNameAsync(name);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByNameAsync(name, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -102,16 +111,18 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Get dish by category
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
-        /// <param name="categoryString"></param>
-        /// <returns>Dishes</returns>
+        /// <param name="categoryString">Dish category</param>
+        /// <returns>Returns category matching dishes</returns>
         [HttpGet, Route("dishes/category/{categoryString}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByCategory(string categoryString)
+        [ObsoleteAttribute]
+        public async Task<IActionResult> GetByCategory(string categoryString, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(categoryString))
             {
@@ -119,8 +130,10 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _menuService.GetByCategoryAsync(categoryString);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByCategoryAsync(categoryString, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -131,24 +144,26 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Get dish by cost
         /// </summary>
-        /// <param name="priceString">Dish price</param>
-        /// <returns>Dishes</returns>
-        [HttpGet, Route("dishes/price/{priceString}")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
+        /// <param name="priceModel">Dish prices</param>
+        /// <returns>Returns dishes in prices limits</returns>
+        [HttpPost, Route("dishes/price")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetByCost(string priceString)
+        public async Task<IActionResult> GetByCost([FromBody, CustomizeValidator]DishByCost priceModel, CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrEmpty(priceString))
+            if (!(priceModel.LowerPrice >= 0 && priceModel.LowerPrice <= priceModel.UpperPrice && priceModel.UpperPrice >= 0))
             {
                 return BadRequest();
             }
             try
             {
-                var result = await _menuService.GetByPriceAsync(priceString);
-                return result == null ? NotFound() : (IActionResult)Ok(result);
+                var result = await _menuService.GetByPriceAsync(priceModel.LowerPrice, priceModel.UpperPrice, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                 : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                 : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -159,17 +174,55 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Get dishes on sale
         /// </summary>
-        /// <returns>Dishes</returns>
+        /// <returns>Returns dishes on sales</returns>
         [HttpGet, Route("sales")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Ivalid parameter format")]
-        [SwaggerResponse(StatusCodes.Status404NotFound, "Dishes are not found")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Dishes are found", typeof(IEnumerable<DishView>))]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Something went wrong")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetSales()
+        public async Task<IActionResult> GetSales(CancellationToken cancellationToken = default)
         {
-            var result = await _menuService.GetSalesAsync();
-            return result == null ? NotFound() : (IActionResult)Ok(result);
+            try
+            {
+                var result = await _menuService.GetSalesAsync(cancellationToken);
+                return result == null ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Returns dishes by tag index
+        /// </summary>
+        /// <returns>Returns dishes by tag index</returns>
+        [HttpGet, Route("tag/{tagIndex}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetByTagIndex(int tagIndex, CancellationToken cancellationToken = default)
+        {
+            if (tagIndex < 0)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _menuService.GetByTagIndexAsync(tagIndex, cancellationToken);
+                return result == null ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

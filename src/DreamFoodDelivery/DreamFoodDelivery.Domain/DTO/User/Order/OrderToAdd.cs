@@ -6,7 +6,7 @@ namespace DreamFoodDelivery.Domain.DTO
 {
     public class OrderToAdd
     {
-        public Guid BasketId { get; set; }
+        //public Guid BasketId { get; set; }
 
         public bool IsInfoFromProfile { get; set; }
         public string Address { get; set; }

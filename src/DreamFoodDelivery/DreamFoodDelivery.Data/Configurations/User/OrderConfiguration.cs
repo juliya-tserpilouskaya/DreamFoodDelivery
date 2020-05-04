@@ -33,6 +33,8 @@ namespace DreamFoodDelivery.Data.Configurations
             //builder.Property(i => i.ShippingСost).HasColumnName("ShippingСost")/*.IsRequired()*/;
             //builder.Property(i => i.Status).HasColumnName("Status")/*.IsRequired()*/.HasMaxLength(31);
             //builder.Property(i => i.Paid).HasColumnName("Paid")/*.IsRequired()*/;
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }
