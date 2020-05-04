@@ -37,7 +37,7 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.valid) {
       const data = this.registerForm.value;
 
-      this.registerRequest = new UserRegistration();
+      //this.registerRequest = new UserRegistration();
 
       this.registerRequest.email = data.name;
       this.registerRequest.password = data.password;

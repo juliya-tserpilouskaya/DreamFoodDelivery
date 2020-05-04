@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid) {
       const data = this.loginForm.value;
 
-      this.loginRequest = new UserRegistration();
+      //this.loginRequest = new UserRegistration();
 
       this.loginRequest.email = data.name;
       this.loginRequest.password = data.password;

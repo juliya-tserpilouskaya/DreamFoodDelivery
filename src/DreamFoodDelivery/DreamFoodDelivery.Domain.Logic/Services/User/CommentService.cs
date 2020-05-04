@@ -112,10 +112,38 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="userId">ID of user</param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAdminAsync(string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
             var comments = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
+            if (!comments.Any())
+            {
+                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
+            }
+            List<CommentView> views = new List<CommentView>();
+            foreach (var comment in comments)
+            {
+                CommentView view = _mapper.Map<CommentView>(comment);
+                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
+                view.Order = order.Data;
+                views.Add(view);
+            }
+            return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+        }
+
+        /// <summary>
+        ///  Asynchronously get comment by userId. Id must be verified 
+        /// </summary>
+        /// <param name="userIdFromIdentity">ID of user from identity</param>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
+        {
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+            {
+                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>($"User was not found");
+            }
+            var comments = await _context.Comments.Where(_ => _.UserId == user.Id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!comments.Any())
             {
                 return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");

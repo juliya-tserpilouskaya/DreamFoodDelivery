@@ -37,12 +37,19 @@ namespace DreamFoodDelivery.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDomainServices(Configuration);
-
+            //In-Memory
+            services.AddDistributedMemoryCache(); // Adds a default in-memory implementation of IDistributedCache
+            services.AddSession();
             var tokenSecret = new TokenSecret();
             Configuration.Bind(nameof(tokenSecret), tokenSecret);
             services.AddSingleton(tokenSecret);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(auth =>
+            {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
@@ -86,6 +93,8 @@ namespace DreamFoodDelivery.Web
             services.AddControllers().AddFluentValidation(fluentValidation =>
             {
                 fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToBasketAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishByCostValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToAddValidation>();
@@ -117,7 +126,7 @@ namespace DreamFoodDelivery.Web
                 app.UseDeveloperExceptionPage();
                 app.UseOpenApi().UseSwaggerUi3();
             }
-
+            app.UseSession(); // use this before .UseEndpoints
             app.UseHttpsRedirection();
 
             app.UseRouting();

@@ -139,12 +139,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             orderToAdd.UpdateTime = DateTime.Now;
             _context.Orders.Add(orderToAdd);
 
-            var connection = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            connection.OrderId = orderToAdd.Id;
-            connection.BasketId = Guid.Empty;
-            _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
-            _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
-
+            var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken); //тут исправлено
+            foreach (var connection in connections)
+            {
+                connection.OrderId = orderToAdd.Id;
+                connection.BasketId = Guid.Empty;
+                _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
+                _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -193,6 +195,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(orderForUpdate).Property(c => c.Address).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.Surname).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
                 try
@@ -234,7 +237,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="userId">ID of user</param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAdminAsync(string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
             var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
@@ -255,6 +258,45 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     if (dish.IsError)
                     {
                         return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>($"Unable to retrieve data");
+                    }
+                    dish.Data.Quantity = dishListItem.Quantity;
+                    viewItem.Dishes.Add(dish.Data);
+                }
+                views.Add(viewItem);
+            }
+            return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(views));
+        }
+
+        /// <summary>
+        ///  Asynchronously get orders by userId. Id must be verified 
+        /// </summary>
+        /// <param name="userIdFromIdentity">ID of user from identity</param>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
+        {
+            UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            if (user is null)
+            {
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"User was not found");
+            }
+            var orders = await _context.Orders.Where(_ => _.UserId == user.Id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
+            if (!orders.Any())
+            {
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+            }
+
+            List<OrderView> views = new List<OrderView>();
+            foreach (var order in orders)
+            {
+                OrderView viewItem = _mapper.Map<OrderView>(order);
+                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                viewItem.Dishes = new HashSet<DishView>();
+                foreach (var dishListItem in dishList)
+                {
+                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    if (dish.IsError)
+                    {
+                        return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                     }
                     dish.Data.Quantity = dishListItem.Quantity;
                     viewItem.Dishes.Add(dish.Data);
@@ -343,7 +385,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result> RemoveAllByUserId(string userId)
         {
             Guid id = Guid.Parse(userId);
-            var orders = _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToList();
+            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
             if (orders is null)
             {
                 return await Task.FromResult(Result.Fail("Orders were not found"));
@@ -356,7 +398,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return await Task.FromResult(Result.Fail("Order was not found"));
                     }
-                    var dishList = _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToList();
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
                     _context.BasketDishes.RemoveRange(dishList);
                     _context.Orders.Remove(order);
                 }

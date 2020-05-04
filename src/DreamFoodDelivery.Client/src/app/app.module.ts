@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './auth/authconfig.interceptor';
+//import { AuthInterceptor } from './auth/authconfig.interceptor';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
@@ -44,11 +44,11 @@ import { BasketComponent } from './basket/basket.component';
   ],
   providers: [
     IdentityService,
-    {
+    /*{
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    },
+    },*/
     UserService,
     MenuService,
     DishService,

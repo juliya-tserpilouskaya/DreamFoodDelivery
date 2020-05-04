@@ -226,7 +226,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
-        //Revise the lecture about the database. A moment about deleting information.
         /// <summary>
         ///  Asynchronously remove user by Id. Id must be verified
         /// </summary>
@@ -262,11 +261,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
         }
 
-        //Revise the lecture about the database. A moment about deleting information.
         /// <summary>
         /// Remove user by idFromIdentity
         /// </summary>
-        /// <param name="idFromIdentity"></param>
+        /// <param name="idFromIdentity">Existing user ID</param>
         [LoggerAttribute]
         public async Task<Result> DeleteUserByIdFromIdentityAsync(string idFromIdentity, CancellationToken cancellationToken = default)
         {
@@ -383,7 +381,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Make admin from user or vice versa
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="idFromIdentity">Existing user ID</param>
         [LoggerAttribute]
         public async Task<Result> ChangeRoleAsync(string idFromIdentity)
         {
@@ -485,7 +483,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 var myToken = await _userManager.GenerateChangeEmailTokenAsync(usersIdentity, userInfo.NewEmail);
                 await _userManager.ChangeEmailAsync(usersIdentity, userInfo.NewEmail, myToken);
-
+                usersIdentity.UserName = userInfo.NewEmail;
+                await _userManager.UpdateAsync(usersIdentity);
                 var userProfile = await GetUserProfileByIdFromIdentityAsync(userInfo.IdFromIdentity);
                 UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userInfo.IdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (userProfile.IsError)

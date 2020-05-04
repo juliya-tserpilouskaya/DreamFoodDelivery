@@ -14,6 +14,9 @@ using Microsoft.EntityFrameworkCore.Internal;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    /// <summary>
+    /// Users Identity sighin/up and delete actions
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -29,21 +32,26 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Create Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
         [HttpPost]
-        [Route("")]
+        [Route("registration")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
                 var result = await _identityService.RegisterAsync(user, cancellationToken);
-
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -55,7 +63,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Log in
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
@@ -65,11 +73,17 @@ namespace DreamFoodDelivery.Web.Controllers
         [LoggerAttribute]
         public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
                 var result = await _identityService.LoginAsync(user.Email, user.Password, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -80,36 +94,43 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        /// <returns></returns>
         [HttpPost]
         [Route("logout")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LoggerAttribute]
         public IActionResult LogOut()
         {
-            HttpContext.Session.Clear(); //deal with it
-
-            return NoContent();
+            
+            HttpContext.Session.Clear();
+            return Ok();
         }
 
         /// <summary>
         /// Remove Identity User & DB User
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
-        /// <returns></returns>
+        /// <returns>Result information</returns>
         [HttpDelete]
         [Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.Values.SelectMany(x => x.Errors.Select(xx => xx.ErrorMessage)).Join("\n"));
+            }
             try
             {
                 var result = await _identityService.DeleteAsync(user.Email, user.Password, cancellationToken);
-
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? throw new InvalidOperationException(result.Message) 
+                     : result.IsSuccess? (IActionResult)Ok(result.IsSuccess) 
+                     : NotFound(); 
             }
             catch (InvalidOperationException ex)
             {
