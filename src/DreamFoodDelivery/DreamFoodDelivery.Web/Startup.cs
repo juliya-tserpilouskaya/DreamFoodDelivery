@@ -112,9 +112,16 @@ namespace DreamFoodDelivery.Web
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder.WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains());
+
+                //options.AddPolicy("CorsPolicy",
+                //    builder => builder.AllowAnyOrigin()
+                //        .AllowAnyMethod()
+                //        .AllowAnyHeader());
             });
         }
 
@@ -139,7 +146,6 @@ namespace DreamFoodDelivery.Web
             app.UseStaticFiles();
 
             app.UseCors("CorsPolicy");
-            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
