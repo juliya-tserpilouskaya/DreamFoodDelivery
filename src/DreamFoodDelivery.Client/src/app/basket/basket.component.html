@@ -1,1 +1,31 @@
-<p>basket works!</p>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <h2>Basket</h2>
+      <br>
+<div *ngIf="basket">
+        <div class="card" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+
+          <div class="card-body">
+
+            <p class="card-text">{{dish.name}}</p>
+            <ul class="list-group">
+            <li class="list-group-item">Cost: {{dish.cost}}$</li>
+            <li class="list-group-item">Sale: {{dish.sale}}%</li>
+            <li class="list-group-item">Composition: {{dish.composition}}</li>
+            <li class="list-group-item">Description: {{dish.description}}</li>
+            <li class="list-group-item">Tags: {{dish.tagList}}</li>
+            <li class="list-group-item">Quantity: {{dish.quantity}}</li>
+            </ul>
+            <br>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+<br/>
+<div class="row justify-content-center">
+<ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="dishes.length"></ngb-pagination>
+</div>

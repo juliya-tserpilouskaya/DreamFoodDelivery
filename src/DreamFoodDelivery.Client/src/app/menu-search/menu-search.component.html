@@ -2,14 +2,15 @@
   <div class="col-12 col-md-10 col-lg-8">
     <h2>Menu</h2>
       <br>
-      <form [formGroup]="addForm" >
+<div *ngIf="dishes">
         <div class="card" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-
+          <form [formGroup]="addForm" (ngSubmit)="onAddToBasket(dish.id)"#formDir="ngForm" novalidate >
           <div class="card-body">
 
             <p class="card-text">{{dish.name}}</p>
             <ul class="list-group">
             <li class="list-group-item">Cost: {{dish.cost}}$</li>
+
             <li class="list-group-item">Sale: {{dish.sale}}%</li>
             <li class="list-group-item">Composition: {{dish.composition}}</li>
             <li class="list-group-item">Description: {{dish.description}}</li>
@@ -23,15 +24,16 @@
             <br>
                   <div class="form-group">
                     <label>Quantity</label>
-                    <input type="number" class="form-control" formControlName="Quantity" min="0" placeholder="0">
+                    <input type="number" class="form-control" formControlName="quantity" min="0" placeholder="0" value="0">
                   </div>
                   <div>
-                    <button type="submit" class="btn btn-outline-success my-2 my-sm-0" (click)="onAddToBasket(dish.id)" >Add to basket </button >
+                    <button type="submit" class="btn btn-outline-success my-2 my-sm-0"  >Add to basket </button >
                   </div>
             <br>
           </div>
+        </form>
         </div>
-      </form>
+      </div>
   </div>
 </div>
 <br/>

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 // import service and models
-import { MenuService, DishView, BasketService, DishToAdd, DishToBasketAdd } from '../app-services/nswag.generated.services';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MenuService, DishView, BasketService, DishToBasketAdd } from '../app-services/nswag.generated.services';
+import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
@@ -15,6 +15,7 @@ export class MenuSearchComponent implements OnInit {
   dishes: DishView[] = [];
   page = 2;
   pageSize = 10;
+  collectionsize = 10;
   parameter: string;
   dishInfoToAdd: DishToBasketAdd;
   addForm: FormGroup;
@@ -26,23 +27,24 @@ export class MenuSearchComponent implements OnInit {
     public fb: FormBuilder
     ) {
     route.params.subscribe(params => this.parameter = params.query);
-    this.addForm = fb.group({Quantity: ['']});
+    this.addForm = fb.group({quantity: [''], dishId: ['']});
     }
 
 
   ngOnInit(): void {
     this.menuService.getAll().subscribe(data => {this.dishes = data;
-                                                 console.log(data);
-                                                 console.log(this.dishes);
+                                                //  console.log(data);
+                                                //  console.log(this.dishes);
                                                 });
 
   }
 
   onAddToBasket(id: string) {
-    const data = this.addForm.value;
-    this.dishInfoToAdd.dishId = id;
-    this.dishInfoToAdd.quantity = data;
-    this.basketService.addDish(this.dishInfoToAdd).subscribe();
+    this.addForm.value.dishId = id;
+    // const data = this.addForm.value;
+    // this.dishInfoToAdd.dishId = id;
+    // this.dishInfoToAdd.quantity = data;
+    this.basketService.addDish(this.addForm.value).subscribe();
   }
 
 }
