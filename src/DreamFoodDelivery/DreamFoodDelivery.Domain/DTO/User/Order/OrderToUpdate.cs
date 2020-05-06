@@ -11,6 +11,6 @@ namespace DreamFoodDelivery.Domain.DTO
         public string PhoneNumber { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
-        public double? ShippingСost { get; set; }
+        public double? ShippingCost { get; set; }
     }
 }

@@ -369,7 +369,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             _context.Entry(thingForUpdate).Property(c => c.Name).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Category).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Сomposition).IsModified = true;
+            _context.Entry(thingForUpdate).Property(c => c.Composition).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Description).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Cost).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Weigh).IsModified = true;

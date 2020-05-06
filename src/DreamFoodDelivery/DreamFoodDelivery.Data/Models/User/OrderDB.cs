@@ -20,8 +20,8 @@ namespace DreamFoodDelivery.Data.Models
         public string Name { get; set; }
         public string Surname { get; set; }
 
-        public double OrderСost { get; set; }
-        public double ShippingСost { get; set; }
+        public double OrderCost { get; set; }
+        public double ShippingCost { get; set; }
         public string Status { get; set; } 
         public DateTime? OrderTime { get; set; } = DateTime.Now;
         public DateTime? DeliveryTime { get; set; }

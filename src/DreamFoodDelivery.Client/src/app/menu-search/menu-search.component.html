@@ -1,18 +1,44 @@
-<div class="card" *ngFor="let item of dishes">
-  <h5 class="card-header">{{item.name}}</h5>
-  <div class="card-body">
-    <div class="col-12 col-md-12 col-lg-12 row">
-      <div class="col-4 col-md-4 col-lg-4">
-        <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
-        <!--<a [routerLink]="['course', item.URL]">Course page</a>-->
-      </div>
-      <div class="col-4 col-md-4 col-lg-4">
-        {{item.cost}}
-      </div>
-      <div class="col-4 col-md-4 col-lg-4">
-        <!--View only for ADMIN-->
-        <!-- <button class="btn btn-outline-success my-2 my-sm-0" (click)="onDelete(item.Id)" type="submit">Delete</button> -->
-      </div>
-    </div>
-  </div>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <h2>Menu</h2>
+      <br>
+      <form [formGroup]="addForm" >
+        <div class="card" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
 
+          <div class="card-body">
+
+            <p class="card-text">{{dish.name}}</p>
+            <ul class="list-group">
+            <li class="list-group-item">Cost: {{dish.cost}}$</li>
+            <li class="list-group-item">Sale: {{dish.sale}}%</li>
+            <li class="list-group-item">Composition: {{dish.composition}}</li>
+            <li class="list-group-item">Description: {{dish.description}}</li>
+            <li class="list-group-item">Tags: {{dish.tagList}}</li>
+            </ul>
+            <h3>What's Inside:</h3>
+              <div class="card-body" *ngFor="let tag of dish.tagList">
+                <!-- Use ENUM on front -->
+                <h5 class="card-header">{{tag.indexNumber}}</h5>
+              </div>
+            <br>
+                  <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" class="form-control" formControlName="Quantity" min="0" placeholder="0">
+                  </div>
+                  <div>
+                    <button type="submit" class="btn btn-outline-success my-2 my-sm-0" (click)="onAddToBasket(dish.id)" >Add to basket </button >
+                  </div>
+            <br>
+          </div>
+        </div>
+      </form>
+  </div>
+</div>
+<br/>
+<div class="row justify-content-center">
+
+  <ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="dishes.length"></ngb-pagination>
+</div>

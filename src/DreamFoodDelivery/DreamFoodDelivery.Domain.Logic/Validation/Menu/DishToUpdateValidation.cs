@@ -13,8 +13,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
             RuleFor(_ => _.Id).NotEmpty().WithMessage("You must enter Id");
             RuleFor(_ => _.Name).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Name must contain from 3 to 90 characters.");
-            RuleFor(_ => _.Сomposition).MinimumLength(10).MaximumLength(250)
-                .WithMessage("Сomposition must contain from 10 to 250 characters.");
+            RuleFor(_ => _.Composition).MinimumLength(10).MaximumLength(250)
+                .WithMessage("Composition must contain from 10 to 250 characters.");
             RuleFor(_ => _.Description).MinimumLength(10).MaximumLength(250)
                 .WithMessage("Description must contain from 10 to 250 characters.");
             RuleFor(_ => _.Weigh).MinimumLength(5).MaximumLength(250)

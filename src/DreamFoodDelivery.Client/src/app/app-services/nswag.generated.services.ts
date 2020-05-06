@@ -3980,7 +3980,7 @@ export class BasketView implements IBasketView {
                 data["dishes"].push(item.toJSON());
         }
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -3994,7 +3994,7 @@ export class DishView implements IDishView {
     id?: string;
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;
@@ -4018,7 +4018,7 @@ export class DishView implements IDishView {
             this.id = _data["id"];
             this.name = _data["name"];
             this.category = _data["category"];
-            this.сomposition = _data["сomposition"];
+            this.composition = _data["composition"];
             this.description = _data["description"];
             this.cost = _data["cost"];
             this.weigh = _data["weigh"];
@@ -4046,7 +4046,7 @@ export class DishView implements IDishView {
         data["id"] = this.id;
         data["name"] = this.name;
         data["category"] = this.category;
-        data["сomposition"] = this.сomposition;
+        data["composition"] = this.composition;
         data["description"] = this.description;
         data["cost"] = this.cost;
         data["weigh"] = this.weigh;
@@ -4059,7 +4059,7 @@ export class DishView implements IDishView {
                 data["tagList"].push(item.toJSON());
         }
         data["quantity"] = this.quantity;
-        return data;
+        return data; 
     }
 }
 
@@ -4067,7 +4067,7 @@ export interface IDishView {
     id?: string;
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;
@@ -4106,7 +4106,7 @@ export class TagToAdd implements ITagToAdd {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["indexNumber"] = this.indexNumber;
-        return data;
+        return data; 
     }
 }
 
@@ -4169,7 +4169,7 @@ export class ProblemDetails implements IProblemDetails {
                     data["extensions"][key] = this.extensions[key];
             }
         }
-        return data;
+        return data; 
     }
 }
 
@@ -4213,7 +4213,7 @@ export class DishToBasketAdd implements IDishToBasketAdd {
         data = typeof data === 'object' ? data : {};
         data["dishId"] = this.dishId;
         data["quantity"] = this.quantity;
-        return data;
+        return data; 
     }
 }
 
@@ -4253,7 +4253,7 @@ export class DishByCost implements IDishByCost {
         data = typeof data === 'object' ? data : {};
         data["lowerPrice"] = this.lowerPrice;
         data["upperPrice"] = this.upperPrice;
-        return data;
+        return data; 
     }
 }
 
@@ -4304,7 +4304,7 @@ export class TagView implements ITagView {
                 data["dishes"].push(item.toJSON());
         }
         data["indexNumber"] = this.indexNumber;
-        return data;
+        return data; 
     }
 }
 
@@ -4351,7 +4351,7 @@ export class DishTagView implements IDishTagView {
         data["dishId"] = this.dishId;
         data["tag"] = this.tag ? this.tag.toJSON() : <any>undefined;
         data["dish"] = this.dish ? this.dish.toJSON() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -4393,7 +4393,7 @@ export class TagToUpdate implements ITagToUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["indexNumber"] = this.indexNumber;
-        return data;
+        return data; 
     }
 }
 
@@ -4454,7 +4454,7 @@ export class CommentView implements ICommentView {
         data["content"] = this.content;
         data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>undefined;
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -4480,8 +4480,8 @@ export class OrderView implements IOrderView {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    orderСost?: number | undefined;
-    shippingСost?: number | undefined;
+    orderCost?: number | undefined;
+    shippingCost?: number | undefined;
     status?: string | undefined;
     orderTime?: Date | undefined;
     deliveryTime?: Date | undefined;
@@ -4511,8 +4511,8 @@ export class OrderView implements IOrderView {
             this.phoneNumber = _data["phoneNumber"];
             this.name = _data["name"];
             this.surname = _data["surname"];
-            this.orderСost = _data["orderСost"];
-            this.shippingСost = _data["shippingСost"];
+            this.orderCost = _data["orderCost"];
+            this.shippingCost = _data["shippingCost"];
             this.status = _data["status"];
             this.orderTime = _data["orderTime"] ? new Date(_data["orderTime"].toString()) : <any>undefined;
             this.deliveryTime = _data["deliveryTime"] ? new Date(_data["deliveryTime"].toString()) : <any>undefined;
@@ -4542,13 +4542,13 @@ export class OrderView implements IOrderView {
         data["phoneNumber"] = this.phoneNumber;
         data["name"] = this.name;
         data["surname"] = this.surname;
-        data["orderСost"] = this.orderСost;
-        data["shippingСost"] = this.shippingСost;
+        data["orderCost"] = this.orderCost;
+        data["shippingCost"] = this.shippingCost;
         data["status"] = this.status;
         data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>undefined;
         data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>undefined;
         data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -4562,8 +4562,8 @@ export interface IOrderView {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    orderСost?: number | undefined;
-    shippingСost?: number | undefined;
+    orderCost?: number | undefined;
+    shippingCost?: number | undefined;
     status?: string | undefined;
     orderTime?: Date | undefined;
     deliveryTime?: Date | undefined;
@@ -4610,7 +4610,7 @@ export class CommentToAdd implements ICommentToAdd {
         data["headline"] = this.headline;
         data["rating"] = this.rating;
         data["content"] = this.content;
-        return data;
+        return data; 
     }
 }
 
@@ -4659,7 +4659,7 @@ export class CommentToUpdate implements ICommentToUpdate {
         data["headline"] = this.headline;
         data["rating"] = this.rating;
         data["content"] = this.content;
-        return data;
+        return data; 
     }
 }
 
@@ -4701,7 +4701,7 @@ export class UserWithToken implements IUserWithToken {
         data = typeof data === 'object' ? data : {};
         data["userToken"] = this.userToken;
         data["userView"] = this.userView ? this.userView.toJSON() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -4741,7 +4741,7 @@ export class UserView implements IUserView {
         data = typeof data === 'object' ? data : {};
         data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>undefined;
         data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>undefined;
-        return data;
+        return data; 
     }
 }
 
@@ -4784,7 +4784,7 @@ export class UserDTO implements IUserDTO {
         data["id"] = this.id;
         data["idFromIdentity"] = this.idFromIdentity;
         data["basketId"] = this.basketId;
-        return data;
+        return data; 
     }
 }
 
@@ -4843,7 +4843,7 @@ export class UserProfile implements IUserProfile {
         data["login"] = this.login;
         data["email"] = this.email;
         data["personalDiscount"] = this.personalDiscount;
-        return data;
+        return data; 
     }
 }
 
@@ -4889,7 +4889,7 @@ export class UserRegistration implements IUserRegistration {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email;
         data["password"] = this.password;
-        return data;
+        return data; 
     }
 }
 
@@ -4929,7 +4929,7 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["statusIndex"] = this.statusIndex;
-        return data;
+        return data; 
     }
 }
 
@@ -4944,8 +4944,8 @@ export class OrderToAdd implements IOrderToAdd {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    orderСost?: number | undefined;
-    shippingСost?: number | undefined;
+    orderCost?: number | undefined;
+    shippingCost?: number | undefined;
 
     constructor(data?: IOrderToAdd) {
         if (data) {
@@ -4963,8 +4963,8 @@ export class OrderToAdd implements IOrderToAdd {
             this.phoneNumber = _data["phoneNumber"];
             this.name = _data["name"];
             this.surname = _data["surname"];
-            this.orderСost = _data["orderСost"];
-            this.shippingСost = _data["shippingСost"];
+            this.orderCost = _data["orderCost"];
+            this.shippingCost = _data["shippingCost"];
         }
     }
 
@@ -4982,9 +4982,9 @@ export class OrderToAdd implements IOrderToAdd {
         data["phoneNumber"] = this.phoneNumber;
         data["name"] = this.name;
         data["surname"] = this.surname;
-        data["orderСost"] = this.orderСost;
-        data["shippingСost"] = this.shippingСost;
-        return data;
+        data["orderCost"] = this.orderCost;
+        data["shippingCost"] = this.shippingCost;
+        return data; 
     }
 }
 
@@ -4994,8 +4994,8 @@ export interface IOrderToAdd {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    orderСost?: number | undefined;
-    shippingСost?: number | undefined;
+    orderCost?: number | undefined;
+    shippingCost?: number | undefined;
 }
 
 export class OrderToUpdate implements IOrderToUpdate {
@@ -5004,7 +5004,7 @@ export class OrderToUpdate implements IOrderToUpdate {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    shippingСost?: number | undefined;
+    shippingCost?: number | undefined;
 
     constructor(data?: IOrderToUpdate) {
         if (data) {
@@ -5022,7 +5022,7 @@ export class OrderToUpdate implements IOrderToUpdate {
             this.phoneNumber = _data["phoneNumber"];
             this.name = _data["name"];
             this.surname = _data["surname"];
-            this.shippingСost = _data["shippingСost"];
+            this.shippingCost = _data["shippingCost"];
         }
     }
 
@@ -5040,8 +5040,8 @@ export class OrderToUpdate implements IOrderToUpdate {
         data["phoneNumber"] = this.phoneNumber;
         data["name"] = this.name;
         data["surname"] = this.surname;
-        data["shippingСost"] = this.shippingСost;
-        return data;
+        data["shippingCost"] = this.shippingCost;
+        return data; 
     }
 }
 
@@ -5051,7 +5051,7 @@ export interface IOrderToUpdate {
     phoneNumber?: string | undefined;
     name?: string | undefined;
     surname?: string | undefined;
-    shippingСost?: number | undefined;
+    shippingCost?: number | undefined;
 }
 
 export class UserToUpdate implements IUserToUpdate {
@@ -5091,7 +5091,7 @@ export class UserToUpdate implements IUserToUpdate {
         data["phoneNumber"] = this.phoneNumber;
         data["name"] = this.name;
         data["surname"] = this.surname;
-        return data;
+        return data; 
     }
 }
 
@@ -5133,7 +5133,7 @@ export class UserEmailToChange implements IUserEmailToChange {
         data = typeof data === 'object' ? data : {};
         data["idFromIdentity"] = this.idFromIdentity;
         data["newEmail"] = this.newEmail;
-        return data;
+        return data; 
     }
 }
 
@@ -5176,7 +5176,7 @@ export class UserPasswordToChange implements IUserPasswordToChange {
         data["idFromIdentity"] = this.idFromIdentity;
         data["currentPassword"] = this.currentPassword;
         data["newPassword"] = this.newPassword;
-        return data;
+        return data; 
     }
 }
 
@@ -5189,7 +5189,7 @@ export interface IUserPasswordToChange {
 export class DishToAdd implements IDishToAdd {
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;
@@ -5209,7 +5209,7 @@ export class DishToAdd implements IDishToAdd {
         if (_data) {
             this.name = _data["name"];
             this.category = _data["category"];
-            this.сomposition = _data["сomposition"];
+            this.composition = _data["composition"];
             this.description = _data["description"];
             this.cost = _data["cost"];
             this.weigh = _data["weigh"];
@@ -5233,7 +5233,7 @@ export class DishToAdd implements IDishToAdd {
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["category"] = this.category;
-        data["сomposition"] = this.сomposition;
+        data["composition"] = this.composition;
         data["description"] = this.description;
         data["cost"] = this.cost;
         data["weigh"] = this.weigh;
@@ -5243,14 +5243,14 @@ export class DishToAdd implements IDishToAdd {
             for (let item of this.tagIndexes)
                 data["tagIndexes"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
 export interface IDishToAdd {
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;
@@ -5262,7 +5262,7 @@ export class DishToUpdate implements IDishToUpdate {
     id?: string;
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;
@@ -5283,7 +5283,7 @@ export class DishToUpdate implements IDishToUpdate {
             this.id = _data["id"];
             this.name = _data["name"];
             this.category = _data["category"];
-            this.сomposition = _data["сomposition"];
+            this.composition = _data["composition"];
             this.description = _data["description"];
             this.cost = _data["cost"];
             this.weigh = _data["weigh"];
@@ -5308,7 +5308,7 @@ export class DishToUpdate implements IDishToUpdate {
         data["id"] = this.id;
         data["name"] = this.name;
         data["category"] = this.category;
-        data["сomposition"] = this.сomposition;
+        data["composition"] = this.composition;
         data["description"] = this.description;
         data["cost"] = this.cost;
         data["weigh"] = this.weigh;
@@ -5318,7 +5318,7 @@ export class DishToUpdate implements IDishToUpdate {
             for (let item of this.tagIndexes)
                 data["tagIndexes"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
@@ -5326,7 +5326,7 @@ export interface IDishToUpdate {
     id?: string;
     name?: string | undefined;
     category?: number | undefined;
-    сomposition?: string | undefined;
+    composition?: string | undefined;
     description?: string | undefined;
     cost?: number | undefined;
     weigh?: string | undefined;

@@ -196,7 +196,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Surname).IsModified = true;
-                _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
+                _context.Entry(orderForUpdate).Property(c => c.ShippingCost).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
                 try
                 {

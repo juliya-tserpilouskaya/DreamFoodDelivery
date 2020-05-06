@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
 {
+    // FIX REG
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<User> _userManager;
@@ -32,12 +33,48 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
+        /// Create Admin
+        /// </summary>
+        /// <param name="user">User registration data</param>
+        [LoggerAttribute]
+        public async Task<Result> CreateAdminAsync(CancellationToken cancellationToken = default)
+        {
+            //fix it later
+            string password = "q123456789";
+            var user = new User
+            {
+                Email = "BestAdminEver@DFD.com",
+                UserName = "SuperAdmin",
+                PersonalDiscount = 0,
+                Role = "Admin",
+            };
+            var createUser = await _userManager.CreateAsync(user, password);
+            if (!createUser.Succeeded)
+            {
+                return Result.Fail(createUser.Errors.Select(_ => _.Description).Join("\n"));
+            }
+            await _userManager.AddToRoleAsync(user, user.Role);
+            var profile = await _service.CreateAccountAsyncById(user.Id, cancellationToken);
+            return Result.Ok();
+        }
+
+        /// <summary>
         /// Create User
         /// </summary>
         /// <param name="user">User registration data</param>
         [LoggerAttribute]
         public async Task<Result<UserWithToken>> RegisterAsync(UserRegistration user, CancellationToken cancellationToken = default)
         {
+            //fix it later
+            if (!_userManager.Users.Any())
+            {
+                var adminResult = CreateAdminAsync(cancellationToken);
+                if (adminResult.Result.IsError)
+                {
+                    return Result<UserWithToken>.Fail<UserWithToken>("Unable to create admin");
+                }
+            }
+
             string defaultRole = "User";
 
             var existingUser = await _userManager.FindByEmailAsync(user.Email);

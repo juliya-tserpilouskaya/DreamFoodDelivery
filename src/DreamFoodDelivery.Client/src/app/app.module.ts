@@ -35,6 +35,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TokenInterceptorService } from './auth/token.interceptor.service';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
 
@@ -61,7 +62,8 @@ import { TokenInterceptorService } from './auth/token.interceptor.service';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbModule
   ],
   providers: [
     AuthGuard,
