@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

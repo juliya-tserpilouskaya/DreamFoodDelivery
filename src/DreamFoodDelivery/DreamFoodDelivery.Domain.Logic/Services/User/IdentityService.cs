@@ -2,6 +2,7 @@
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
@@ -43,7 +44,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             string password = "q123456789";
             var user = new User
             {
-                Email = "BestAdminEver@DFD.com",
+                Email = "dfd_mail@mail.ru",
                 UserName = "SuperAdmin",
                 PersonalDiscount = 0,
                 Role = "Admin",
@@ -55,6 +56,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             await _userManager.AddToRoleAsync(user, user.Role);
             var profile = await _service.CreateAccountAsyncById(user.Id, cancellationToken);
+            var admin = await _userManager.FindByEmailAsync(user.Email);
+            await _service.ConfirmEmailAsync(admin.Id);
             return Result.Ok();
         }
 

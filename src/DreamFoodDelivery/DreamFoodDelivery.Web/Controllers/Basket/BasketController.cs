@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using DreamFoodDelivery.Common;
 using System.Threading;
 using FluentValidation.AspNetCore;
+using DreamFoodDelivery.Domain.View;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -72,7 +73,6 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                //bool isUser = HttpContext.User.Identity.IsAuthenticated;
                 var userIdFromIdentity = HttpContext.User.Claims.Single(_ => _.Type == "id").Value;
                 var result = await _basketService.AddUpdateDishAsync(dishInfo.DishId, userIdFromIdentity, dishInfo.Quantity, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) 

@@ -7,6 +7,7 @@ namespace DreamFoodDelivery.Domain.DTO
     public class TagToUpdate
     {
         public Guid Id { get; set; }
-        public int? IndexNumber { get; set; } 
+        // public int? IndexNumber { get; set; }
+        public string TagName { get; set; }
     }
 }

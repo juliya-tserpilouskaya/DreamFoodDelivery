@@ -4,6 +4,7 @@ using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comments = await _context.Comments.AsNoTracking().ToListAsync(cancellationToken);
             if (!comments.Any())
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
+                return Result<IEnumerable<CommentView>>.Warning("No comments found");
             }
             List<CommentView> views = new List<CommentView>();
             foreach (var comment in comments)
@@ -62,7 +63,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var comment = await _context.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (comment is null)
                 {
-                    return Result<CommentView>.Fail<CommentView>($"Comment was not found");
+                    return Result<CommentView>.Warning($"Comment was not found");
                 }
                 CommentView view = _mapper.Map<CommentView>(comment);
                 var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
@@ -79,15 +80,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new comment
         /// </summary>
         /// <param name="comment">New comment to add</param>
+        /// <param name="userIdFromIdentity">Existing user Id to add</param>
         [LoggerAttribute]
-        public async Task<Result<CommentView>> AddAsync(CommentToAdd comment, CancellationToken cancellationToken = default)
+        public async Task<Result<CommentView>> AddAsync(CommentToAdd comment, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
+            UserDB userDB = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             var commentToAdd = _mapper.Map<CommentDB>(comment);
+            commentToAdd.UserId = userDB.Id;
             _context.Comments.Add(commentToAdd);
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                CommentDB commentAfterAdding = await _context.Comments.Where(_ => _.UserId == commentToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                CommentDB commentAfterAdding = await _context.Comments.Where(_ => _.UserId == userDB.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 CommentView view = _mapper.Map<CommentView>(commentAfterAdding);
                 var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
                 view.Order = order.Data;
@@ -118,7 +122,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comments = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!comments.Any())
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
+                return Result<IEnumerable<CommentView>>.Warning("No comments found");
             }
             List<CommentView> views = new List<CommentView>();
             foreach (var comment in comments)
@@ -146,7 +150,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comments = await _context.Comments.Where(_ => _.UserId == user.Id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!comments.Any())
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
+                return Result<IEnumerable<CommentView>>.Warning("No comments found");
             }
             List<CommentView> views = new List<CommentView>();
             foreach (var comment in comments)
@@ -168,7 +172,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.AsNoTracking().ToListAsync(cancellationToken);
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comments were not found"));
+                return await Task.FromResult(Result.Warning("Comments were not found"));
             }
             try
             {
@@ -197,7 +201,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(); //check
             if (!comment.Any())
             {
-                return await Task.FromResult(Result.Fail("Commenst were not found"));
+                return await Task.FromResult(Result.Warning("Commenst were not found"));
             }
             try
             {
@@ -226,7 +230,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comment was not found"));
+                return await Task.FromResult(Result.Warning("Comment was not found"));
             }
             try
             {
@@ -264,7 +268,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var commentAfterUpdate = await _context.Comments.Where(_ => _.Id == comment.Id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (commentAfterUpdate is null)
                 {
-                    return Result<CommentView>.Fail<CommentView>($"Comment was not found");
+                    return Result<CommentView>.Warning($"Comment was not found");
                 }
                 CommentView view = _mapper.Map<CommentView>(commentAfterUpdate);
                 var order = await _orderService.GetByIdAsync(commentAfterUpdate.OrderId.ToString());

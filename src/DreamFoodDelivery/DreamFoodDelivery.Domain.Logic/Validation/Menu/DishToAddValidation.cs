@@ -3,6 +3,7 @@ using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace DreamFoodDelivery.Domain.Logic.Validation
 {
@@ -24,7 +25,9 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
                 .WithMessage("Cost must be greater than 0");
             RuleFor(_ => _.Sale).GreaterThanOrEqualTo(0)
                 .WithMessage("Sale must be equal to or greater than 0");
+            
             //public HashSet<TagToAdd> TagIndexes { get; set; } //on front list
+            RuleForEach(_ => _.TagNames).SetValidator(new TagToAddValidation());
         }
     }
 }

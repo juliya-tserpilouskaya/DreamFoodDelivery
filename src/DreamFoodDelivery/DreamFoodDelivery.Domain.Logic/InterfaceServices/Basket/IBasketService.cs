@@ -1,5 +1,5 @@
 ﻿using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;

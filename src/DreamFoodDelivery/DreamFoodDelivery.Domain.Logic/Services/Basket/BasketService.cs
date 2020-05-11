@@ -2,8 +2,8 @@
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
-using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        ///  Asynchronously add dish to basket
+        ///  Asynchronously add dish to basket or update quantity
         /// </summary>
         /// <param name="dishId">Existing dish Id to add</param>
         /// <param name="quantity">Dish quantity to add</param>
@@ -64,8 +64,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             else
             {
-                connection.Quantity = quantity;
-                _context.Entry(connection).Property(c => c.Quantity).IsModified = true;
+                if (quantity > 0)
+                {
+                    connection.Quantity = quantity;
+                    _context.Entry(connection).Property(c => c.Quantity).IsModified = true;
+                }
+                else // quantity == 0
+                {
+                    _context.BasketDishes.Remove(connection);
+                }
             }
             
             basket.ModificationTime = DateTime.Now;

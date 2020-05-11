@@ -36,6 +36,22 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TokenInterceptorService } from './auth/token.interceptor.service';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { BadRequestComponent } from './pages/bad-request/bad-request.component';
+import { InternalServerErrorComponent } from './pages/internal-server-error/internal-server-error.component';
+
+import { OrderCreateComponent } from './orders/order-create/order-create.component';
+import { OrderDetailsComponent } from './orders/order-details/order-details.component';
+import { UserOrdersComponent } from './orders/user-orders/user-orders.component';
+
+import { UserCommentsComponent } from './comments/user-comments/user-comments.component';
+import { CommentCreateComponent } from './comments/comment-create/comment-create.component';
+import { EmailChangeComponent } from './profile-info/email-change/email-change.component';
+import { EmailConfirmComponent } from './profile-info/email-confirm/email-confirm.component';
+import { ProfileDeleteComponent } from './profile-info/profile-delete/profile-delete.component';
+import { ChangeUserDetailsComponent } from './administration/change-user-details/change-user-details.component';
+import { AdminCommentsComponent } from './administration/admin-comments/admin-comments.component';
+import { AdminsOrdersComponent } from './administration/admins-orders/admins-orders.component';
+import { OrderStatusChangeComponent } from './administration/order-status-change/order-status-change.component';
 
 
 
@@ -54,6 +70,20 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     HomeComponent,
     AboutUsComponent,
     PageNotFoundComponent,
+    BadRequestComponent,
+    InternalServerErrorComponent,
+    OrderCreateComponent,
+    UserOrdersComponent,
+    OrderDetailsComponent,
+    UserCommentsComponent,
+    CommentCreateComponent,
+    EmailChangeComponent,
+    EmailConfirmComponent,
+    ProfileDeleteComponent,
+    ChangeUserDetailsComponent,
+    AdminCommentsComponent,
+    AdminsOrdersComponent,
+    OrderStatusChangeComponent,
   ],
   imports: [
     BrowserAnimationsModule,

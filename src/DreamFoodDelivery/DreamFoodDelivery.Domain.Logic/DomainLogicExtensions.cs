@@ -24,6 +24,10 @@ namespace DreamFoodDelivery.Domain.Logic
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<ISearchService, SearchService>();
+            services.AddScoped<IAdminService, AdminService>();
+            services.AddScoped<IDishService, DishService>();
+            services.AddScoped<IEmailSenderService, EmailSenderService>();
 
             return services;
         }

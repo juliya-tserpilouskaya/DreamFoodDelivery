@@ -1,0 +1,31 @@
+.btn-icon {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.btn > .icon {
+  position: relative;
+  left: -.75rem;
+  display: inline-block;
+  padding: .375rem .75rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: .25rem 0 0 .25rem;
+}
+#maket {
+  width: 100%; /* Ширина всей таблицы */
+ }
+ TD {
+  vertical-align: top; /* Вертикальное выравнивание в ячейках */
+  padding: 5px; /* Поля вокруг ячеек */
+ }
+ TD#leftcol {
+  width: 200px; /* Ширина левой колонки */
+  background: #ccc; /* Цвет фона левой колонки */
+  border: 1px solid #000; /* Параметры рамки */
+ }
+ TD#rightcol {
+  background: #fc3; /* Цвет фона правой колонки */
+  border: 1px solid #000; /* Параметры рамки */
+ }
+ #spacer {
+  width: 10px; /* Расстояние между колонками */
+ }

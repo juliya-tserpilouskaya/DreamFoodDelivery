@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -162,7 +163,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.AddAsync(comment, cancellationToken);
+                var result = await _commentService.AddAsync(comment, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

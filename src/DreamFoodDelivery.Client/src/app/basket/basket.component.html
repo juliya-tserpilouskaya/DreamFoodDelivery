@@ -1,30 +1,70 @@
 <div class="row justify-content-center">
-  <div class="col-12 col-md-10 col-lg-8">
-    <h2>Basket</h2>
-      <br>
-<div *ngIf="basket">
-        <div class="card" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
 
-          <div class="card-body">
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">Basket</h1>
+    </div>
+  </section>
 
-            <p class="card-text">{{dish.name}}</p>
-            <ul class="list-group">
-            <li class="list-group-item">Cost: {{dish.cost}}$</li>
-            <li class="list-group-item">Sale: {{dish.sale}}%</li>
-            <li class="list-group-item">Composition: {{dish.composition}}</li>
-            <li class="list-group-item">Description: {{dish.description}}</li>
-            <li class="list-group-item">Tags: {{dish.tagList}}</li>
-            <li class="list-group-item">Quantity: {{dish.quantity}}</li>
-            </ul>
-            <br>
+  <div *ngIf="basket else loading">
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+            <form [formGroup]="updateForm" (ngSubmit)="onBasketUpdate(dish.id)"#formDir="ngForm" novalidate >
+
+              <div class="card mb-4 shadow-sm">
+                <h4 class="jumbotron-heading">{{dish.name}}</h4>
+                <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect fill="#55595c" width="100%" height="100%"></rect><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg>
+                <div class="card-body">
+                  <p class="card-text">{{dish.description}}</p>
+                  <table cellspacing="0" id="maket">
+                    <tr>
+                     <td id="leftcol">
+                      <ul class="list-group">
+                        <li class="list-group-item">Cost: {{dish.cost}}$</li>
+                        <li class="list-group-item">Sale: {{dish.sale}}%</li>
+                        <li class="list-group-item">quantity: {{dish.quantity}}</li>
+                      </ul>
+                     </td>
+                     <td id="spacer"></td>
+
+                     <td id="rightcol">
+                      <div>
+                        <h5>Tags:</h5>
+                        <ul class="list-group" *ngFor="let tag of dish.tagList">
+                          <li class="list-group-item">{{tag.indexNumber}}</li>
+                        </ul>
+                      </div>
+                     </td>
+                    </tr>
+                   </table>
+                    <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
+                    <div class="form-group" *ngIf="isAuthenticated">
+                      <input type="number" class="form-control" max="20" min="1" formControlName="quantity">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">Count update</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish(dish.id)">Remove</button>
+                    </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="form-group" *ngIf="isAuthenticated">
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish()">Remove All from basket</button>
+            <a [routerLink]="['order']">Make order</a>
           </div>
         </div>
       </div>
+    </div>
   </div>
 </div>
-<br/>
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>
+
 <div class="row justify-content-center">
-<ngb-pagination
+  <ngb-pagination
   [(page)]="page"
   [pageSize]="pageSize"
   [collectionSize]="dishes.length"></ngb-pagination>

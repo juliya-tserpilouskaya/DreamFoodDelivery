@@ -1,4 +1,33 @@
-<p>profile works!</p>
+<div class="row">
+  <div class="col col-lg-3">
+      <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+        <button class="btn btn-dark"
+        type="button"
+        data-toggle="collapse"
+        data-target="#collapseOrders"
+        aria-expanded="false"
+        aria-controls="collapseOrders">My Orders</button>
+
+        <button class="btn btn-dark"
+          type="button"
+          data-toggle="collapse"
+          data-target="#collapseComments"
+          aria-expanded="false"
+          aria-controls="collapseComments">My Comments</button>
+      </div>
+  </div>
+
+  <div class="col">
+    <div class="collapse" id="collapseOrders">
+      <app-user-orders></app-user-orders>
+    </div>
+
+    <div class="collapse" id="collapseComments">
+      <app-user-comments></app-user-comments>
+  </div>
+  </div>
+</div>
+
 <li class="nav-item">
   <button type="button" *ngIf="isAuthenticated" class="btn btn-primary" [routerLink]="['/profile/update']">Info update</button>
 </li>

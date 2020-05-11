@@ -4,6 +4,7 @@ using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                //TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.TagName == tagToAdd.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagView>.Ok(_mapper.Map<TagView>(tagAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -72,7 +74,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                //TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                TagDB tagAfterAdding = await _context.Tags.Where(_ => _.TagName == tagToAdd.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagDB>.Ok(tagAfterAdding);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -191,7 +194,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag, CancellationToken cancellationToken = default)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
-            _context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
+            //_context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
+            _context.Entry(tagForUpdate).Property(c => c.TagName).IsModified = true;
 
             try
             {

@@ -10,7 +10,7 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
     {
         public CommentToAddValidation()
         {
-            RuleFor(_ => _.UserId).NotEmpty().WithMessage("You must enter user Id");
+            //RuleFor(_ => _.UserId).NotEmpty().WithMessage("You must enter user Id");
             RuleFor(_ => _.OrderId).NotEmpty().WithMessage("You must enter order Id");
             RuleFor(_ => _.Headline).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Headline must contain from 3 to 90 characters.");

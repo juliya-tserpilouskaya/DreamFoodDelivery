@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DreamFoodDelivery.Domain.DTO;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.DTO
+namespace DreamFoodDelivery.Domain.View
 {
     public class DishView
     {

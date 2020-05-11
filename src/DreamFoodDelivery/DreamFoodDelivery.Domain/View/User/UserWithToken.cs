@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Domain.DTO
+namespace DreamFoodDelivery.Domain.View
 {
     public class UserWithToken
     {

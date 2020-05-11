@@ -106,6 +106,7 @@ namespace DreamFoodDelivery.Web
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserPasswordToChangeValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<SearchValidation>();
             });
             services.AddAutoMapper(typeof(Startup).Assembly);
 

@@ -29,10 +29,16 @@ namespace DreamFoodDelivery.Common
             return new Result(false, false, message);
         }
 
+        public static Result Fail()
+        {
+            return new Result(false, true, null);
+        }
+
         public static Result Fail(string message)
         {
             return new Result(false, true, message);
         }
+
         public static Result NoContent()
         {
             return new Result(false, false, null);
@@ -52,7 +58,6 @@ namespace DreamFoodDelivery.Common
         {
             return new Result<T>(true, false, null, data);
         }
-
         public static Result<T> Warning<T>(T data, string message) where T : class
         {
             return new Result<T>(false, false, message, data);

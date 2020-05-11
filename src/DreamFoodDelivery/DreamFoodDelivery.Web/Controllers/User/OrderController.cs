@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -23,9 +24,11 @@ namespace DreamFoodDelivery.Web.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        private readonly IUserService _userService;
+        public OrderController(IOrderService orderService, IUserService userService)
         {
             _orderService = orderService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -117,8 +120,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Create new order
         /// </summary>
-        /// <param name="order">New comment to add</param>
-        /// <returns>Comment info after adding</returns>
+        /// <param name="order">New order to add</param>
+        /// <returns>Order info after adding</returns>
         [HttpPost, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -133,8 +136,16 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _orderService.AddAsync(order, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
-                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+                var isEmailConf = await _userService.IsEmailConfirmedAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value);
+                if (isEmailConf.IsSuccess)
+                {
+                    var result = await _orderService.AddAsync(order, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
+                    return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, "Confirm your email");
+                }
             }
             catch (InvalidOperationException ex)
             {
