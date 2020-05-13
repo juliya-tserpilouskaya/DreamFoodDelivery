@@ -33,8 +33,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// Get all dishes in the basket
         /// </summary>
         /// <returns>Returns all dishes in the basket</returns>
-        [HttpGet]
-        [Route("")]
+        [HttpGet, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -90,7 +89,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="dishId">Dish id</param>
         /// <returns>Returns all dishes in the basket</returns>
-        [HttpDelete, Route("{dishId}")]
+        [HttpPost, Route("{dishId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

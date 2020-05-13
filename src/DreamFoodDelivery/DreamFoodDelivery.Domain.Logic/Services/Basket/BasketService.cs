@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Helpers;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.View;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +23,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     public class BasketService : IBasketService
     {
         private readonly DreamFoodDeliveryContext _context;
+        private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         IMenuService _menuService;
 
-        public BasketService(IMapper mapper, DreamFoodDeliveryContext context, IMenuService menuService)
+        public BasketService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IMenuService menuService)
         {
             _context = context;
+            _userManager = userManager;
             _mapper = mapper;
             _menuService = menuService;
         }
@@ -45,7 +50,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return Result<BasketView>.Fail<BasketView>($"Dish was not found");
             }
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
+            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
@@ -59,7 +65,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             
             if (connection is null)
             {
-                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity };
+                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity, DishCost = dishToAdd.Cost };
                 _context.BasketDishes.Add(basketDish);
             }
             else
@@ -92,7 +98,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data"); 
                     }
                     dish.Data.Quantity = dishListItem.Quantity;
+                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
                     view.Dishes.Add(dish.Data);
+                }
+                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                {
+                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
                 }
                 return Result<BasketView>.Ok(view);
             }
@@ -119,7 +131,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<BasketView>> RemoveDishByIdAsync(string dishId, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
+            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
@@ -150,7 +163,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data");
                     }
                     dish.Data.Quantity = dishListItem.Quantity;
+                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
                     view.Dishes.Add(dish.Data);
+                }
+                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                {
+                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
                 }
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }
@@ -176,7 +195,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<BasketView>> GetAllDishesByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (user is null)
+            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>($"User was not found");
             }
@@ -195,11 +215,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        //Действия с количеством
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data");
                     }
                     dish.Data.Quantity = dishListItem.Quantity;
+                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
                     view.Dishes.Add(dish.Data);
+                }
+                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                {
+                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
                 }
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }

@@ -215,7 +215,7 @@ export class BasketService {
             })
         };
 
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processRemoveById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -2373,7 +2373,7 @@ export class OrderService {
         return _observableOf<OrderView>(<any>null);
     }
 
-    update(order: OrderToUpdate): Observable<OrderToUpdate> {
+    update(order: OrderToUpdate): Observable<OrderView> {
         let url_ = this.baseUrl + "/api/Order";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2396,14 +2396,14 @@ export class OrderService {
                 try {
                     return this.processUpdate(<any>response_);
                 } catch (e) {
-                    return <Observable<OrderToUpdate>><any>_observableThrow(e);
+                    return <Observable<OrderView>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<OrderToUpdate>><any>_observableThrow(response_);
+                return <Observable<OrderView>><any>_observableThrow(response_);
         }));
     }
 
-    protected processUpdate(response: HttpResponseBase): Observable<OrderToUpdate> {
+    protected processUpdate(response: HttpResponseBase): Observable<OrderView> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2414,7 +2414,7 @@ export class OrderService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = OrderToUpdate.fromJS(resultData200);
+            result200 = OrderView.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 400) {
@@ -2440,7 +2440,7 @@ export class OrderService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<OrderToUpdate>(<any>null);
+        return _observableOf<OrderView>(<any>null);
     }
 
     getByUserId(): Observable<OrderView[]> {
@@ -2657,6 +2657,139 @@ export class OrderService {
             }));
         }
         return _observableOf<void>(<any>null);
+    }
+
+    getStatuses(): Observable<OrderStatus[]> {
+        let url_ = this.baseUrl + "/api/Order/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStatuses(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStatuses(<any>response_);
+                } catch (e) {
+                    return <Observable<OrderStatus[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<OrderStatus[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetStatuses(response: HttpResponseBase): Observable<OrderStatus[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(OrderStatus.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<OrderStatus[]>(<any>null);
+    }
+
+    getOrdersInStatus(statusName: string | null): Observable<OrderView[]> {
+        let url_ = this.baseUrl + "/api/Order/{statusName}";
+        if (statusName === undefined || statusName === null)
+            throw new Error("The parameter 'statusName' must be defined.");
+        url_ = url_.replace("{statusName}", encodeURIComponent("" + statusName));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOrdersInStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOrdersInStatus(<any>response_);
+                } catch (e) {
+                    return <Observable<OrderView[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<OrderView[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetOrdersInStatus(response: HttpResponseBase): Observable<OrderView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(OrderView.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<OrderView[]>(<any>null);
     }
 }
 
@@ -3522,8 +3655,8 @@ export class SearchService {
         return _observableOf<TagView[]>(<any>null);
     }
 
-    getAllApartments(request: RequestParameters): Observable<DishView[]> {
-        let url_ = this.baseUrl + "/api/Search/parameters";
+    getAllDishesByRequest(request: RequestParameters): Observable<DishView[]> {
+        let url_ = this.baseUrl + "/api/Search/request";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -3539,11 +3672,11 @@ export class SearchService {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllApartments(response_);
+            return this.processGetAllDishesByRequest(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAllApartments(<any>response_);
+                    return this.processGetAllDishesByRequest(<any>response_);
                 } catch (e) {
                     return <Observable<DishView[]>><any>_observableThrow(e);
                 }
@@ -3552,7 +3685,7 @@ export class SearchService {
         }));
     }
 
-    protected processGetAllApartments(response: HttpResponseBase): Observable<DishView[]> {
+    protected processGetAllDishesByRequest(response: HttpResponseBase): Observable<DishView[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -4039,8 +4172,10 @@ export class AdminService {
 
 export class BasketView implements IBasketView {
     id?: string;
-    dishes?: DishView[] | undefined;
-    modificationTime?: Date | undefined;
+    dishes?: DishView[] | null;
+    modificationTime?: Date | null;
+    basketCost?: number;
+    shippingCost?: number | null;
 
     constructor(data?: IBasketView) {
         if (data) {
@@ -4053,13 +4188,15 @@ export class BasketView implements IBasketView {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             if (Array.isArray(_data["dishes"])) {
                 this.dishes = [] as any;
                 for (let item of _data["dishes"])
                     this.dishes!.push(DishView.fromJS(item));
             }
-            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>undefined;
+            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>null;
+            this.basketCost = _data["basketCost"] !== undefined ? _data["basketCost"] : <any>null;
+            this.shippingCost = _data["shippingCost"] !== undefined ? _data["shippingCost"] : <any>null;
         }
     }
 
@@ -4072,36 +4209,40 @@ export class BasketView implements IBasketView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
         if (Array.isArray(this.dishes)) {
             data["dishes"] = [];
             for (let item of this.dishes)
                 data["dishes"].push(item.toJSON());
         }
-        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>undefined;
+        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
+        data["basketCost"] = this.basketCost !== undefined ? this.basketCost : <any>null;
+        data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
         return data; 
     }
 }
 
 export interface IBasketView {
     id?: string;
-    dishes?: DishView[] | undefined;
-    modificationTime?: Date | undefined;
+    dishes?: DishView[] | null;
+    modificationTime?: Date | null;
+    basketCost?: number;
+    shippingCost?: number | null;
 }
 
 export class DishView implements IDishView {
     id?: string;
-    name?: string | undefined;
-    category?: number | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    added?: Date | undefined;
-    modified?: Date | undefined;
-    tagList?: TagToAdd[] | undefined;
-    quantity?: number | undefined;
+    name?: string | null;
+    category?: number | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    added?: Date | null;
+    modified?: Date | null;
+    tagList?: TagToAdd[] | null;
+    quantity?: number;
 
     constructor(data?: IDishView) {
         if (data) {
@@ -4114,22 +4255,22 @@ export class DishView implements IDishView {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.category = _data["category"];
-            this.composition = _data["composition"];
-            this.description = _data["description"];
-            this.cost = _data["cost"];
-            this.weigh = _data["weigh"];
-            this.sale = _data["sale"];
-            this.added = _data["added"] ? new Date(_data["added"].toString()) : <any>undefined;
-            this.modified = _data["modified"] ? new Date(_data["modified"].toString()) : <any>undefined;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.category = _data["category"] !== undefined ? _data["category"] : <any>null;
+            this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.weigh = _data["weigh"] !== undefined ? _data["weigh"] : <any>null;
+            this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
+            this.added = _data["added"] ? new Date(_data["added"].toString()) : <any>null;
+            this.modified = _data["modified"] ? new Date(_data["modified"].toString()) : <any>null;
             if (Array.isArray(_data["tagList"])) {
                 this.tagList = [] as any;
                 for (let item of _data["tagList"])
                     this.tagList!.push(TagToAdd.fromJS(item));
             }
-            this.quantity = _data["quantity"];
+            this.quantity = _data["quantity"] !== undefined ? _data["quantity"] : <any>null;
         }
     }
 
@@ -4142,43 +4283,43 @@ export class DishView implements IDishView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["category"] = this.category;
-        data["composition"] = this.composition;
-        data["description"] = this.description;
-        data["cost"] = this.cost;
-        data["weigh"] = this.weigh;
-        data["sale"] = this.sale;
-        data["added"] = this.added ? this.added.toISOString() : <any>undefined;
-        data["modified"] = this.modified ? this.modified.toISOString() : <any>undefined;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["category"] = this.category !== undefined ? this.category : <any>null;
+        data["composition"] = this.composition !== undefined ? this.composition : <any>null;
+        data["description"] = this.description !== undefined ? this.description : <any>null;
+        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["weigh"] = this.weigh !== undefined ? this.weigh : <any>null;
+        data["sale"] = this.sale !== undefined ? this.sale : <any>null;
+        data["added"] = this.added ? this.added.toISOString() : <any>null;
+        data["modified"] = this.modified ? this.modified.toISOString() : <any>null;
         if (Array.isArray(this.tagList)) {
             data["tagList"] = [];
             for (let item of this.tagList)
                 data["tagList"].push(item.toJSON());
         }
-        data["quantity"] = this.quantity;
+        data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
         return data; 
     }
 }
 
 export interface IDishView {
     id?: string;
-    name?: string | undefined;
-    category?: number | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    added?: Date | undefined;
-    modified?: Date | undefined;
-    tagList?: TagToAdd[] | undefined;
-    quantity?: number | undefined;
+    name?: string | null;
+    category?: number | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    added?: Date | null;
+    modified?: Date | null;
+    tagList?: TagToAdd[] | null;
+    quantity?: number;
 }
 
 export class TagToAdd implements ITagToAdd {
-    tagName?: string | undefined;
+    tagName?: string | null;
 
     constructor(data?: ITagToAdd) {
         if (data) {
@@ -4191,7 +4332,7 @@ export class TagToAdd implements ITagToAdd {
 
     init(_data?: any) {
         if (_data) {
-            this.tagName = _data["tagName"];
+            this.tagName = _data["tagName"] !== undefined ? _data["tagName"] : <any>null;
         }
     }
 
@@ -4204,22 +4345,22 @@ export class TagToAdd implements ITagToAdd {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["tagName"] = this.tagName;
+        data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
         return data; 
     }
 }
 
 export interface ITagToAdd {
-    tagName?: string | undefined;
+    tagName?: string | null;
 }
 
 export class ProblemDetails implements IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-    extensions?: { [key: string]: any; } | undefined;
+    type?: string | null;
+    title?: string | null;
+    status?: number | null;
+    detail?: string | null;
+    instance?: string | null;
+    extensions?: { [key: string]: any; } | null;
 
     constructor(data?: IProblemDetails) {
         if (data) {
@@ -4232,11 +4373,11 @@ export class ProblemDetails implements IProblemDetails {
 
     init(_data?: any) {
         if (_data) {
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
+            this.type = _data["type"] !== undefined ? _data["type"] : <any>null;
+            this.title = _data["title"] !== undefined ? _data["title"] : <any>null;
+            this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
+            this.detail = _data["detail"] !== undefined ? _data["detail"] : <any>null;
+            this.instance = _data["instance"] !== undefined ? _data["instance"] : <any>null;
             if (_data["extensions"]) {
                 this.extensions = {} as any;
                 for (let key in _data["extensions"]) {
@@ -4256,16 +4397,16 @@ export class ProblemDetails implements IProblemDetails {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
+        data["type"] = this.type !== undefined ? this.type : <any>null;
+        data["title"] = this.title !== undefined ? this.title : <any>null;
+        data["status"] = this.status !== undefined ? this.status : <any>null;
+        data["detail"] = this.detail !== undefined ? this.detail : <any>null;
+        data["instance"] = this.instance !== undefined ? this.instance : <any>null;
         if (this.extensions) {
             data["extensions"] = {};
             for (let key in this.extensions) {
                 if (this.extensions.hasOwnProperty(key))
-                    data["extensions"][key] = this.extensions[key];
+                    data["extensions"][key] = this.extensions[key] !== undefined ? this.extensions[key] : <any>null;
             }
         }
         return data; 
@@ -4273,16 +4414,16 @@ export class ProblemDetails implements IProblemDetails {
 }
 
 export interface IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-    extensions?: { [key: string]: any; } | undefined;
+    type?: string | null;
+    title?: string | null;
+    status?: number | null;
+    detail?: string | null;
+    instance?: string | null;
+    extensions?: { [key: string]: any; } | null;
 }
 
 export class DishToBasketAdd implements IDishToBasketAdd {
-    dishId?: string | undefined;
+    dishId?: string | null;
     quantity?: number;
 
     constructor(data?: IDishToBasketAdd) {
@@ -4296,8 +4437,8 @@ export class DishToBasketAdd implements IDishToBasketAdd {
 
     init(_data?: any) {
         if (_data) {
-            this.dishId = _data["dishId"];
-            this.quantity = _data["quantity"];
+            this.dishId = _data["dishId"] !== undefined ? _data["dishId"] : <any>null;
+            this.quantity = _data["quantity"] !== undefined ? _data["quantity"] : <any>null;
         }
     }
 
@@ -4310,14 +4451,14 @@ export class DishToBasketAdd implements IDishToBasketAdd {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["dishId"] = this.dishId;
-        data["quantity"] = this.quantity;
+        data["dishId"] = this.dishId !== undefined ? this.dishId : <any>null;
+        data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
         return data; 
     }
 }
 
 export interface IDishToBasketAdd {
-    dishId?: string | undefined;
+    dishId?: string | null;
     quantity?: number;
 }
 
@@ -4336,8 +4477,8 @@ export class DishByCost implements IDishByCost {
 
     init(_data?: any) {
         if (_data) {
-            this.lowerPrice = _data["lowerPrice"];
-            this.upperPrice = _data["upperPrice"];
+            this.lowerPrice = _data["lowerPrice"] !== undefined ? _data["lowerPrice"] : <any>null;
+            this.upperPrice = _data["upperPrice"] !== undefined ? _data["upperPrice"] : <any>null;
         }
     }
 
@@ -4350,8 +4491,8 @@ export class DishByCost implements IDishByCost {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["lowerPrice"] = this.lowerPrice;
-        data["upperPrice"] = this.upperPrice;
+        data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
+        data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
         return data; 
     }
 }
@@ -4363,7 +4504,7 @@ export interface IDishByCost {
 
 export class TagView implements ITagView {
     id?: string;
-    tagName?: string | undefined;
+    tagName?: string | null;
 
     constructor(data?: ITagView) {
         if (data) {
@@ -4376,8 +4517,8 @@ export class TagView implements ITagView {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.tagName = _data["tagName"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.tagName = _data["tagName"] !== undefined ? _data["tagName"] : <any>null;
         }
     }
 
@@ -4390,20 +4531,20 @@ export class TagView implements ITagView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["tagName"] = this.tagName;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
         return data; 
     }
 }
 
 export interface ITagView {
     id?: string;
-    tagName?: string | undefined;
+    tagName?: string | null;
 }
 
 export class TagToUpdate implements ITagToUpdate {
     id?: string;
-    tagName?: string | undefined;
+    tagName?: string | null;
 
     constructor(data?: ITagToUpdate) {
         if (data) {
@@ -4416,8 +4557,8 @@ export class TagToUpdate implements ITagToUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.tagName = _data["tagName"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.tagName = _data["tagName"] !== undefined ? _data["tagName"] : <any>null;
         }
     }
 
@@ -4430,27 +4571,27 @@ export class TagToUpdate implements ITagToUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["tagName"] = this.tagName;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
         return data; 
     }
 }
 
 export interface ITagToUpdate {
     id?: string;
-    tagName?: string | undefined;
+    tagName?: string | null;
 }
 
 export class CommentView implements ICommentView {
     id?: string;
     userId?: string;
     orderId?: string;
-    order?: OrderView | undefined;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
-    postTime?: Date | undefined;
-    modificationTime?: Date | undefined;
+    order?: OrderView | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    postTime?: Date | null;
+    modificationTime?: Date | null;
 
     constructor(data?: ICommentView) {
         if (data) {
@@ -4463,15 +4604,15 @@ export class CommentView implements ICommentView {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.userId = _data["userId"];
-            this.orderId = _data["orderId"];
-            this.order = _data["order"] ? OrderView.fromJS(_data["order"]) : <any>undefined;
-            this.headline = _data["headline"];
-            this.rating = _data["rating"];
-            this.content = _data["content"];
-            this.postTime = _data["postTime"] ? new Date(_data["postTime"].toString()) : <any>undefined;
-            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>undefined;
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
+            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
+            this.order = _data["order"] ? OrderView.fromJS(_data["order"]) : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+            this.postTime = _data["postTime"] ? new Date(_data["postTime"].toString()) : <any>null;
+            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>null;
         }
     }
 
@@ -4484,15 +4625,15 @@ export class CommentView implements ICommentView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["userId"] = this.userId;
-        data["orderId"] = this.orderId;
-        data["order"] = this.order ? this.order.toJSON() : <any>undefined;
-        data["headline"] = this.headline;
-        data["rating"] = this.rating;
-        data["content"] = this.content;
-        data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>undefined;
-        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>undefined;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
+        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
+        data["order"] = this.order ? this.order.toJSON() : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>null;
+        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
         return data; 
     }
 }
@@ -4501,30 +4642,30 @@ export interface ICommentView {
     id?: string;
     userId?: string;
     orderId?: string;
-    order?: OrderView | undefined;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
-    postTime?: Date | undefined;
-    modificationTime?: Date | undefined;
+    order?: OrderView | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    postTime?: Date | null;
+    modificationTime?: Date | null;
 }
 
 export class OrderView implements IOrderView {
     id?: string;
-    dishes?: DishView[] | undefined;
-    commentId?: string | undefined;
+    dishes?: DishView[] | null;
+    commentId?: string | null;
     isInfoFromProfile?: boolean;
-    address?: string | undefined;
+    address?: string | null;
     personalDiscount?: number;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    orderCost?: number | undefined;
-    shippingCost?: number | undefined;
-    status?: string | undefined;
-    orderTime?: Date | undefined;
-    deliveryTime?: Date | undefined;
-    paymentTime?: Date | undefined;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
+    orderCost?: number | null;
+    shippingCost?: number | null;
+    status?: string | null;
+    orderTime?: Date | null;
+    deliveryTime?: Date | null;
+    paymentTime?: Date | null;
 
     constructor(data?: IOrderView) {
         if (data) {
@@ -4537,25 +4678,25 @@ export class OrderView implements IOrderView {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             if (Array.isArray(_data["dishes"])) {
                 this.dishes = [] as any;
                 for (let item of _data["dishes"])
                     this.dishes!.push(DishView.fromJS(item));
             }
-            this.commentId = _data["commentId"];
-            this.isInfoFromProfile = _data["isInfoFromProfile"];
-            this.address = _data["address"];
-            this.personalDiscount = _data["personalDiscount"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            this.orderCost = _data["orderCost"];
-            this.shippingCost = _data["shippingCost"];
-            this.status = _data["status"];
-            this.orderTime = _data["orderTime"] ? new Date(_data["orderTime"].toString()) : <any>undefined;
-            this.deliveryTime = _data["deliveryTime"] ? new Date(_data["deliveryTime"].toString()) : <any>undefined;
-            this.paymentTime = _data["paymentTime"] ? new Date(_data["paymentTime"].toString()) : <any>undefined;
+            this.commentId = _data["commentId"] !== undefined ? _data["commentId"] : <any>null;
+            this.isInfoFromProfile = _data["isInfoFromProfile"] !== undefined ? _data["isInfoFromProfile"] : <any>null;
+            this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
+            this.personalDiscount = _data["personalDiscount"] !== undefined ? _data["personalDiscount"] : <any>null;
+            this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
+            this.orderCost = _data["orderCost"] !== undefined ? _data["orderCost"] : <any>null;
+            this.shippingCost = _data["shippingCost"] !== undefined ? _data["shippingCost"] : <any>null;
+            this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
+            this.orderTime = _data["orderTime"] ? new Date(_data["orderTime"].toString()) : <any>null;
+            this.deliveryTime = _data["deliveryTime"] ? new Date(_data["deliveryTime"].toString()) : <any>null;
+            this.paymentTime = _data["paymentTime"] ? new Date(_data["paymentTime"].toString()) : <any>null;
         }
     }
 
@@ -4568,52 +4709,52 @@ export class OrderView implements IOrderView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
         if (Array.isArray(this.dishes)) {
             data["dishes"] = [];
             for (let item of this.dishes)
                 data["dishes"].push(item.toJSON());
         }
-        data["commentId"] = this.commentId;
-        data["isInfoFromProfile"] = this.isInfoFromProfile;
-        data["address"] = this.address;
-        data["personalDiscount"] = this.personalDiscount;
-        data["phoneNumber"] = this.phoneNumber;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["orderCost"] = this.orderCost;
-        data["shippingCost"] = this.shippingCost;
-        data["status"] = this.status;
-        data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>undefined;
-        data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>undefined;
-        data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>undefined;
+        data["commentId"] = this.commentId !== undefined ? this.commentId : <any>null;
+        data["isInfoFromProfile"] = this.isInfoFromProfile !== undefined ? this.isInfoFromProfile : <any>null;
+        data["address"] = this.address !== undefined ? this.address : <any>null;
+        data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
+        data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
+        data["orderCost"] = this.orderCost !== undefined ? this.orderCost : <any>null;
+        data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
+        data["status"] = this.status !== undefined ? this.status : <any>null;
+        data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>null;
+        data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>null;
+        data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>null;
         return data; 
     }
 }
 
 export interface IOrderView {
     id?: string;
-    dishes?: DishView[] | undefined;
-    commentId?: string | undefined;
+    dishes?: DishView[] | null;
+    commentId?: string | null;
     isInfoFromProfile?: boolean;
-    address?: string | undefined;
+    address?: string | null;
     personalDiscount?: number;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    orderCost?: number | undefined;
-    shippingCost?: number | undefined;
-    status?: string | undefined;
-    orderTime?: Date | undefined;
-    deliveryTime?: Date | undefined;
-    paymentTime?: Date | undefined;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
+    orderCost?: number | null;
+    shippingCost?: number | null;
+    status?: string | null;
+    orderTime?: Date | null;
+    deliveryTime?: Date | null;
+    paymentTime?: Date | null;
 }
 
 export class CommentToAdd implements ICommentToAdd {
     orderId?: string;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
 
     constructor(data?: ICommentToAdd) {
         if (data) {
@@ -4626,10 +4767,10 @@ export class CommentToAdd implements ICommentToAdd {
 
     init(_data?: any) {
         if (_data) {
-            this.orderId = _data["orderId"];
-            this.headline = _data["headline"];
-            this.rating = _data["rating"];
-            this.content = _data["content"];
+            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
         }
     }
 
@@ -4642,26 +4783,26 @@ export class CommentToAdd implements ICommentToAdd {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["orderId"] = this.orderId;
-        data["headline"] = this.headline;
-        data["rating"] = this.rating;
-        data["content"] = this.content;
+        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
         return data; 
     }
 }
 
 export interface ICommentToAdd {
     orderId?: string;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
 }
 
 export class CommentToUpdate implements ICommentToUpdate {
     id?: string;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
 
     constructor(data?: ICommentToUpdate) {
         if (data) {
@@ -4674,10 +4815,10 @@ export class CommentToUpdate implements ICommentToUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.headline = _data["headline"];
-            this.rating = _data["rating"];
-            this.content = _data["content"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
         }
     }
 
@@ -4690,24 +4831,24 @@ export class CommentToUpdate implements ICommentToUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["headline"] = this.headline;
-        data["rating"] = this.rating;
-        data["content"] = this.content;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
         return data; 
     }
 }
 
 export interface ICommentToUpdate {
     id?: string;
-    headline?: string | undefined;
-    rating?: number | undefined;
-    content?: string | undefined;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
 }
 
 export class UserWithToken implements IUserWithToken {
-    userToken?: string | undefined;
-    userView?: UserView | undefined;
+    userToken?: string | null;
+    userView?: UserView | null;
 
     constructor(data?: IUserWithToken) {
         if (data) {
@@ -4720,8 +4861,8 @@ export class UserWithToken implements IUserWithToken {
 
     init(_data?: any) {
         if (_data) {
-            this.userToken = _data["userToken"];
-            this.userView = _data["userView"] ? UserView.fromJS(_data["userView"]) : <any>undefined;
+            this.userToken = _data["userToken"] !== undefined ? _data["userToken"] : <any>null;
+            this.userView = _data["userView"] ? UserView.fromJS(_data["userView"]) : <any>null;
         }
     }
 
@@ -4734,20 +4875,20 @@ export class UserWithToken implements IUserWithToken {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["userToken"] = this.userToken;
-        data["userView"] = this.userView ? this.userView.toJSON() : <any>undefined;
+        data["userToken"] = this.userToken !== undefined ? this.userToken : <any>null;
+        data["userView"] = this.userView ? this.userView.toJSON() : <any>null;
         return data; 
     }
 }
 
 export interface IUserWithToken {
-    userToken?: string | undefined;
-    userView?: UserView | undefined;
+    userToken?: string | null;
+    userView?: UserView | null;
 }
 
 export class UserView implements IUserView {
-    userDTO?: UserDTO | undefined;
-    userProfile?: UserProfile | undefined;
+    userDTO?: UserDTO | null;
+    userProfile?: UserProfile | null;
 
     constructor(data?: IUserView) {
         if (data) {
@@ -4760,8 +4901,8 @@ export class UserView implements IUserView {
 
     init(_data?: any) {
         if (_data) {
-            this.userDTO = _data["userDTO"] ? UserDTO.fromJS(_data["userDTO"]) : <any>undefined;
-            this.userProfile = _data["userProfile"] ? UserProfile.fromJS(_data["userProfile"]) : <any>undefined;
+            this.userDTO = _data["userDTO"] ? UserDTO.fromJS(_data["userDTO"]) : <any>null;
+            this.userProfile = _data["userProfile"] ? UserProfile.fromJS(_data["userProfile"]) : <any>null;
         }
     }
 
@@ -4774,20 +4915,20 @@ export class UserView implements IUserView {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>undefined;
-        data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>undefined;
+        data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>null;
+        data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>null;
         return data; 
     }
 }
 
 export interface IUserView {
-    userDTO?: UserDTO | undefined;
-    userProfile?: UserProfile | undefined;
+    userDTO?: UserDTO | null;
+    userProfile?: UserProfile | null;
 }
 
 export class UserDTO implements IUserDTO {
     id?: string;
-    idFromIdentity?: string | undefined;
+    idFromIdentity?: string | null;
     basketId?: string;
 
     constructor(data?: IUserDTO) {
@@ -4801,9 +4942,9 @@ export class UserDTO implements IUserDTO {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.idFromIdentity = _data["idFromIdentity"];
-            this.basketId = _data["basketId"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.idFromIdentity = _data["idFromIdentity"] !== undefined ? _data["idFromIdentity"] : <any>null;
+            this.basketId = _data["basketId"] !== undefined ? _data["basketId"] : <any>null;
         }
     }
 
@@ -4816,27 +4957,27 @@ export class UserDTO implements IUserDTO {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["idFromIdentity"] = this.idFromIdentity;
-        data["basketId"] = this.basketId;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
+        data["basketId"] = this.basketId !== undefined ? this.basketId : <any>null;
         return data; 
     }
 }
 
 export interface IUserDTO {
     id?: string;
-    idFromIdentity?: string | undefined;
+    idFromIdentity?: string | null;
     basketId?: string;
 }
 
 export class UserProfile implements IUserProfile {
-    role?: string | undefined;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    login?: string | undefined;
-    email?: string | undefined;
+    role?: string | null;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
+    login?: string | null;
+    email?: string | null;
     personalDiscount?: number;
 
     constructor(data?: IUserProfile) {
@@ -4850,14 +4991,14 @@ export class UserProfile implements IUserProfile {
 
     init(_data?: any) {
         if (_data) {
-            this.role = _data["role"];
-            this.address = _data["address"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            this.login = _data["login"];
-            this.email = _data["email"];
-            this.personalDiscount = _data["personalDiscount"];
+            this.role = _data["role"] !== undefined ? _data["role"] : <any>null;
+            this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
+            this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
+            this.login = _data["login"] !== undefined ? _data["login"] : <any>null;
+            this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
+            this.personalDiscount = _data["personalDiscount"] !== undefined ? _data["personalDiscount"] : <any>null;
         }
     }
 
@@ -4870,26 +5011,26 @@ export class UserProfile implements IUserProfile {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["role"] = this.role;
-        data["address"] = this.address;
-        data["phoneNumber"] = this.phoneNumber;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["login"] = this.login;
-        data["email"] = this.email;
-        data["personalDiscount"] = this.personalDiscount;
+        data["role"] = this.role !== undefined ? this.role : <any>null;
+        data["address"] = this.address !== undefined ? this.address : <any>null;
+        data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
+        data["login"] = this.login !== undefined ? this.login : <any>null;
+        data["email"] = this.email !== undefined ? this.email : <any>null;
+        data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
         return data; 
     }
 }
 
 export interface IUserProfile {
-    role?: string | undefined;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    login?: string | undefined;
-    email?: string | undefined;
+    role?: string | null;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
+    login?: string | null;
+    email?: string | null;
     personalDiscount?: number;
 }
 
@@ -4908,8 +5049,8 @@ export class UserRegistration implements IUserRegistration {
 
     init(_data?: any) {
         if (_data) {
-            this.email = _data["email"];
-            this.password = _data["password"];
+            this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
+            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
         }
     }
 
@@ -4922,8 +5063,8 @@ export class UserRegistration implements IUserRegistration {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["password"] = this.password;
+        data["email"] = this.email !== undefined ? this.email : <any>null;
+        data["password"] = this.password !== undefined ? this.password : <any>null;
         return data; 
     }
 }
@@ -4935,7 +5076,7 @@ export interface IUserRegistration {
 
 export class OrderToStatusUpdate implements IOrderToStatusUpdate {
     id?: string;
-    statusIndex?: number | undefined;
+    statusIndex?: number | null;
 
     constructor(data?: IOrderToStatusUpdate) {
         if (data) {
@@ -4948,8 +5089,8 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.statusIndex = _data["statusIndex"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.statusIndex = _data["statusIndex"] !== undefined ? _data["statusIndex"] : <any>null;
         }
     }
 
@@ -4962,25 +5103,23 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["statusIndex"] = this.statusIndex;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
         return data; 
     }
 }
 
 export interface IOrderToStatusUpdate {
     id?: string;
-    statusIndex?: number | undefined;
+    statusIndex?: number | null;
 }
 
 export class OrderToAdd implements IOrderToAdd {
     isInfoFromProfile?: boolean;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    orderCost?: number | undefined;
-    shippingCost?: number | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
 
     constructor(data?: IOrderToAdd) {
         if (data) {
@@ -4993,13 +5132,11 @@ export class OrderToAdd implements IOrderToAdd {
 
     init(_data?: any) {
         if (_data) {
-            this.isInfoFromProfile = _data["isInfoFromProfile"];
-            this.address = _data["address"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            this.orderCost = _data["orderCost"];
-            this.shippingCost = _data["shippingCost"];
+            this.isInfoFromProfile = _data["isInfoFromProfile"] !== undefined ? _data["isInfoFromProfile"] : <any>null;
+            this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
+            this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
         }
     }
 
@@ -5012,34 +5149,29 @@ export class OrderToAdd implements IOrderToAdd {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["isInfoFromProfile"] = this.isInfoFromProfile;
-        data["address"] = this.address;
-        data["phoneNumber"] = this.phoneNumber;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["orderCost"] = this.orderCost;
-        data["shippingCost"] = this.shippingCost;
+        data["isInfoFromProfile"] = this.isInfoFromProfile !== undefined ? this.isInfoFromProfile : <any>null;
+        data["address"] = this.address !== undefined ? this.address : <any>null;
+        data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         return data; 
     }
 }
 
 export interface IOrderToAdd {
     isInfoFromProfile?: boolean;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    orderCost?: number | undefined;
-    shippingCost?: number | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
 }
 
 export class OrderToUpdate implements IOrderToUpdate {
     id?: string;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    shippingCost?: number | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
 
     constructor(data?: IOrderToUpdate) {
         if (data) {
@@ -5052,12 +5184,11 @@ export class OrderToUpdate implements IOrderToUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.address = _data["address"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
-            this.shippingCost = _data["shippingCost"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
+            this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
         }
     }
 
@@ -5070,30 +5201,68 @@ export class OrderToUpdate implements IOrderToUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["address"] = this.address;
-        data["phoneNumber"] = this.phoneNumber;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
-        data["shippingCost"] = this.shippingCost;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["address"] = this.address !== undefined ? this.address : <any>null;
+        data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         return data; 
     }
 }
 
 export interface IOrderToUpdate {
     id?: string;
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
-    shippingCost?: number | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
+}
+
+export class OrderStatus implements IOrderStatus {
+    statusIndex?: number | null;
+    statusName?: string | null;
+
+    constructor(data?: IOrderStatus) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.statusIndex = _data["statusIndex"] !== undefined ? _data["statusIndex"] : <any>null;
+            this.statusName = _data["statusName"] !== undefined ? _data["statusName"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): OrderStatus {
+        data = typeof data === 'object' ? data : {};
+        let result = new OrderStatus();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
+        data["statusName"] = this.statusName !== undefined ? this.statusName : <any>null;
+        return data; 
+    }
+}
+
+export interface IOrderStatus {
+    statusIndex?: number | null;
+    statusName?: string | null;
 }
 
 export class UserToUpdate implements IUserToUpdate {
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
 
     constructor(data?: IUserToUpdate) {
         if (data) {
@@ -5106,10 +5275,10 @@ export class UserToUpdate implements IUserToUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.address = _data["address"];
-            this.phoneNumber = _data["phoneNumber"];
-            this.name = _data["name"];
-            this.surname = _data["surname"];
+            this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
+            this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
         }
     }
 
@@ -5122,24 +5291,24 @@ export class UserToUpdate implements IUserToUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["address"] = this.address;
-        data["phoneNumber"] = this.phoneNumber;
-        data["name"] = this.name;
-        data["surname"] = this.surname;
+        data["address"] = this.address !== undefined ? this.address : <any>null;
+        data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         return data; 
     }
 }
 
 export interface IUserToUpdate {
-    address?: string | undefined;
-    phoneNumber?: string | undefined;
-    name?: string | undefined;
-    surname?: string | undefined;
+    address?: string | null;
+    phoneNumber?: string | null;
+    name?: string | null;
+    surname?: string | null;
 }
 
 export class UserEmailToChange implements IUserEmailToChange {
-    idFromIdentity?: string | undefined;
-    newEmail?: string | undefined;
+    idFromIdentity?: string | null;
+    newEmail?: string | null;
 
     constructor(data?: IUserEmailToChange) {
         if (data) {
@@ -5152,8 +5321,8 @@ export class UserEmailToChange implements IUserEmailToChange {
 
     init(_data?: any) {
         if (_data) {
-            this.idFromIdentity = _data["idFromIdentity"];
-            this.newEmail = _data["newEmail"];
+            this.idFromIdentity = _data["idFromIdentity"] !== undefined ? _data["idFromIdentity"] : <any>null;
+            this.newEmail = _data["newEmail"] !== undefined ? _data["newEmail"] : <any>null;
         }
     }
 
@@ -5166,21 +5335,21 @@ export class UserEmailToChange implements IUserEmailToChange {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["idFromIdentity"] = this.idFromIdentity;
-        data["newEmail"] = this.newEmail;
+        data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
+        data["newEmail"] = this.newEmail !== undefined ? this.newEmail : <any>null;
         return data; 
     }
 }
 
 export interface IUserEmailToChange {
-    idFromIdentity?: string | undefined;
-    newEmail?: string | undefined;
+    idFromIdentity?: string | null;
+    newEmail?: string | null;
 }
 
 export class UserPasswordToChange implements IUserPasswordToChange {
-    idFromIdentity?: string | undefined;
-    currentPassword?: string | undefined;
-    newPassword?: string | undefined;
+    idFromIdentity?: string | null;
+    currentPassword?: string | null;
+    newPassword?: string | null;
 
     constructor(data?: IUserPasswordToChange) {
         if (data) {
@@ -5193,9 +5362,9 @@ export class UserPasswordToChange implements IUserPasswordToChange {
 
     init(_data?: any) {
         if (_data) {
-            this.idFromIdentity = _data["idFromIdentity"];
-            this.currentPassword = _data["currentPassword"];
-            this.newPassword = _data["newPassword"];
+            this.idFromIdentity = _data["idFromIdentity"] !== undefined ? _data["idFromIdentity"] : <any>null;
+            this.currentPassword = _data["currentPassword"] !== undefined ? _data["currentPassword"] : <any>null;
+            this.newPassword = _data["newPassword"] !== undefined ? _data["newPassword"] : <any>null;
         }
     }
 
@@ -5208,27 +5377,27 @@ export class UserPasswordToChange implements IUserPasswordToChange {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["idFromIdentity"] = this.idFromIdentity;
-        data["currentPassword"] = this.currentPassword;
-        data["newPassword"] = this.newPassword;
+        data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
+        data["currentPassword"] = this.currentPassword !== undefined ? this.currentPassword : <any>null;
+        data["newPassword"] = this.newPassword !== undefined ? this.newPassword : <any>null;
         return data; 
     }
 }
 
 export interface IUserPasswordToChange {
-    idFromIdentity?: string | undefined;
-    currentPassword?: string | undefined;
-    newPassword?: string | undefined;
+    idFromIdentity?: string | null;
+    currentPassword?: string | null;
+    newPassword?: string | null;
 }
 
 export class DishToAdd implements IDishToAdd {
-    name?: string | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    tagNames?: TagToAdd[] | undefined;
+    name?: string | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    tagNames?: TagToAdd[] | null;
 
     constructor(data?: IDishToAdd) {
         if (data) {
@@ -5241,12 +5410,12 @@ export class DishToAdd implements IDishToAdd {
 
     init(_data?: any) {
         if (_data) {
-            this.name = _data["name"];
-            this.composition = _data["composition"];
-            this.description = _data["description"];
-            this.cost = _data["cost"];
-            this.weigh = _data["weigh"];
-            this.sale = _data["sale"];
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.weigh = _data["weigh"] !== undefined ? _data["weigh"] : <any>null;
+            this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
             if (Array.isArray(_data["tagNames"])) {
                 this.tagNames = [] as any;
                 for (let item of _data["tagNames"])
@@ -5264,12 +5433,12 @@ export class DishToAdd implements IDishToAdd {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["composition"] = this.composition;
-        data["description"] = this.description;
-        data["cost"] = this.cost;
-        data["weigh"] = this.weigh;
-        data["sale"] = this.sale;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["composition"] = this.composition !== undefined ? this.composition : <any>null;
+        data["description"] = this.description !== undefined ? this.description : <any>null;
+        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["weigh"] = this.weigh !== undefined ? this.weigh : <any>null;
+        data["sale"] = this.sale !== undefined ? this.sale : <any>null;
         if (Array.isArray(this.tagNames)) {
             data["tagNames"] = [];
             for (let item of this.tagNames)
@@ -5280,24 +5449,24 @@ export class DishToAdd implements IDishToAdd {
 }
 
 export interface IDishToAdd {
-    name?: string | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    tagNames?: TagToAdd[] | undefined;
+    name?: string | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    tagNames?: TagToAdd[] | null;
 }
 
 export class DishToUpdate implements IDishToUpdate {
     id?: string;
-    name?: string | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    tagIndexes?: TagToAdd[] | undefined;
+    name?: string | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    tagIndexes?: TagToAdd[] | null;
 
     constructor(data?: IDishToUpdate) {
         if (data) {
@@ -5310,13 +5479,13 @@ export class DishToUpdate implements IDishToUpdate {
 
     init(_data?: any) {
         if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.composition = _data["composition"];
-            this.description = _data["description"];
-            this.cost = _data["cost"];
-            this.weigh = _data["weigh"];
-            this.sale = _data["sale"];
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
+            this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
+            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.weigh = _data["weigh"] !== undefined ? _data["weigh"] : <any>null;
+            this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
             if (Array.isArray(_data["tagIndexes"])) {
                 this.tagIndexes = [] as any;
                 for (let item of _data["tagIndexes"])
@@ -5334,13 +5503,13 @@ export class DishToUpdate implements IDishToUpdate {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["composition"] = this.composition;
-        data["description"] = this.description;
-        data["cost"] = this.cost;
-        data["weigh"] = this.weigh;
-        data["sale"] = this.sale;
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["composition"] = this.composition !== undefined ? this.composition : <any>null;
+        data["description"] = this.description !== undefined ? this.description : <any>null;
+        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["weigh"] = this.weigh !== undefined ? this.weigh : <any>null;
+        data["sale"] = this.sale !== undefined ? this.sale : <any>null;
         if (Array.isArray(this.tagIndexes)) {
             data["tagIndexes"] = [];
             for (let item of this.tagIndexes)
@@ -5352,18 +5521,18 @@ export class DishToUpdate implements IDishToUpdate {
 
 export interface IDishToUpdate {
     id?: string;
-    name?: string | undefined;
-    composition?: string | undefined;
-    description?: string | undefined;
-    cost?: number | undefined;
-    weigh?: string | undefined;
-    sale?: number | undefined;
-    tagIndexes?: TagToAdd[] | undefined;
+    name?: string | null;
+    composition?: string | null;
+    description?: string | null;
+    cost?: number;
+    weigh?: string | null;
+    sale?: number | null;
+    tagIndexes?: TagToAdd[] | null;
 }
 
 export class RequestParameters implements IRequestParameters {
-    request?: string | undefined;
-    tagsNames?: string[] | undefined;
+    request?: string | null;
+    tagsNames?: string[] | null;
     onSale?: boolean;
     lowerPrice?: number;
     upperPrice?: number;
@@ -5379,15 +5548,15 @@ export class RequestParameters implements IRequestParameters {
 
     init(_data?: any) {
         if (_data) {
-            this.request = _data["request"];
+            this.request = _data["request"] !== undefined ? _data["request"] : <any>null;
             if (Array.isArray(_data["tagsNames"])) {
                 this.tagsNames = [] as any;
                 for (let item of _data["tagsNames"])
                     this.tagsNames!.push(item);
             }
-            this.onSale = _data["onSale"];
-            this.lowerPrice = _data["lowerPrice"];
-            this.upperPrice = _data["upperPrice"];
+            this.onSale = _data["onSale"] !== undefined ? _data["onSale"] : <any>null;
+            this.lowerPrice = _data["lowerPrice"] !== undefined ? _data["lowerPrice"] : <any>null;
+            this.upperPrice = _data["upperPrice"] !== undefined ? _data["upperPrice"] : <any>null;
         }
     }
 
@@ -5400,22 +5569,22 @@ export class RequestParameters implements IRequestParameters {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["request"] = this.request;
+        data["request"] = this.request !== undefined ? this.request : <any>null;
         if (Array.isArray(this.tagsNames)) {
             data["tagsNames"] = [];
             for (let item of this.tagsNames)
                 data["tagsNames"].push(item);
         }
-        data["onSale"] = this.onSale;
-        data["lowerPrice"] = this.lowerPrice;
-        data["upperPrice"] = this.upperPrice;
+        data["onSale"] = this.onSale !== undefined ? this.onSale : <any>null;
+        data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
+        data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
         return data; 
     }
 }
 
 export interface IRequestParameters {
-    request?: string | undefined;
-    tagsNames?: string[] | undefined;
+    request?: string | null;
+    tagsNames?: string[] | null;
     onSale?: boolean;
     lowerPrice?: number;
     upperPrice?: number;

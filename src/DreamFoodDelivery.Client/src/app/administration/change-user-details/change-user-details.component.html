@@ -1,1 +1,36 @@
-<p>change-user-details works!</p>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-10 col-lg-8">
+    <h1>{{user.userProfile.name}}</h1>
+
+    <main role="main" class="container">
+      <div class="starter-template">
+        <p class="lead">ID: {{user.userDTO.id}}
+        <p class="lead">Identity ID: {{user.userDTO.idFromIdentity}}
+        <p class="lead">Basket ID: {{user.userDTO.basketId}}
+      </div>
+    </main>
+    <h3>Info:</h3>
+    <div class="card-body">
+      <ul class="list-group">
+        <li class="list-group-item">Role: {{user.userProfile.role}}</li>
+        <li class="list-group-item">Adress: {{user.userProfile.address}}</li>
+        <li class="list-group-item">Email: {{user.userProfile.email}}</li>
+        <li class="list-group-item">Login: {{user.userProfile.login}}</li>
+        <li class="list-group-item">Personal discount: {{user.userProfile.personalDiscount}}</li>
+        <li class="list-group-item">Phone number: {{user.userProfile.phoneNumber}}</li>
+      </ul>
+    </div>
+
+    <!-- <h3>Comments:</h3>
+      <div class="card-body" *ngFor="let item of comments.Items">
+            <h5 class="card-header">{{item.Name}}</h5>
+          <div class="card-body">-->
+            <!-- <h5 class="card-title">{{item.Name}}</h5> -->
+           <!-- <p class="card-text">{{item.Description}}</p>
+          </div>
+      </div> -->
+
+
+      <!-- /.container -->
+  </div>
+</div>

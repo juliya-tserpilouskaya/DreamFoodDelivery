@@ -5,7 +5,7 @@
       <h1 class="jumbotron-heading">Menu</h1>
       <p class="lead text-muted">For convenience, you can use filtering by tags:</p>
         <div *ngIf="tags else loading">
-          <button *ngFor="let tag of tags" type="button" class="btn btn-secondary mr-2" (click)="tagFilter(tag.indexNumber)">{{tag.indexNumber}}</button>
+          <button *ngFor="let tag of tags" type="button" class="btn btn-secondary mr-2" (click)="tagFilter()">{{tag.tagName}}</button>
        </div>
     </div>
   </section>
@@ -36,7 +36,7 @@
                       <div>
                         <h5>Tags:</h5>
                         <ul class="list-group" *ngFor="let tag of dish.tagList">
-                          <li class="list-group-item">{{tag.indexNumber}}</li>
+                          <li class="list-group-item">{{tag.tagName}}</li>
                         </ul>
                       </div>
                      </td>

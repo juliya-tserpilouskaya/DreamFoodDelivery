@@ -61,6 +61,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="id">Comment id</param>
         /// <returns>Returns ID matching comment</returns>
         [HttpGet, Route("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CommentView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -35,8 +35,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="user">User data: Email, Password</param>
         /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
-        [HttpPost]
-        [Route("registration")]
+        [HttpPost, Route("registration")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -66,8 +65,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="user">User data: Email, Password</param>
         /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
-        [HttpPost]
-        [Route("login")]
+        [HttpPost, Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -95,8 +93,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        [HttpPost]
-        [Route("logout")]
+        [HttpPost, Route("logout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LoggerAttribute]
@@ -112,8 +109,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
         /// <returns>Result information</returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete, Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

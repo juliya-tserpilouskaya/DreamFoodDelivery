@@ -32,19 +32,18 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         /// Get all tags from DB
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        [Route("tags")]
+        [HttpGet, Route("tags")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TagView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult>GetAllTagsAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult>GetAllTagsAsync(CancellationToken cancellationToken = default)
         {
             try
             {
                 var result = await _service.GetAllTagsAsync(cancellationToken);
 
-                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -57,13 +56,12 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("parameters")]
+        [HttpPost, Route("request")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAllApartmentsAsync([FromBody, CustomizeValidator] RequestParameters request, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IActionResult> GetAllDishesByRequestAsync([FromBody, CustomizeValidator] RequestParameters request, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -73,7 +71,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             {
                 var result = await _service.GetAllDishesByRequestAsync(request, cancellationToken);
 
-                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {

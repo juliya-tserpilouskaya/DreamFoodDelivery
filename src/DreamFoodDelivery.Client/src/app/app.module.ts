@@ -15,7 +15,9 @@ import { IdentityService,
          BasketService,
          OrderService,
          CommentService,
-         TagService } from './app-services/nswag.generated.services';
+         TagService,
+         AdminService,
+         SearchService} from './app-services/nswag.generated.services';
 
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
@@ -52,6 +54,11 @@ import { ChangeUserDetailsComponent } from './administration/change-user-details
 import { AdminCommentsComponent } from './administration/admin-comments/admin-comments.component';
 import { AdminsOrdersComponent } from './administration/admins-orders/admins-orders.component';
 import { OrderStatusChangeComponent } from './administration/order-status-change/order-status-change.component';
+import { DishesComponent } from './dishes/dishes.component';
+import { AdminUsersComponent } from './administration/admin-users/admin-users.component';
+import { AdminNavBarComponent } from './administration/admin-nav-bar/admin-nav-bar.component';
+import { CommentUpdateComponent } from './comments/comment-update/comment-update.component';
+import { OrderUpdateComponent } from './orders/order-update/order-update.component';
 
 
 
@@ -84,6 +91,11 @@ import { OrderStatusChangeComponent } from './administration/order-status-change
     AdminCommentsComponent,
     AdminsOrdersComponent,
     OrderStatusChangeComponent,
+    DishesComponent,
+    AdminUsersComponent,
+    AdminNavBarComponent,
+    CommentUpdateComponent,
+    OrderUpdateComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -110,7 +122,9 @@ import { OrderStatusChangeComponent } from './administration/order-status-change
     BasketService,
     OrderService,
     CommentService,
-    TagService
+    TagService,
+    AdminService,
+    SearchService
   ],
   bootstrap: [AppComponent]
 })

@@ -80,5 +80,15 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="order">New order status</param>
         Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///  Asynchronously return all order statuses
+        /// </summary>
+        Task<Result<IEnumerable<OrderStatus>>> GetStatuses(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///  Asynchronously return all order in status
+        /// </summary>
+        Task<Result<IEnumerable<OrderView>>> GetOrdersInStatus(string statusName, CancellationToken cancellationToken = default);
     }
 }

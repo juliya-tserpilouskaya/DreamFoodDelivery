@@ -33,7 +33,7 @@
                       <div>
                         <h5>Tags:</h5>
                         <ul class="list-group" *ngFor="let tag of dish.tagList">
-                          <li class="list-group-item">{{tag.indexNumber}}</li>
+                          <li class="list-group-item">{{tag.tagName}}</li>
                         </ul>
                       </div>
                      </td>
@@ -50,7 +50,7 @@
             </form>
           </div>
           <div class="form-group" *ngIf="isAuthenticated">
-            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish()">Remove All from basket</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove All from basket</button>
             <a [routerLink]="['order']">Make order</a>
           </div>
         </div>

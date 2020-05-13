@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import * as jwt_decode from 'jwt-decode';
 
 @Component({
   selector: 'app-menu',
@@ -9,12 +10,22 @@ import { AuthService } from '../auth/auth.service';
 export class MenuComponent implements OnInit {
 
   constructor(private authService: AuthService) { }
-  // isAuthenticated: boolean;
 
   ngOnInit(): void {
-    // this.isAuthenticated = this.authService.isLoggedIn;
   }
+
   get isAuthenticated(): boolean {
     return this.authService.isLoggedIn;
+  }
+
+  get isAdmin(): boolean {
+    const token = this.authService.getToken();
+    const decodedoken = jwt_decode(token);
+    // tslint:disable-next-line: no-string-literal
+    const currentRole = decodedoken['role'];
+    if (currentRole.includes('Admin')) {
+      return true;
+    }
+    return false;
   }
 }

@@ -21,10 +21,10 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
                 RuleFor(_ => _.Surname).MinimumLength(3).MaximumLength(90)
                     .WithMessage("Surname must contain from 3 to 90 characters.");
             });
-            RuleFor(_ => _.OrderCost).GreaterThan(0)
-                .WithMessage("Order cost must be greater than 0");
-            RuleFor(_ => _.ShippingCost).GreaterThan(0)
-                .WithMessage("Shipping cost must be greater than 0");
+            //RuleFor(_ => _.OrderCost).GreaterThan(0)
+            //    .WithMessage("Order cost must be greater than 0");
+            //RuleFor(_ => _.ShippingCost).GreaterThan(0)
+            //    .WithMessage("Shipping cost must be greater than 0");
         }
     }
 }

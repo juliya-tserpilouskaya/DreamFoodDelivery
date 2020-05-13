@@ -182,8 +182,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// </summary>
         /// <param name="identityId">Users id from identity</param>
         /// <returns>Result information</returns>
-        [HttpPost]
-        [Route("{identityId}/role_update")]
+        [HttpPost, Route("{identityId}/role_update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

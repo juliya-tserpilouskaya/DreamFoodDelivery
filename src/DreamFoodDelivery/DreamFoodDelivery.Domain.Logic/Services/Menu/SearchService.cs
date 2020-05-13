@@ -133,7 +133,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <returns></returns>
         public async Task<Result<IEnumerable<TagView>>> GetAllTagsAsync(CancellationToken cancellationToken)
         {
-            var tags = await _context.Tags.AsNoTracking().ToListAsync(cancellationToken);
+            var tags = await _context.Tags.OrderBy(_ => _.TagName).AsNoTracking().ToListAsync(cancellationToken);
             if (!tags.Any())
             {
                 return Result<IEnumerable<TagView>>.Fail<IEnumerable<TagView>>("No tags found");

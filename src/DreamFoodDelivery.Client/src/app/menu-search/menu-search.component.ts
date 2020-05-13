@@ -47,6 +47,10 @@ export class MenuSearchComponent implements OnInit {
     this.basketService.addDish(this.addForm.value).subscribe();
   }
 
+  tagFilter() {
+
+  }
+
   get isAuthenticated(): boolean {
     return this.authService.isLoggedIn;
   }

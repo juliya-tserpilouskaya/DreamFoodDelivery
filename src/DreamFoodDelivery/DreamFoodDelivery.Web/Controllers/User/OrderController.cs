@@ -159,7 +159,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="order">Order to update</param>
         /// <returns>Order info after updatting</returns>
         [HttpPut, Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderToUpdate))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -282,6 +282,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAll(CancellationToken cancellationToken = default)
         {
             try
@@ -309,6 +310,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
         public async Task<IActionResult> RemoveAllByUserId(string id, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
@@ -321,6 +323,61 @@ namespace DreamFoodDelivery.Web.Controllers
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
                      : NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Get all statuses from DB
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet, Route("statuses")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderStatus>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult>GetStatuses(CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var result = await _orderService.GetStatuses(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously return all order in status
+        /// </summary>
+        /// <param name="statusName">Status index</param>
+        /// <returns>Result information</returns>
+        [Authorize(Roles = "Admin")]
+        [HttpDelete, Route("{statusName}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetOrdersInStatus(string statusName, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(statusName))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _orderService.GetOrdersInStatus(statusName, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
