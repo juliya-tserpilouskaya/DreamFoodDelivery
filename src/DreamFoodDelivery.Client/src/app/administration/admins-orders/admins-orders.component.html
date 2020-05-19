@@ -22,7 +22,7 @@
             <!-- Other info view -->
             <div class="col-4 col-md-4 col-lg-4">
               <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
-              <a [routerLink]="['order/:id', item.id, 'update']">Change comments details</a>
+              <a [routerLink]="['/order', item.id, 'details']">Change orders details</a>
             </div>
             <div class="col-4 col-md-4 col-lg-4">
               <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>

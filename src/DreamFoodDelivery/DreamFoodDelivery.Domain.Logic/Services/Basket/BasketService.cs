@@ -65,7 +65,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             
             if (connection is null)
             {
-                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity, DishCost = dishToAdd.Cost };
+                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity, DishCost = dishToAdd.Cost, Sale = dishToAdd.Sale };
                 _context.BasketDishes.Add(basketDish);
             }
             else
@@ -97,14 +97,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data"); 
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
-                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
+                    if (dish.Data.Sale > 0)
+                    {
+                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale/100) * dish.Data.Quantity;
+                    }
+                    else
+                    {
+                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    }
                     view.Dishes.Add(dish.Data);
                 }
-                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
                 if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
                 {
                     view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                }
+                else
+                {
+                    view.ShippingCost = 0;
                 }
                 return Result<BasketView>.Ok(view);
             }
@@ -162,14 +173,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
-                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
+                    if (dish.Data.Sale > 0)
+                    {
+                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale / 100) * dish.Data.Quantity;
+                    }
+                    else
+                    {
+                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    }
                     view.Dishes.Add(dish.Data);
                 }
-                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
                 if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
                 {
                     view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                }
+                else
+                {
+                    view.ShippingCost = 0;
                 }
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }
@@ -217,14 +239,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<BasketView>.Fail<BasketView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
-                    view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
+                    if (dish.Data.Sale > 0)
+                    {
+                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale / 100) * dish.Data.Quantity;
+                    }
+                    else
+                    {
+                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
+                    }
                     view.Dishes.Add(dish.Data);
                 }
-                view.BasketCost *= userIdentity.PersonalDiscount / 100;
+                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
                 if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
                 {
                     view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                }
+                else
+                {
+                    view.ShippingCost = 0;
                 }
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }

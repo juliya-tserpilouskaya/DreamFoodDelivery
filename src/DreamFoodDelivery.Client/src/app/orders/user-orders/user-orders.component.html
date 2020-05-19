@@ -1,1 +1,20 @@
-<p>user-orders works!</p>
+<div class="card" *ngFor="let item of orders">
+  <h5 class="card-header">{{item.name}} {{item.surname}}</h5>
+  <div class="card-body">
+    <div class="col-12 col-md-12 col-lg-12 row">
+      <div class="col-4 col-md-4 col-lg-4">
+        {{item.address}}
+      </div>
+      <div class="col-4 col-md-4 col-lg-4">
+        {{item.orderCost}}
+      </div>
+      <!-- Other info view -->
+      <div class="col-4 col-md-4 col-lg-4">
+        <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
+        <a [routerLink]="['/order', item.id, 'details']">Change orders details</a>
+        <br>
+        <a *ngIf="item.status == 'Delivered'" [routerLink]="['/comment/create/for/', item.id]">Add comment</a>
+      </div>
+    </div>
+  </div>
+</div>

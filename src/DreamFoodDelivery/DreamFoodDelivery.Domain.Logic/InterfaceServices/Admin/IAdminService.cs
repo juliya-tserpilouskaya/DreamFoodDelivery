@@ -26,7 +26,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="personalDiscount">New personal discount</param>
         /// <param name="idFromIdentity">Existing user ID</param>
-        Task<Result<UserView>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default);
+        Task<Result<UserView>> UpdateUserPersonalDiscountAsync(int personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously remove user by Id. Id must be verified

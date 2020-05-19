@@ -1,18 +1,39 @@
 <div class="row justify-content-center">
-
   <section class="jumbotron text-center">
     <div class="container">
       <h1 class="jumbotron-heading">Menu</h1>
-      <p class="lead text-muted">For convenience, you can use filtering by tags:</p>
-        <div *ngIf="tags else loading">
-          <button *ngFor="let tag of tags" type="button" class="btn btn-secondary mr-2" (click)="tagFilter()">{{tag.tagName}}</button>
-       </div>
+      <p class="lead text-muted">For convenience, you can use tags and search:</p>
+        <form [formGroup]="searchForm" (ngSubmit)="onSearchButtonClicked()">
+          <div *ngIf="tags else loading">
+            <label *ngFor="let tag of tags">
+              <input type="checkbox" (change)="onChange(tag.tagName, $event.target.checked)" />
+              {{tag.tagName}}
+            </label>
+            <div class="form-group">
+              <label>
+                <input  type="checkbox" id="isOnSale" value="Sale" formControlName="onSale" />Only on sale
+              </label>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Price in $</span>
+                  </div>
+                  <input class="form-control" type="number" min="0" placeholder="Min" formControlName="lowerPrice" >
+                  <input class="form-control" type="number" min="0" placeholder="Max" formControlName="upperPrice" >
+              </div>
+            </div>
+            <input type="query" id="inputQuery" class="form-control" formControlName="request" placeholder="Dish information">
+            <button class="btn btn-lg btn-primary" type="submit">Search</button>
+          </div>
+        </form>
     </div>
   </section>
+</div>
 
   <div *ngIf="dishes else loading">
     <div class="album py-5 bg-light">
-      <div class="container">
+      <div class="container-fluid">
         <div class="row">
           <div class="col-md-4" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
             <form [formGroup]="addForm" (ngSubmit)="onAddToBasket(dish.id)"#formDir="ngForm" novalidate >
@@ -28,6 +49,7 @@
                       <ul class="list-group">
                         <li class="list-group-item">Cost: {{dish.cost}}$</li>
                         <li class="list-group-item">Sale: {{dish.sale}}%</li>
+                        <li class="list-group-item">Final cost: {{dish.finaleCost}}$</li>
                       </ul>
                      </td>
                      <td id="spacer"></td>
@@ -44,7 +66,7 @@
                    </table>
                     <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
                     <div class="form-group" *ngIf="isAuthenticated">
-                      <input type="number" class="form-control" max="20" min="1" formControlName="quantity">
+                      <input type="number" class="form-control" max="20" min="1" placeholder="0" formControlName="quantity">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">Add to basket</button>
                     </div>
                 </div>
@@ -55,7 +77,7 @@
       </div>
     </div>
   </div>
-</div>
+
 
 <ng-template #loading>
   <div>Loading...</div>

@@ -6,7 +6,7 @@ namespace DreamFoodDelivery.Domain.DTO
 {
     public class OrderToStatusUpdate
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public int? StatusIndex { get; set; }
     }
 }

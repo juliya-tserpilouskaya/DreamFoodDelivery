@@ -1,0 +1,13 @@
+<div>
+  <h3>Please push to send token</h3>
+  <button type="button" class="btn btn-sm btn-outline-success" (click)="sendToken()">Send token</button>
+  <form *ngIf="isSend" [formGroup]="tokenForm" (ngSubmit)="getToken()">
+      <h3>Please enter information</h3>
+      <div class="form-group">
+          <input type="text" class="form-control" id="inputEmail" formControlName="token" placeholder="Enter token" required>
+      </div>
+      <div>
+        <button class="btn btn-lg btn-primary" type="submit">Confirm</button>
+      </div>
+  </form>
+</div>

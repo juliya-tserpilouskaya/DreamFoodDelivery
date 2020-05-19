@@ -7,26 +7,58 @@
         <div class="btn-toolbar mb-2 mb-md-0">
           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove All</button>
         </div>
+        <div class="form-group">
+          <form [formGroup]="requestForm" #formDir="ngForm" novalidate>
+              <div class="col-12">
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                          <div class="input-group-text">Comments on the page</div>
+                      </div>
+                      <input type="number" formControlName="pageSize" class="form-control">
+
+                      <div class="input-group-append">
+                          <button class="btn btn-success" (click)="getComments()">Show comments</button>
+                      </div>
+                  </div>
+              </div>
+          </form>
+      </div>
       </div>
 
-      <div class="card" *ngFor="let item of comments">
-        <h5 class="card-header">{{item.userId}}</h5>
-        <div class="card-body">
-          <div class="col-12 col-md-12 col-lg-12 row">
-            <div class="col-4 col-md-4 col-lg-4">
-              {{item.headline}}
-            </div>
-            <div class="col-4 col-md-4 col-lg-4">
-              {{item.content}}
-            </div>
-            <div class="col-4 col-md-4 col-lg-4">
-              <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
-              <a [routerLink]="['comment/:id', item.id, 'update']">Change comments details</a>
-            </div>
-            <div class="col-4 col-md-4 col-lg-4">
-              <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>
+      <div *ngIf="response">
+        <div class="card" *ngFor="let item of response.data">
+          <h5 class="card-header">{{item.userId}}</h5>
+          <div class="card-body">
+            <div class="col-12 col-md-12 col-lg-12 row">
+              <div class="col-4 col-md-4 col-lg-4">
+                {{item.headline}}
+              </div>
+              <div class="col-4 col-md-4 col-lg-4">
+                {{item.content}}
+              </div>
+              <div class="col-4 col-md-4 col-lg-4">
+                <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
+                <a [routerLink]="['/comment', item.id, 'update']">Change comments details</a>
+              </div>
+              <div class="col-4 col-md-4 col-lg-4">
+                <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div *ngIf="response" class="form-group text-center">
+        <div class="form-group btn-group col-4">
+            <button class="btn btn-warning col-8" (click)="previousePage()"><Previous</button>
+            <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
+        </div>
+        <br>
+        <div class="form-group btn-group mr-2">
+            <div *ngFor="let page of pages">
+                <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'"
+                    (click)="getPage(page)">{{page}}</button>
+            </div>
         </div>
       </div>
     </main>

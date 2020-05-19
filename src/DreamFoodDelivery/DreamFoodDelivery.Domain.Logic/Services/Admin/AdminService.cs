@@ -117,10 +117,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="personalDiscount">New personal discount</param>
         /// <param name="idFromIdentity">Existing user ID</param>
         [LoggerAttribute]
-        public async Task<Result<UserView>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default)
+        public async Task<Result<UserView>> UpdateUserPersonalDiscountAsync(int personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default)
         {
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
-            userIdentity.PersonalDiscount = double.Parse(personalDiscount); //try parse
+            userIdentity.PersonalDiscount = personalDiscount; //try parse
             try
             {
                 await _userManager.UpdateAsync(userIdentity);

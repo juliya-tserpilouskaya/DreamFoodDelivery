@@ -71,7 +71,9 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             {
                 var result = await _service.GetAllDishesByRequestAsync(request, cancellationToken);
 
-                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {

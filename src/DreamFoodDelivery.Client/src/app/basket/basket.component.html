@@ -3,8 +3,14 @@
   <section class="jumbotron text-center">
     <div class="container">
       <h1 class="jumbotron-heading">Basket</h1>
+      <div class="form-group" *ngIf="isAuthenticated">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
+      </div>
     </div>
   </section>
+</div>
 
   <div *ngIf="basket else loading">
     <div class="album py-5 bg-light">
@@ -41,7 +47,7 @@
                    </table>
                     <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
                     <div class="form-group" *ngIf="isAuthenticated">
-                      <input type="number" class="form-control" max="20" min="1" formControlName="quantity">
+                      <input type="number" class="form-control" max="20" min="1" placeholder="{{dish.quantity}}" formControlName="quantity">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">Count update</button>
                       <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish(dish.id)">Remove</button>
                     </div>
@@ -49,15 +55,11 @@
               </div>
             </form>
           </div>
-          <div class="form-group" *ngIf="isAuthenticated">
-            <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove All from basket</button>
-            <a [routerLink]="['order']">Make order</a>
-          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
 
 <ng-template #loading>
   <div>Loading...</div>

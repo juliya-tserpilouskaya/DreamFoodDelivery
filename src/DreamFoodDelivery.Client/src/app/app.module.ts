@@ -47,18 +47,26 @@ import { UserOrdersComponent } from './orders/user-orders/user-orders.component'
 
 import { UserCommentsComponent } from './comments/user-comments/user-comments.component';
 import { CommentCreateComponent } from './comments/comment-create/comment-create.component';
-import { EmailChangeComponent } from './profile-info/email-change/email-change.component';
-import { EmailConfirmComponent } from './profile-info/email-confirm/email-confirm.component';
-import { ProfileDeleteComponent } from './profile-info/profile-delete/profile-delete.component';
 import { ChangeUserDetailsComponent } from './administration/change-user-details/change-user-details.component';
 import { AdminCommentsComponent } from './administration/admin-comments/admin-comments.component';
 import { AdminsOrdersComponent } from './administration/admins-orders/admins-orders.component';
-import { OrderStatusChangeComponent } from './administration/order-status-change/order-status-change.component';
 import { DishesComponent } from './dishes/dishes.component';
 import { AdminUsersComponent } from './administration/admin-users/admin-users.component';
 import { AdminNavBarComponent } from './administration/admin-nav-bar/admin-nav-bar.component';
 import { CommentUpdateComponent } from './comments/comment-update/comment-update.component';
 import { OrderUpdateComponent } from './orders/order-update/order-update.component';
+import { EmployeeComponent } from './employee/employee.component';
+import { EmployeeNavBarComponent } from './employee/employee-nav-bar/employee-nav-bar.component';
+import { EmployeeOrdersComponent } from './employee/employee-orders/employee-orders.component';
+import { DishUpdateComponent } from './dishes/dish-update/dish-update.component';
+import { DishAddNewComponent } from './dishes/dish-add-new/dish-add-new.component';
+import { UserOrdersAdminComponent } from './orders/user-orders-admin/user-orders-admin.component';
+import { UserCommentsAdminComponent } from './comments/user-comments-admin/user-comments-admin.component';
+import { DeleteAccountComponent } from './auth/delete-account/delete-account.component';
+import { ChangeEmailComponent } from './auth/change-email/change-email.component';
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
+import { ConfirmEmailComponent } from './auth/confirm-email/confirm-email.component';
+import { UnexpectedComponent } from './pages/unexpected/unexpected.component';
 
 
 
@@ -84,18 +92,26 @@ import { OrderUpdateComponent } from './orders/order-update/order-update.compone
     OrderDetailsComponent,
     UserCommentsComponent,
     CommentCreateComponent,
-    EmailChangeComponent,
-    EmailConfirmComponent,
-    ProfileDeleteComponent,
     ChangeUserDetailsComponent,
     AdminCommentsComponent,
     AdminsOrdersComponent,
-    OrderStatusChangeComponent,
     DishesComponent,
     AdminUsersComponent,
     AdminNavBarComponent,
     CommentUpdateComponent,
     OrderUpdateComponent,
+    EmployeeComponent,
+    EmployeeNavBarComponent,
+    EmployeeOrdersComponent,
+    DishUpdateComponent,
+    DishAddNewComponent,
+    UserOrdersAdminComponent,
+    UserCommentsAdminComponent,
+    DeleteAccountComponent,
+    ChangeEmailComponent,
+    ChangePasswordComponent,
+    ConfirmEmailComponent,
+    UnexpectedComponent,
   ],
   imports: [
     BrowserAnimationsModule,

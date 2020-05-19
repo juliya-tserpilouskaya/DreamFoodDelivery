@@ -90,7 +90,9 @@ namespace DreamFoodDelivery.Web
                 config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
-            services.AddControllers().AddFluentValidation(fluentValidation =>
+            services.AddControllers()
+                .AddNewtonsoftJson()
+                .AddFluentValidation(fluentValidation =>
             {
                 fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToBasketAddValidation>();

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Bogus;
+using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -56,11 +57,11 @@ namespace DreamFoodDelivery.Logic.Tests
             using (var context = new DreamFoodDeliveryContext(options))
             {
                 var service = new CommentService(_mapper, context, _orderService);
-                var result = await service.GetAllAsync();
+                var result = await service.GetAllAsync(new PageRequest());
 
                 foreach (var item in _comments)
                 {
-                    var itemFromResult = result.Data.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
+                    var itemFromResult = result.Data.Data.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
                 }
             }

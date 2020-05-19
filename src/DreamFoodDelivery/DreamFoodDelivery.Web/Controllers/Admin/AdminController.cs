@@ -127,9 +127,9 @@ namespace DreamFoodDelivery.Web.Controllers.User
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]string personalDiscount, string identityId, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> UpdatePersonalDiscount([FromBody]int personalDiscount, string identityId, CancellationToken cancellationToken = default)
         {
-            if (personalDiscount is null || identityId is null)
+            if ((personalDiscount > 100 && personalDiscount < 0) || identityId is null)
             {
                 return BadRequest(ModelState);
             }

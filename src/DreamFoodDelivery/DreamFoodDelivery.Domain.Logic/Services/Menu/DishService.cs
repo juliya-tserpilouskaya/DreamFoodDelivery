@@ -108,7 +108,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _context.Entry(thingForUpdate).Property(c => c.Sale).IsModified = true;
             _context.Entry(thingForUpdate).Property(c => c.Modified).IsModified = true;
 
-            foreach (var item in dish.TagIndexes)
+            foreach (var item in dish.TagNames)
             {
                 //TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 TagDB tag = await _context.Tags.Where(_ => _.TagName == item.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);

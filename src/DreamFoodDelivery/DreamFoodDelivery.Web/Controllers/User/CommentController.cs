@@ -31,20 +31,27 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Get all comments
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// </summary>
         /// <returns>Returns all comments stored</returns>
         [Authorize(Roles = "Admin")]
-        [HttpGet, Route("all")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CommentView>))]
+        //[HttpGet, Route("all")]
+        [HttpPost, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponse<CommentView>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAll([FromBody] PageRequest request, CancellationToken cancellationToken = default)
         {
+            if (request is null)
+            {
+                return BadRequest();
+            }
             try
             {
-                var result = await _commentService.GetAllAsync(cancellationToken);
+                var result = await _commentService.GetAllAsync(request, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : NoContent();

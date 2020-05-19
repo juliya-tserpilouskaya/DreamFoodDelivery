@@ -62,7 +62,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         {
                             return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                         }
-                        dish.Data.Quantity = dishListItem.Quantity;
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         viewItem.Dishes.Add(dish.Data);
                     }
                     views.Add(viewItem);
@@ -73,7 +73,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
             }
-
         }
 
         /// <summary>
@@ -101,7 +100,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -131,17 +130,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             OrderDB orderToAdd = _mapper.Map<OrderDB>(order);
             if (orderToAdd.IsInfoFromProfile)
             {
+                if (userIdentity.Address is null || userIdentity.PhoneNumber is null || userIdentity.Name is null || userIdentity.Surname is null)
+                {
+                    return Result<OrderView>.Fail<OrderView>("Update your profile, please!");
+                }
                 orderToAdd.Address = userIdentity.Address;
                 orderToAdd.PhoneNumber = userIdentity.PhoneNumber;
                 orderToAdd.Name = userIdentity.Name;
                 orderToAdd.Surname = userIdentity.Surname;
-            }
-            else
-            {
-                if (userIdentity.Address is null|| userIdentity.PhoneNumber is null || userIdentity.Name is null || userIdentity.Surname is null)
-                {
-                    return Result<OrderView>.Fail<OrderView>("Update your profile, please!");
-                }
             }
             orderToAdd.PersonalDiscount = userIdentity.PersonalDiscount;
             orderToAdd.UserId = userDB.Id;
@@ -152,7 +148,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             foreach (var connection in connections)
             {
-                orderToAdd.OrderCost += connection.DishCost * connection.Quantity;
+                orderToAdd.OrderCost += connection.DishCost * (1 - connection.Sale/100) * connection.Quantity;
                 connection.OrderId = orderToAdd.Id;
                 connection.BasketId = Guid.Empty;
                 _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
@@ -179,7 +175,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -205,7 +201,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(DFD_Сonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
@@ -230,7 +226,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         {
                             return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                         }
-                        dish.Data.Quantity = dishListItem.Quantity;
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         view.Dishes.Add(dish.Data);
                     }
                     return Result<OrderView>.Ok(view);
@@ -277,7 +273,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
                 }
                 views.Add(viewItem);
@@ -316,7 +312,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
                 }
                 views.Add(viewItem);
@@ -445,7 +441,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             string orderStatus = Enum.GetName(typeof(OrderStatuses), order.StatusIndex);
             switch (orderStatus)
             {
@@ -497,7 +493,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -592,8 +588,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 {
                     OrderStatus statusItem = new OrderStatus();
                     statusItem.StatusIndex = index;
-                    statusItem.StatusName = Enum.GetName(typeof(OrderStatus), index);
+                    statusItem.StatusName = Enum.GetName(typeof(OrderStatuses), index);
                     orderStatuses.Add(statusItem);
+                }
+                if (!orderStatuses.Any())
+                {
+                    return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>("No orders found");
                 }
                 return Result<IEnumerable<OrderStatus>>.Ok(_mapper.Map<IEnumerable<OrderStatus>>(orderStatuses));
             }
@@ -611,10 +611,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             try
             {
-                var orders = await _context.Orders.Where(_ => _.Status == statusName).AsNoTracking().ToListAsync(cancellationToken);
+                List<OrderDB> orders = new List<OrderDB>();
+                if (statusName == "Paid")
+                {
+                    orders = await _context.Orders.Where(_ => _.PaymentTime.HasValue).AsNoTracking().ToListAsync(cancellationToken);
+                }
+                else
+                {
+                    orders = await _context.Orders.Where(_ => _.Status == statusName).AsNoTracking().ToListAsync(cancellationToken);
+                }
                 if (!orders.Any())
                 {
-                    return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                    return Result<IEnumerable<OrderView>>.Warning("No orders found");
                 }
 
                 List<OrderView> views = new List<OrderView>();
@@ -630,7 +638,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         {
                             return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                         }
-                        dish.Data.Quantity = dishListItem.Quantity;
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         viewItem.Dishes.Add(dish.Data);
                     }
                     views.Add(viewItem);

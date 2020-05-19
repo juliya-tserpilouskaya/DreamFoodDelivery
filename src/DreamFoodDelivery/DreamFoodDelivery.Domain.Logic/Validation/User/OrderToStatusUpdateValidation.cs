@@ -11,7 +11,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
     {
         public OrderToStatusUpdateValidation()
         {
-            RuleFor(_ => _.Id).NotEmpty().WithMessage("You must enter order Id");
+            RuleFor(_ => _.Id).Must(id => Guid.TryParse(id, out var _))
+                .WithMessage("Order id can't parse to Guid type");
             RuleFor(_ => _.StatusIndex).GreaterThan(0).LessThan(Enum.GetNames(typeof(OrderStatuses)).Length)
                 .WithMessage("StatusIndex must be in range");
         }

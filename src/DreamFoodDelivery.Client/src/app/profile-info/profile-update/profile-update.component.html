@@ -1,1 +1,61 @@
-<p>profile-update works!</p>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Order data</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <button type="button" class="btn btn-sm btn-outline-success" (click)="goBack()">Go back</button>
+  </div>
+</div>
+
+<div class="row justify-content-center" *ngIf="user; else loading">
+  <div class="col-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="jumbotron-heading"> Name: {{user.userProfile.name}}{{user.userProfile.surname}}</h4>
+        <ul class="list-group">
+          <li class="list-group-item">Email: {{user.userProfile.email}}</li>
+          <li class="list-group-item">Phone number: {{user.userProfile.phoneNumber}}</li>
+          <li class="list-group-item">Address: {{user.userProfile.address}}</li>
+          <li class="list-group-item">Personal discount: {{user.userProfile.personalDiscount}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6">
+    <h3 class="h4">Update order data (you got only 15 minutes after making order)</h3>
+    <form  [formGroup]="userInfoUpdateForm" novalidate (ngSubmit)="update()" #formDir="ngForm">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" formControlName="name" placeholder="Place for name">
+        <small *ngIf="!userInfoUpdateForm.controls.name.valid" class="text-danger">
+          Name is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Surname</label>
+        <input type="text" class="form-control" formControlName="surname" placeholder="Place for surname">
+        <small *ngIf="!userInfoUpdateForm.controls.surname.valid" class="text-danger">
+          Surname is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" class="form-control" formControlName="address" placeholder="Enter the address, building and apartment number.">
+        <small *ngIf="!userInfoUpdateForm.controls.address.valid" class="text-danger">
+          Address is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Phone number</label>
+        <input type="text" class="form-control" formControlName="phoneNumber" placeholder="Place for phone number">
+        <small *ngIf="!userInfoUpdateForm.controls.phoneNumber.valid" class="text-danger">
+          Phone number is required (minimum 12 characters, maximum 13 characters).
+        </small>
+      </div>
+      <button type="submit" [disabled]="!userInfoUpdateForm.valid">Update order</button>
+    </form>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>

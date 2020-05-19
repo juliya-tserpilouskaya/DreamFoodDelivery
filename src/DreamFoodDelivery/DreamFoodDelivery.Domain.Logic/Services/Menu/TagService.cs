@@ -194,6 +194,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag, CancellationToken cancellationToken = default)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
+            tagForUpdate.Id = Guid.Parse(tag.Id);
             //_context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
             _context.Entry(tagForUpdate).Property(c => c.TagName).IsModified = true;
 

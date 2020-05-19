@@ -45,6 +45,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             foreach (var dish in dishes)
             {
                 DishView viewItem = _mapper.Map<DishView>(dish);
+                viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
                 viewItem.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {
@@ -69,6 +70,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 DishDB dish = await _context.Dishes.Where(_ => _.Id == id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView view = _mapper.Map<DishView>(dish);
+                view.FinaleCost = view.Cost * (1 - view.Sale / 100);
                 view.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {
@@ -106,6 +108,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -178,6 +181,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -212,6 +216,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
+                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -248,7 +253,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 DishDB dish = await _context.Dishes.Where(_ => _.Id == dishTag.DishId).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView viewItem = _mapper.Map<DishView>(dish);
-
+                viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
                 viewItem.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {

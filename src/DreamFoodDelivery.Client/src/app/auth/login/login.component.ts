@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
   user: UserWithToken;
+  isAuthenticated: boolean;
   currentUser = {};
 
   constructor(
@@ -28,7 +29,6 @@ export class LoginComponent implements OnInit {
         password: ['']
       });
     }
-    isAuthenticated: boolean;
 
   ngOnInit(): void {
   }
@@ -43,6 +43,17 @@ export class LoginComponent implements OnInit {
                             this.loginForm.reset();
                             this.router.navigate(['/profile']);
                             this.isAuthenticated =  this.authService.isLoggedIn;
+                          },
+                          error => {
+                            if (error.status === 500){
+                              this.router.navigate(['/error/500']);
+                             }
+                             else if (error.status === 404) {
+                              this.router.navigate(['/error/404']);
+                             }
+                            //  else {
+                            //   this.router.navigate(['/error/unexpected']);
+                            //  }
                            });
     }
   }

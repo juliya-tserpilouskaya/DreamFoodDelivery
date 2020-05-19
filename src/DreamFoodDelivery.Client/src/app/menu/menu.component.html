@@ -16,6 +16,9 @@
         <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/administration']" routerLinkActive="active">Admin</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/orders/status']" routerLinkActive="active">Employee</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/dishes']" routerLinkActive="active">Dishes</a>
       </li>
       <li class="nav-item">

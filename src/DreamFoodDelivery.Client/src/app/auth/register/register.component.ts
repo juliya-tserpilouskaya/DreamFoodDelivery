@@ -44,6 +44,17 @@ export class RegisterComponent implements OnInit {
                             this.registerForm.reset();
                             this.router.navigate(['/profile']);
                             this.isAuthenticated =  this.authService.isLoggedIn;
+                          },
+                          error => {
+                            if (error.status === 500){
+                              this.router.navigate(['/error/500']);
+                             }
+                             else if (error.status === 404) {
+                              this.router.navigate(['/error/404']);
+                             }
+                            //  else {
+                            //   this.router.navigate(['/error/unexpected']);
+                            //  }
                            });
    }
   }

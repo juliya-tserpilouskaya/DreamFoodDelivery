@@ -13,17 +13,21 @@
         <h5 class="card-header">{{item.userProfile.name}}</h5>
         <div class="card-body">
           <div class="col-12 col-md-12 col-lg-12 row">
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3 col-md-3 col-lg-3">
               {{item.userProfile.email}}
             </div>
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3 col-md-3 col-lg-3">
               {{item.userProfile.role}}
             </div>
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3 col-md-3 col-lg-3">
               <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
               <a [routerLink]="['/administration/user', item.userDTO.id]">Change users details</a>
+              <br>
+              <a [routerLink]="['/administration/orders/user/', item.userDTO.id]">Change users orders</a>
+              <br>
+              <a [routerLink]="['/administration/comments/user/', item.userDTO.id]">Change users comments</a>
             </div>
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3 col-md-3 col-lg-3">
               <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeUser(item.userDTO.id)" type="submit">Delete</button>
               <button class="btn btn-outline-success my-2 my-sm-0" (click)="changeRole(item.userDTO.idFromIdentity)" type="submit">Change role</button>
             </div>

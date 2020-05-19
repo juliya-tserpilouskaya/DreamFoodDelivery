@@ -1041,33 +1041,37 @@ export class CommentService {
         this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
     }
 
-    getAll(): Observable<CommentView[]> {
+    getAll(request: PageRequest): Observable<PageResponseOfCommentView> {
         let url_ = this.baseUrl + "/api/Comment/all";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(request);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetAll(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
                     return this.processGetAll(<any>response_);
                 } catch (e) {
-                    return <Observable<CommentView[]>><any>_observableThrow(e);
+                    return <Observable<PageResponseOfCommentView>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<CommentView[]>><any>_observableThrow(response_);
+                return <Observable<PageResponseOfCommentView>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<CommentView[]> {
+    protected processGetAll(response: HttpResponseBase): Observable<PageResponseOfCommentView> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1078,11 +1082,7 @@ export class CommentService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CommentView.fromJS(item));
-            }
+            result200 = PageResponseOfCommentView.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 204) {
@@ -1105,7 +1105,7 @@ export class CommentService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<CommentView[]>(<any>null);
+        return _observableOf<PageResponseOfCommentView>(<any>null);
     }
 
     removeAll(): Observable<void> {
@@ -2703,12 +2703,9 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 400) {
+        } else if (status === 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            return throwException("A server side error occurred.", status, _responseText, _headers);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2723,7 +2720,7 @@ export class OrderService {
     }
 
     getOrdersInStatus(statusName: string | null): Observable<OrderView[]> {
-        let url_ = this.baseUrl + "/api/Order/{statusName}";
+        let url_ = this.baseUrl + "/api/Order/status/{statusName}";
         if (statusName === undefined || statusName === null)
             throw new Error("The parameter 'statusName' must be defined.");
         url_ = url_.replace("{statusName}", encodeURIComponent("" + statusName));
@@ -2737,7 +2734,7 @@ export class OrderService {
             })
         };
 
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetOrdersInStatus(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -2769,16 +2766,19 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result403: any = null;
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4016,7 +4016,7 @@ export class AdminService {
         return _observableOf<UserView>(<any>null);
     }
 
-    updatePersonalDiscount(identityId: string | null, personalDiscount: string): Observable<UserView> {
+    updatePersonalDiscount(identityId: string | null, personalDiscount: number): Observable<UserView> {
         let url_ = this.baseUrl + "/api/Admin/{identityId}/discount";
         if (identityId === undefined || identityId === null)
             throw new Error("The parameter 'identityId' must be defined.");
@@ -4233,12 +4233,12 @@ export interface IBasketView {
 export class DishView implements IDishView {
     id?: string;
     name?: string | null;
-    category?: number | null;
     composition?: string | null;
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
+    sale?: number;
+    finaleCost?: number;
     added?: Date | null;
     modified?: Date | null;
     tagList?: TagToAdd[] | null;
@@ -4257,12 +4257,12 @@ export class DishView implements IDishView {
         if (_data) {
             this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
-            this.category = _data["category"] !== undefined ? _data["category"] : <any>null;
             this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
             this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
             this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
             this.weigh = _data["weigh"] !== undefined ? _data["weigh"] : <any>null;
             this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
+            this.finaleCost = _data["finaleCost"] !== undefined ? _data["finaleCost"] : <any>null;
             this.added = _data["added"] ? new Date(_data["added"].toString()) : <any>null;
             this.modified = _data["modified"] ? new Date(_data["modified"].toString()) : <any>null;
             if (Array.isArray(_data["tagList"])) {
@@ -4285,12 +4285,12 @@ export class DishView implements IDishView {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
-        data["category"] = this.category !== undefined ? this.category : <any>null;
         data["composition"] = this.composition !== undefined ? this.composition : <any>null;
         data["description"] = this.description !== undefined ? this.description : <any>null;
         data["cost"] = this.cost !== undefined ? this.cost : <any>null;
         data["weigh"] = this.weigh !== undefined ? this.weigh : <any>null;
         data["sale"] = this.sale !== undefined ? this.sale : <any>null;
+        data["finaleCost"] = this.finaleCost !== undefined ? this.finaleCost : <any>null;
         data["added"] = this.added ? this.added.toISOString() : <any>null;
         data["modified"] = this.modified ? this.modified.toISOString() : <any>null;
         if (Array.isArray(this.tagList)) {
@@ -4306,12 +4306,12 @@ export class DishView implements IDishView {
 export interface IDishView {
     id?: string;
     name?: string | null;
-    category?: number | null;
     composition?: string | null;
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
+    sale?: number;
+    finaleCost?: number;
     added?: Date | null;
     modified?: Date | null;
     tagList?: TagToAdd[] | null;
@@ -4543,7 +4543,7 @@ export interface ITagView {
 }
 
 export class TagToUpdate implements ITagToUpdate {
-    id?: string;
+    id?: string | null;
     tagName?: string | null;
 
     constructor(data?: ITagToUpdate) {
@@ -4578,8 +4578,68 @@ export class TagToUpdate implements ITagToUpdate {
 }
 
 export interface ITagToUpdate {
-    id?: string;
+    id?: string | null;
     tagName?: string | null;
+}
+
+export class PageResponseOfCommentView implements IPageResponseOfCommentView {
+    data?: CommentView[] | null;
+    pageNumber?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+
+    constructor(data?: IPageResponseOfCommentView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(CommentView.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+            this.hasNextPage = _data["hasNextPage"] !== undefined ? _data["hasNextPage"] : <any>null;
+            this.hasPreviousPage = _data["hasPreviousPage"] !== undefined ? _data["hasPreviousPage"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PageResponseOfCommentView {
+        data = typeof data === 'object' ? data : {};
+        let result = new PageResponseOfCommentView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        data["hasNextPage"] = this.hasNextPage !== undefined ? this.hasNextPage : <any>null;
+        data["hasPreviousPage"] = this.hasPreviousPage !== undefined ? this.hasPreviousPage : <any>null;
+        return data; 
+    }
+}
+
+export interface IPageResponseOfCommentView {
+    data?: CommentView[] | null;
+    pageNumber?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
 }
 
 export class CommentView implements ICommentView {
@@ -4750,8 +4810,48 @@ export interface IOrderView {
     paymentTime?: Date | null;
 }
 
+export class PageRequest implements IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IPageRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PageRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PageRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        return data; 
+    }
+}
+
+export interface IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
+}
+
 export class CommentToAdd implements ICommentToAdd {
-    orderId?: string;
+    orderId?: string | null;
     headline?: string | null;
     rating?: number | null;
     content?: string | null;
@@ -4792,14 +4892,14 @@ export class CommentToAdd implements ICommentToAdd {
 }
 
 export interface ICommentToAdd {
-    orderId?: string;
+    orderId?: string | null;
     headline?: string | null;
     rating?: number | null;
     content?: string | null;
 }
 
 export class CommentToUpdate implements ICommentToUpdate {
-    id?: string;
+    id?: string | null;
     headline?: string | null;
     rating?: number | null;
     content?: string | null;
@@ -4840,7 +4940,7 @@ export class CommentToUpdate implements ICommentToUpdate {
 }
 
 export interface ICommentToUpdate {
-    id?: string;
+    id?: string | null;
     headline?: string | null;
     rating?: number | null;
     content?: string | null;
@@ -5075,7 +5175,7 @@ export interface IUserRegistration {
 }
 
 export class OrderToStatusUpdate implements IOrderToStatusUpdate {
-    id?: string;
+    id?: string | null;
     statusIndex?: number | null;
 
     constructor(data?: IOrderToStatusUpdate) {
@@ -5110,7 +5210,7 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
 }
 
 export interface IOrderToStatusUpdate {
-    id?: string;
+    id?: string | null;
     statusIndex?: number | null;
 }
 
@@ -5167,7 +5267,7 @@ export interface IOrderToAdd {
 }
 
 export class OrderToUpdate implements IOrderToUpdate {
-    id?: string;
+    id?: string | null;
     address?: string | null;
     phoneNumber?: string | null;
     name?: string | null;
@@ -5211,7 +5311,7 @@ export class OrderToUpdate implements IOrderToUpdate {
 }
 
 export interface IOrderToUpdate {
-    id?: string;
+    id?: string | null;
     address?: string | null;
     phoneNumber?: string | null;
     name?: string | null;
@@ -5396,7 +5496,7 @@ export class DishToAdd implements IDishToAdd {
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
+    sale?: number;
     tagNames?: TagToAdd[] | null;
 
     constructor(data?: IDishToAdd) {
@@ -5454,7 +5554,7 @@ export interface IDishToAdd {
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
+    sale?: number;
     tagNames?: TagToAdd[] | null;
 }
 
@@ -5465,8 +5565,8 @@ export class DishToUpdate implements IDishToUpdate {
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
-    tagIndexes?: TagToAdd[] | null;
+    sale?: number;
+    tagNames?: TagToAdd[] | null;
 
     constructor(data?: IDishToUpdate) {
         if (data) {
@@ -5486,10 +5586,10 @@ export class DishToUpdate implements IDishToUpdate {
             this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
             this.weigh = _data["weigh"] !== undefined ? _data["weigh"] : <any>null;
             this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
-            if (Array.isArray(_data["tagIndexes"])) {
-                this.tagIndexes = [] as any;
-                for (let item of _data["tagIndexes"])
-                    this.tagIndexes!.push(TagToAdd.fromJS(item));
+            if (Array.isArray(_data["tagNames"])) {
+                this.tagNames = [] as any;
+                for (let item of _data["tagNames"])
+                    this.tagNames!.push(TagToAdd.fromJS(item));
             }
         }
     }
@@ -5510,10 +5610,10 @@ export class DishToUpdate implements IDishToUpdate {
         data["cost"] = this.cost !== undefined ? this.cost : <any>null;
         data["weigh"] = this.weigh !== undefined ? this.weigh : <any>null;
         data["sale"] = this.sale !== undefined ? this.sale : <any>null;
-        if (Array.isArray(this.tagIndexes)) {
-            data["tagIndexes"] = [];
-            for (let item of this.tagIndexes)
-                data["tagIndexes"].push(item.toJSON());
+        if (Array.isArray(this.tagNames)) {
+            data["tagNames"] = [];
+            for (let item of this.tagNames)
+                data["tagNames"].push(item.toJSON());
         }
         return data; 
     }
@@ -5526,8 +5626,8 @@ export interface IDishToUpdate {
     description?: string | null;
     cost?: number;
     weigh?: string | null;
-    sale?: number | null;
-    tagIndexes?: TagToAdd[] | null;
+    sale?: number;
+    tagNames?: TagToAdd[] | null;
 }
 
 export class RequestParameters implements IRequestParameters {

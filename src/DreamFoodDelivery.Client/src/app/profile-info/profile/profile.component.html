@@ -15,6 +15,14 @@
           aria-expanded="false"
           aria-controls="collapseComments">My Comments</button>
       </div>
+      <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/profile/update']">Info update</button>
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/delete']">Delete account</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/email/confirm']">Confirm email</button>
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/email/change']">Change email</button>
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/password/change']">Change password</button>
+      </div>
   </div>
 
   <div class="col">
@@ -28,6 +36,4 @@
   </div>
 </div>
 
-<li class="nav-item">
-  <button type="button" *ngIf="isAuthenticated" class="btn btn-primary" [routerLink]="['/profile/update']">Info update</button>
-</li>
+

@@ -338,7 +338,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [Authorize(Roles = "Admin")]
         [HttpGet, Route("statuses")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderStatus>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public async Task<IActionResult>GetStatuses(CancellationToken cancellationToken = default(CancellationToken))
@@ -346,7 +346,9 @@ namespace DreamFoodDelivery.Web.Controllers
             try
             {
                 var result = await _orderService.GetStatuses(cancellationToken);
-                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -360,10 +362,10 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="statusName">Status index</param>
         /// <returns>Result information</returns>
         [Authorize(Roles = "Admin")]
-        [HttpDelete, Route("{statusName}")]
+        [HttpGet, Route("status/{statusName}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public async Task<IActionResult> GetOrdersInStatus(string statusName, CancellationToken cancellationToken = default)
@@ -377,7 +379,7 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _orderService.GetOrdersInStatus(statusName, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
