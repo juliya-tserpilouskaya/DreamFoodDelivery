@@ -1,5 +1,6 @@
 ﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,11 +28,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="name">Dish name</param>
         Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        ///  Asynchronously returns dish by category. Id must be verified 
-        /// </summary>
-        /// <param name="categoryString">Dish category</param>
-        Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString, CancellationToken cancellationToken = default);
+        ///// <summary>
+        /////  Asynchronously returns dish by category. Id must be verified 
+        ///// </summary>
+        ///// <param name="categoryString">Dish category</param>
+        //Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
@@ -46,32 +47,9 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<IEnumerable<DishView>>> GetSalesAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///  Asynchronously add new dish
-        /// </summary>
-        /// <param name="dish">New dish to add</param>
-        Task<Result<DishView>> AddAsync(DishToAdd dish, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously update dish
-        /// </summary>
-        /// <param name="dish">Existing dish to update</param>
-        Task<Result<DishView>> UpdateAsync(DishToUpdate dish, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously remove dish by Id. Id must be verified
-        /// </summary>
-        /// <param name="dishId">ID of existing dish</param>
-        Task<Result> RemoveByIdAsync(string dishId, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously remove all dishes 
-        /// </summary>
-        Task<Result> RemoveAllAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
         ///  Asynchronously get dishes by tag index. Id must be verified 
         /// </summary>
-        /// <param name="tagIndex">Index of existing tag</param>
-        Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(int tagIndex, CancellationToken cancellationToken = default);
+        /// <param name="tagName">Existing tag</param
+        Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(/*int tagIndex*/ string tagName, CancellationToken cancellationToken = default);
     }
 }

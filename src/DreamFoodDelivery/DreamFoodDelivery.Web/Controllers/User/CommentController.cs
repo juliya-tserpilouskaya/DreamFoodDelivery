@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -30,20 +31,27 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Get all comments
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// </summary>
         /// <returns>Returns all comments stored</returns>
         [Authorize(Roles = "Admin")]
-        [HttpGet, Route("all")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CommentView>))]
+        //[HttpGet, Route("all")]
+        [HttpPost, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponse<CommentView>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAll([FromBody] PageRequest request, CancellationToken cancellationToken = default)
         {
+            if (request is null)
+            {
+                return BadRequest();
+            }
             try
             {
-                var result = await _commentService.GetAllAsync(cancellationToken);
+                var result = await _commentService.GetAllAsync(request, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : NoContent();
@@ -60,6 +68,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="id">Comment id</param>
         /// <returns>Returns ID matching comment</returns>
         [HttpGet, Route("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CommentView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -162,7 +171,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.AddAsync(comment, cancellationToken);
+                var result = await _commentService.AddAsync(comment, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

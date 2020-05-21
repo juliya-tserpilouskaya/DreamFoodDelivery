@@ -3,15 +3,16 @@
         <h3>Please enter information to sign up</h3>
         <div class="form-group">
             <label for="inputEmail">Email</label>
-            <input type="email" class="form-control" formControlName="name" placeholder="Enter email" required>
+            <input type="email" class="form-control" formControlName="email" placeholder="Enter email" required>
         </div>
         <div class="form-group">
             <label for="inputPassword">Password</label>
             <input type="password" class="form-control" formControlName="password" placeholder="Password" required>
         </div>
         <div>
-          <button class="btn btn-lg btn btn-success" type="submit"(click)="register()">Sign up</button>
+          <button class="btn btn-lg btn btn-success" type="submit" >Sign up</button>
           <a  class="btn btn-link" [routerLink]="['/login']">Login</a>
         </div>
+        <p class="mt-5 mb-3 text-muted">&copy; 2020</p>
     </form>
 </div>

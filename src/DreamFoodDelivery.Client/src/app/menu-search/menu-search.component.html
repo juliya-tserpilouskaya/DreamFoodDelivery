@@ -1,0 +1,94 @@
+<div class="row justify-content-center">
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">Menu</h1>
+      <p class="lead text-muted">For convenience, you can use tags and search:</p>
+        <form [formGroup]="searchForm" (ngSubmit)="onSearchButtonClicked()">
+          <div *ngIf="tags else loading">
+            <label *ngFor="let tag of tags">
+              <input type="checkbox" (change)="onChange(tag.tagName, $event.target.checked)" />
+              {{tag.tagName}}
+            </label>
+            <div class="form-group">
+              <label>
+                <input  type="checkbox" id="isOnSale" value="Sale" formControlName="onSale" />Only on sale
+              </label>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Price in $</span>
+                  </div>
+                  <input class="form-control" type="number" min="0" placeholder="Min" formControlName="lowerPrice" >
+                  <input class="form-control" type="number" min="0" placeholder="Max" formControlName="upperPrice" >
+              </div>
+            </div>
+            <input type="query" id="inputQuery" class="form-control" formControlName="request" placeholder="Dish information">
+            <button class="btn btn-lg btn-primary" type="submit">Search</button>
+          </div>
+        </form>
+    </div>
+  </section>
+</div>
+
+  <div *ngIf="dishes else loading">
+    <div class="album py-5 bg-light">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-4" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+            <form [formGroup]="addForm" (ngSubmit)="onAddToBasket(dish.id)"#formDir="ngForm" novalidate >
+
+              <div class="card mb-4 shadow-sm">
+                <h4 class="jumbotron-heading">{{dish.name}}</h4>
+                <div  *ngIf="mainImages[dish.id]">
+                  <img [src]="mainImages[dish.id]" class="card-img">
+                </div>
+                <!-- <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect fill="#55595c" width="100%" height="100%"></rect><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg> -->
+                <div class="card-body">
+                  <p class="card-text">{{dish.description}}</p>
+                  <table cellspacing="0" id="maket">
+                    <tr>
+                     <td id="leftcol">
+                      <ul class="list-group">
+                        <li class="list-group-item">Cost: {{dish.cost}}$</li>
+                        <li class="list-group-item">Sale: {{dish.sale}}%</li>
+                        <li class="list-group-item">Final cost: {{dish.finaleCost}}$</li>
+                      </ul>
+                     </td>
+                     <td id="spacer"></td>
+
+                     <td id="rightcol">
+                      <div>
+                        <h5>Tags:</h5>
+                        <ul class="list-group" *ngFor="let tag of dish.tagList">
+                          <li class="list-group-item">{{tag.tagName}}</li>
+                        </ul>
+                      </div>
+                     </td>
+                    </tr>
+                   </table>
+                    <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
+                    <div class="form-group" *ngIf="isAuthenticated">
+                      <input type="number" class="form-control" max="20" min="1" placeholder="0" formControlName="quantity">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">Add to basket</button>
+                    </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>
+
+<div class="row justify-content-center">
+  <ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="dishes.length"></ngb-pagination>
+</div>

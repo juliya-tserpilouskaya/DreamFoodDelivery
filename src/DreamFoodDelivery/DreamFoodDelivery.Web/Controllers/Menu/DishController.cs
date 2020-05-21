@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +23,10 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
     [ApiController]
     public class DishController : ControllerBase
     {
-        private readonly IMenuService _menuService;
-        public DishController(IMenuService menuService)
+        private readonly IDishService _dishService;
+        public DishController(IDishService dishService)
         {
-            _menuService = menuService;
+            _dishService = dishService;
         }
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             }
             try
             {
-                var result = await _menuService.AddAsync(dish, cancellationToken);
+                var result = await _dishService.AddAsync(dish, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : BadRequest(result.Message);
@@ -77,7 +78,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             }
             try
             {
-                var result = await _menuService.UpdateAsync(dish, cancellationToken);
+                var result = await _dishService.UpdateAsync(dish, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : BadRequest(result.Message);
@@ -108,7 +109,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
             }
             try
             {
-                var result = await _menuService.RemoveByIdAsync(id, cancellationToken);
+                var result = await _dishService.RemoveByIdAsync(id, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) 
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) 
                      : NoContent();
@@ -134,7 +135,7 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         {
             try
             {
-                var result = await _menuService.RemoveAllAsync(cancellationToken);
+                var result = await _dishService.RemoveAllAsync(cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
                      : NoContent();

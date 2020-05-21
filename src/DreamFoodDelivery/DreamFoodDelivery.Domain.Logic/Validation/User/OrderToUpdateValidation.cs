@@ -10,7 +10,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
     {
         public OrderToUpdateValidation()
         {
-            RuleFor(_ => _.Id).NotEmpty().WithMessage("You must enter order Id");
+            RuleFor(_ => _.Id).Must(id => Guid.TryParse(id, out var _))
+                .WithMessage("Order id can't parse to Guid type");
             RuleFor(_ => _.Address).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Address must contain from 3 to 90 characters.");
             RuleFor(_ => _.PhoneNumber).Length(12,13)
@@ -19,8 +20,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
                 .WithMessage("Name must contain from 3 to 90 characters.");
             RuleFor(_ => _.Surname).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Surname must contain from 3 to 90 characters.");
-            RuleFor(_ => _.ShippingСost).GreaterThan(0)
-                .WithMessage("Shipping cost must be greater than 0");
+            //RuleFor(_ => _.ShippingCost).GreaterThan(0)
+            //    .WithMessage("Shipping cost must be greater than 0");
         }
     }
 }

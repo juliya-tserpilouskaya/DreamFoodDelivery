@@ -11,9 +11,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Common;
 using System.Threading;
+using DreamFoodDelivery.Domain.View;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
+    // !!! Obsolete controller. If necessary, review their return data types and status codes!!!
     /// <summary>
     /// Work with tags
     /// </summary>
@@ -31,8 +33,10 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Get all tags
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <returns>Returns all tags stored</returns>
+        [ObsoleteAttribute]
         [AllowAnonymous]
         [HttpGet, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TagView>))]

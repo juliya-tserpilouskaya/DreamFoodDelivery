@@ -1,5 +1,6 @@
 ﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,8 +13,10 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
     {
         /// <summary>
         /// Asynchronously returns all comments
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// </summary>
-        Task<Result<IEnumerable<CommentView>>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task<Result<PageResponse<CommentView>>> GetAllAsync(PageRequest request, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously get comment by comment Id. Id must be verified 
@@ -37,7 +40,8 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         ///  Asynchronously add new comment
         /// </summary>
         /// <param name="comment">New comment to add</param>
-        Task<Result<CommentView>> AddAsync(CommentToAdd comment, CancellationToken cancellationToken = default);
+        /// <param name="userIdFromIdentity">Existing user Id to add</param>
+        Task<Result<CommentView>> AddAsync(CommentToAdd comment, string userIdFromIdentity, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously update comment

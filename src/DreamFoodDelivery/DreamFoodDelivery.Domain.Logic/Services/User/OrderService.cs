@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -60,7 +63,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         {
                             return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                         }
-                        dish.Data.Quantity = dishListItem.Quantity;
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         viewItem.Dishes.Add(dish.Data);
                     }
                     views.Add(viewItem);
@@ -71,7 +74,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
             }
-
         }
 
         /// <summary>
@@ -99,7 +101,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -129,24 +131,37 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             OrderDB orderToAdd = _mapper.Map<OrderDB>(order);
             if (orderToAdd.IsInfoFromProfile)
             {
+                if (userIdentity.Address is null || userIdentity.PhoneNumber is null || userIdentity.Name is null || userIdentity.Surname is null)
+                {
+                    return Result<OrderView>.Fail<OrderView>("Update your profile, please!");
+                }
                 orderToAdd.Address = userIdentity.Address;
-                orderToAdd.PersonalDiscount = userIdentity.PersonalDiscount;
                 orderToAdd.PhoneNumber = userIdentity.PhoneNumber;
                 orderToAdd.Name = userIdentity.Name;
+                orderToAdd.Surname = userIdentity.Surname;
             }
+            orderToAdd.PersonalDiscount = userIdentity.PersonalDiscount;
             orderToAdd.UserId = userDB.Id;
             orderToAdd.Status = Enum.GetName(typeof(OrderStatuses), 0);
             orderToAdd.UpdateTime = DateTime.Now;
             _context.Orders.Add(orderToAdd);
 
-            var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken); //тут исправлено
+            var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             foreach (var connection in connections)
             {
+                orderToAdd.OrderCost += connection.DishCost * (1 - connection.Sale/100) * connection.Quantity;
                 connection.OrderId = orderToAdd.Id;
                 connection.BasketId = Guid.Empty;
                 _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
                 _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
             }
+            orderToAdd.OrderCost *= userIdentity.PersonalDiscount / 100;
+            if (orderToAdd.OrderCost < Number_Сonstants.FREE_SHIPPING_BORDER)
+            {
+                orderToAdd.ShippingCost = Number_Сonstants.DELIVERY_COST;
+            }
+            _context.Entry(orderToAdd).Property(c => c.OrderCost).IsModified = true; //is it nessesary? 
+            _context.Entry(orderToAdd).Property(c => c.ShippingCost).IsModified = true; //is it nessesary? 
             try
             {
                 await _context.SaveChangesAsync();
@@ -161,7 +176,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -187,8 +202,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(15))///////////////////////////////////////////////////////////////////
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(Number_Сonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
                 orderForUpdate.UpdateTime = DateTime.Now;
@@ -196,7 +211,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Surname).IsModified = true;
-                _context.Entry(orderForUpdate).Property(c => c.ShippingСost).IsModified = true;
+                //_context.Entry(orderForUpdate).Property(c => c.ShippingCost).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
                 try
                 {
@@ -212,7 +227,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         {
                             return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                         }
-                        dish.Data.Quantity = dishListItem.Quantity;
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         view.Dishes.Add(dish.Data);
                     }
                     return Result<OrderView>.Ok(view);
@@ -259,7 +274,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
                 }
                 views.Add(viewItem);
@@ -298,7 +313,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
                 }
                 views.Add(viewItem);
@@ -427,7 +442,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result<OrderView>> UpdateOrderStatusAsync(OrderToStatusUpdate order, CancellationToken cancellationToken = default)
         {
-            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == order.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             string orderStatus = Enum.GetName(typeof(OrderStatuses), order.StatusIndex);
             switch (orderStatus)
             {
@@ -479,7 +494,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     {
                         return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
                     }
-                    dish.Data.Quantity = dishListItem.Quantity;
+                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
                 }
                 return Result<OrderView>.Ok(view);
@@ -558,6 +573,84 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
             }
+        }
+
+        /// <summary>
+        ///  Asynchronously return all order statuses
+        /// </summary>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<OrderStatus>>> GetStatuses(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                HashSet<OrderStatus> orderStatuses = new HashSet<OrderStatus>();
+
+                foreach (int index in Enum.GetValues(typeof(OrderStatuses)))
+                {
+                    OrderStatus statusItem = new OrderStatus();
+                    statusItem.StatusIndex = index;
+                    statusItem.StatusName = Enum.GetName(typeof(OrderStatuses), index);
+                    orderStatuses.Add(statusItem);
+                }
+                if (!orderStatuses.Any())
+                {
+                    return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>("No orders found");
+                }
+                return Result<IEnumerable<OrderStatus>>.Ok(_mapper.Map<IEnumerable<OrderStatus>>(orderStatuses));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously return all order in status
+        /// </summary>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<OrderView>>> GetOrdersInStatus(string statusName, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                List<OrderDB> orders = new List<OrderDB>();
+                if (statusName == "Paid")
+                {
+                    orders = await _context.Orders.Where(_ => _.PaymentTime.HasValue).AsNoTracking().ToListAsync(cancellationToken);
+                }
+                else
+                {
+                    orders = await _context.Orders.Where(_ => _.Status == statusName).AsNoTracking().ToListAsync(cancellationToken);
+                }
+                if (!orders.Any())
+                {
+                    return Result<IEnumerable<OrderView>>.Warning("No orders found");
+                }
+
+                List<OrderView> views = new List<OrderView>();
+                foreach (var order in orders)
+                {
+                    OrderView viewItem = _mapper.Map<OrderView>(order);
+                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    viewItem.Dishes = new HashSet<DishView>();
+                    foreach (var dishListItem in dishList)
+                    {
+                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        if (dish.IsError)
+                        {
+                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
+                        }
+                        dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
+                        viewItem.Dishes.Add(dish.Data);
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<OrderView>>.Ok(_mapper.Map<IEnumerable<OrderView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
+            }
+
         }
     }
 }
