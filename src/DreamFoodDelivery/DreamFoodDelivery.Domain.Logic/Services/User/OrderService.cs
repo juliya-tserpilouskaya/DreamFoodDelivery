@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -155,9 +156,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
             }
             orderToAdd.OrderCost *= userIdentity.PersonalDiscount / 100;
-            if (orderToAdd.OrderCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+            if (orderToAdd.OrderCost < Number_Сonstants.FREE_SHIPPING_BORDER)
             {
-                orderToAdd.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                orderToAdd.ShippingCost = Number_Сonstants.DELIVERY_COST;
             }
             _context.Entry(orderToAdd).Property(c => c.OrderCost).IsModified = true; //is it nessesary? 
             _context.Entry(orderToAdd).Property(c => c.ShippingCost).IsModified = true; //is it nessesary? 
@@ -202,7 +203,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order, CancellationToken cancellationToken = default)
         {
             OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(DFD_Сonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
+            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(Number_Сonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
                 orderForUpdate.UpdateTime = DateTime.Now;

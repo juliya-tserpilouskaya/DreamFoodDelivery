@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
@@ -109,9 +110,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     view.Dishes.Add(dish.Data);
                 }
                 view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                if (view.BasketCost < Number_Сonstants.FREE_SHIPPING_BORDER)
                 {
-                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                    view.ShippingCost = Number_Сonstants.DELIVERY_COST;
                 }
                 else
                 {
@@ -185,9 +186,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     view.Dishes.Add(dish.Data);
                 }
                 view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                if (view.BasketCost < Number_Сonstants.FREE_SHIPPING_BORDER)
                 {
-                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                    view.ShippingCost = Number_Сonstants.DELIVERY_COST;
                 }
                 else
                 {
@@ -251,9 +252,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     view.Dishes.Add(dish.Data);
                 }
                 view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                if (view.BasketCost < DFD_Сonstants.FREE_SHIPPING_BORDER)
+                if (view.BasketCost < Number_Сonstants.FREE_SHIPPING_BORDER)
                 {
-                    view.ShippingCost = DFD_Сonstants.DELIVERY_COST;
+                    view.ShippingCost = Number_Сonstants.DELIVERY_COST;
                 }
                 else
                 {

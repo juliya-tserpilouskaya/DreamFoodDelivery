@@ -21,6 +21,8 @@ using NSwag.Generation.Processors.Security;
 using NSwag;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Domain.Logic.Validation;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace DreamFoodDelivery.Web
 {
@@ -70,7 +72,7 @@ namespace DreamFoodDelivery.Web
                 {
                     document.Info.Title = "~Dream food for you~";
                     document.Info.Description = "Intership ASP.NET Core web API";
-                    document.Info.Version = "v0.0.1";
+                    document.Info.Version = "v0.1";
                     document.Info.Contact = new NSwag.OpenApiContact
                     {
                         Name = "Yuliya Tserpilouskaya",
@@ -147,6 +149,12 @@ namespace DreamFoodDelivery.Web
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+                RequestPath = "/Images"
+            });
 
             app.UseCors("CorsPolicy");
 

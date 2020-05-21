@@ -67,6 +67,9 @@ import { ChangeEmailComponent } from './auth/change-email/change-email.component
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { ConfirmEmailComponent } from './auth/confirm-email/confirm-email.component';
 import { UnexpectedComponent } from './pages/unexpected/unexpected.component';
+import { ImageUploadComponent } from './images/image-upload/image-upload.component';
+import { ImagesGetComponent } from './images/images-get/images-get.component';
+import { ImageModifiedService } from './app-services/image.services';
 
 
 
@@ -112,6 +115,8 @@ import { UnexpectedComponent } from './pages/unexpected/unexpected.component';
     ChangePasswordComponent,
     ConfirmEmailComponent,
     UnexpectedComponent,
+    ImageUploadComponent,
+    ImagesGetComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -140,7 +145,8 @@ import { UnexpectedComponent } from './pages/unexpected/unexpected.component';
     CommentService,
     TagService,
     AdminService,
-    SearchService
+    SearchService,
+    ImageModifiedService
   ],
   bootstrap: [AppComponent]
 })
