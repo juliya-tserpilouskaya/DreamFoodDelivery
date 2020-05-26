@@ -36,10 +36,10 @@ namespace DreamFoodDelivery.Common.Сonstants
 
         public const string TAGS_WERE_NOT_FOUND = "Tags were not found. ";
 
-        public const string COMMENT_WAS_NOT_FOUND = "Comment was not found. ";
-        public const string CANNOT_DELETE_COMMENT = "Cannot delete comment. ";
-        public const string COMMENTS_WERE_NOT_FOUND = "Comments were not found. ";
-        public const string CANNOT_DELETE_COMMENTS = "Cannot delete comments. ";
+        public const string COMMENT_WAS_NOT_FOUND = "Review was not found. ";
+        public const string CANNOT_DELETE_COMMENT = "Cannot delete review. ";
+        public const string COMMENTS_WERE_NOT_FOUND = "Reviews were not found. ";
+        public const string CANNOT_DELETE_COMMENTS = "Cannot delete review. ";
 
         public const string NO_IMAGES = "This dish doesn't have images!";
         public const string IMAGE_IS_NOT_EXISTS = "Image is not exists!";

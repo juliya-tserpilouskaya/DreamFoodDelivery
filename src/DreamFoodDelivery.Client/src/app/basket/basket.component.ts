@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Location } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
+import { ImageModifiedService } from '../app-services/image.services';
 
 @Component({
   selector: 'app-basket',
@@ -18,10 +19,13 @@ export class BasketComponent implements OnInit {
   pageSize = 10;
   updateForm: FormGroup;
 
+  mainImages: {[id: string]: string} = { };
+
   constructor(
     private basketService: BasketService,
     private authService: AuthService,
     private orderService: OrderService,
+    private imageService: ImageModifiedService,
     private location: Location,
     public router: Router,
     public fb: FormBuilder
@@ -32,6 +36,11 @@ export class BasketComponent implements OnInit {
   ngOnInit(): void {
     this.basketService.getAll().subscribe(data => {this.basket = data;
                                                    this.dishes = data.dishes;
+                                                   if (this.dishes) {
+                                                    for (const dish of this.dishes){
+                                                      this.getImages(dish.id);
+                                                    }
+                                                   }
                                                   },
                                                   error => {
                                                     if (error.status === 500){
@@ -101,6 +110,18 @@ export class BasketComponent implements OnInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  getImages(id: string){
+    this.imageService.getImageNamesList(id)
+    .subscribe(allImages => {
+      if (allImages != null && allImages.length > 0) {
+        this.imageService.getImage(id, allImages[0])
+        .subscribe(data => {
+        this.mainImages[id] = data;
+        });
+      }
+    });
   }
 
   get isAuthenticated(): boolean {

@@ -9,8 +9,8 @@
           <h4 class="card-text">Delivery service: {{basket.shippingCost}} $</h4>
           <br>
         </div>
-        <button *ngIf="basket.dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
-        <button *ngIf="basket.dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
+        <button *ngIf="dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
+        <button *ngIf="dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
       </div>
     </div>
@@ -25,36 +25,27 @@
             <form [formGroup]="updateForm" (ngSubmit)="onBasketUpdate(dish.id)"#formDir="ngForm" novalidate >
 
               <div class="card mb-4 shadow-sm">
-                <h4 class="jumbotron-heading">{{dish.name}}</h4>
-                <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect fill="#55595c" width="100%" height="100%"></rect><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg>
-                <div class="card-body">
-                  <p class="card-text">{{dish.description}}</p>
-                  <table cellspacing="0" id="maket">
-                    <tr>
-                     <td id="leftcol">
-                      <ul class="list-group">
-                        <li class="list-group-item">Cost: {{dish.cost}}$</li>
-                        <li class="list-group-item">Sale: {{dish.sale}}%</li>
-                        <li class="list-group-item">quantity: {{dish.quantity}}</li>
-                      </ul>
-                     </td>
-                     <td id="spacer"></td>
-
-                     <td id="rightcol">
-                      <div>
-                        <h5>Tags:</h5>
-                        <ul class="list-group" *ngFor="let tag of dish.tagList">
-                          <li class="list-group-item">{{tag.tagName}}</li>
-                        </ul>
-                      </div>
-                     </td>
-                    </tr>
-                   </table>
-                    <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
+                <div class="card-header">
+                  <h4 class="jumbotron-heading">{{dish.name}}</h4>
+                </div>
+                <div  *ngIf="mainImages[dish.id]">
+                  <img [src]="mainImages[dish.id]" class="card-img">
+                </div>
+                 <div class="card-body">
+                  <p class="card-text">Description: {{dish.description}}</p>
+                  <ul class="list-group">
+                    <li class="list-group-item">Cost: {{dish.cost}}$</li>
+                    <li class="list-group-item">Discount: {{dish.sale}}%</li>
+                    <li class="list-group-item">Total cost: {{dish.finaleCost}}$</li>
+                  </ul>
+                    <p class="card-text">Ingredients: {{dish.composition}}, weight: {{dish.weigh}}</p>
                     <div class="form-group" *ngIf="isAuthenticated">
                       <input type="number" class="form-control" max="20" min="1" placeholder="{{dish.quantity}}" formControlName="quantity">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">Count update</button>
                       <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish(dish.id)">Remove</button>
+                    </div>
+                    <div class="card-footer">
+                      <h5><span class="badge-pill badge-info" *ngFor="let tag of dish.tagList">{{tag.tagName}}</span></h5>
                     </div>
                 </div>
               </div>

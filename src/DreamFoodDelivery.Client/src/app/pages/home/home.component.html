@@ -2,9 +2,9 @@
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h2>Welcome!</h2>
     &nbsp;
-    <p *ngIf="!false">If you are a registered user, you can <a href="login">login</a>.<br>
-      If you are a new here, please <a href="register">register</a>.<br>
-      Anyway, you could read rewiews about us here, and check our <a href="menu">menu</a> without registration.</p>
+    <p *ngIf="!false">If you are registered user, you can <a href="login">login</a>.<br>
+      If you are new here, please <a href="register">register</a>.<br>
+      You could read rewiews about us here, and check our <a href="menu">menu</a> without registration.</p>
   </div>
 
 
@@ -19,7 +19,7 @@
                 <input type="number" formControlName="pageSize" class="form-control">
 
                 <div class="input-group-append">
-                    <button class="btn btn-success" (click)="getComments()">Show comments</button>
+                    <button class="btn btn-success" (click)="getComments()">Show reviews</button>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
   <div *ngIf="!response">
 
     <div class="card" >
-      <h5 class="card-header"> Here could be your review in future!</h5>
+      <h5 class="card-header"> Your review can be here in future!</h5>
       <div class="card-body">
         <div class="col-12 col-md-12 col-lg-12 row">
           <div>

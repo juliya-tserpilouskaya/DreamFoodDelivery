@@ -25,13 +25,13 @@ export class AdminsOrdersComponent implements OnInit {
     // });
     this.manageOrderService.getAllOrders()
       .then(data => this.orders = data)
-      .catch(msg => console.log(msg));
+      .catch(msg => console.log(msg.status)); // +
   }
 
   removeById(id: string): void {
-    this.orderService.removeById(id).subscribe(data => {
-      const indexToDelete = this.orders.findIndex((mark: OrderView) => mark.id === id);
-      this.orders.splice(indexToDelete, 1);
+    this.orderService.removeById(id).subscribe(data => { this.ngOnInit();
+      // const indexToDelete = this.orders.findIndex((mark: OrderView) => mark.id === id);
+      // this.orders.splice(indexToDelete, 1);
     },
     error => {
       // if (error.status === 500){

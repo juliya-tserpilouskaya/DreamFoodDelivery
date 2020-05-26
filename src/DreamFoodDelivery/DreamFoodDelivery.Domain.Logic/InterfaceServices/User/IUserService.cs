@@ -57,12 +57,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         ///  Asynchronously confirms user email
         /// </summary>
-        /// <param name="idFromIdentity">User id to confirm email</param>
-        Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously confirms user email
-        /// </summary>
         Task<Result> ConfirmEmailSendAsync(string idFromIdentity);
 
         /// <summary>

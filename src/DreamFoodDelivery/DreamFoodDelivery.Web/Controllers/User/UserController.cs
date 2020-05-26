@@ -118,34 +118,6 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Confirm the user email
-        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
-        /// </summary>
-        /// <returns>Returns user information after email confirm</returns>
-        [ObsoleteAttribute]
-        [HttpPost, Route("email/confirm")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [LoggerAttribute]
-        public async Task<IActionResult> ConfirmUserEmail(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                var result = await _userService.ConfirmEmailAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
-                return result.IsError ? throw new InvalidOperationException(result.Message)
-                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
-
-        /// <summary>
         /// Confirm the user email - send token
         /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>

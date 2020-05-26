@@ -79,6 +79,7 @@ export class OrderCreateComponent implements OnInit {
   getdataFromProfile(): void {
     this.orderAddForm.setValue({
       isInfoFromProfile: false,
+      updateProfile: false,
       address: this.user.userProfile.address,
       phoneNumber: this.user.userProfile.phoneNumber,
       name: this.user.userProfile.name,

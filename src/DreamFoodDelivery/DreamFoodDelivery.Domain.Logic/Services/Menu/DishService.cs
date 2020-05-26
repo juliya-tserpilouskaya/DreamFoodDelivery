@@ -86,7 +86,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result<DishView>.Fail<DishView>(ExceptionConstants.DISH_WAS_NOT_FOUND);
                 }
                 DishView view = _mapper.Map<DishView>(dish);
-                view.FinaleCost = Math.Round(view.Cost * (1 - view.Sale / 100), 2);
+                view.TotalCost = Math.Round(view.Cost * (1 - view.Sale / 100), 2);
                 view.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {
@@ -127,7 +127,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(dishToUpdate).Property(c => c.Composition).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Description).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Cost).IsModified = true;
-                _context.Entry(dishToUpdate).Property(c => c.Weigh).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Weight).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Sale).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Modified).IsModified = true;
 

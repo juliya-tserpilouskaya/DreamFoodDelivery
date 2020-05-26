@@ -29,6 +29,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="imageName"></param>
         /// <param name="dishId"></param>
         /// <returns></returns>
+        [LoggerAttribute]
         public Result DeleteImageByName(string imageName, string dishId)
         {
             if (_context.Dishes.Where(_ => _.Id.ToString().Equals(dishId)).AsNoTracking() is null)
@@ -62,6 +63,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <param name="imageName"></param>
         /// <param name="dishId"></param>
         /// <returns></returns>
+        [LoggerAttribute]
         public Result<string> GetImage(string imageName, string dishId)
         {
             var directiryPath = $"Images\\DishImages\\{dishId}";
@@ -88,6 +90,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="dishId"></param>
         /// <returns></returns>
+        [LoggerAttribute]
         public Result<ICollection<string>> GetImagesInfo(string dishId)
         {
             try
@@ -122,6 +125,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
+        [LoggerAttribute]
         public async Task<Result<string>> UploadImageAsync(IFormFile file, string dishId)
         {
             if (CheckIfImageFile(file))
@@ -161,6 +165,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
+        [LoggerAttribute]
         public async Task<Result<string>> WriteFileAsync(IFormFile file, string dishId)
         {
             if (_context.Dishes.Where(_ => _.Id.ToString().Equals(dishId)).FirstOrDefault() is null)

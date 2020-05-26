@@ -38,8 +38,9 @@ export class AdminUsersComponent implements OnInit {
 
   removeUser(id: string): void {
     this.adminService.removeById(id).subscribe(data => {
-      const indexToDelete = this.usersDTO.findIndex((mark: UserDTO) => mark.id === id);
-      this.users.splice(indexToDelete, 1);
+      // const indexToDelete = this.usersDTO.findIndex((mark: UserDTO) => mark.id === id);
+      // this.users.splice(indexToDelete, 1);
+      this.ngOnInit();
     },
     error => {
       if (error.status === 500){
@@ -69,6 +70,12 @@ export class AdminUsersComponent implements OnInit {
       //  else {
       //   this.router.navigate(['/error/unexpected']);
       //  }
+    });
+  }
+
+  confirmEmail(idIdentity: string): void {
+    this.adminService.confirmUserEmail(idIdentity).subscribe(data => {
+      this.ngOnInit();
     });
   }
 

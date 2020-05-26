@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DreamFoodDelivery.Web.Controllers
 {
     /// <summary>
-    /// Work with comments
+    /// Work with reviews
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]

@@ -17,7 +17,7 @@
             </label>
             <div class="form-group">
               <label>
-                <input  type="checkbox" id="isOnSale" value="Sale" formControlName="onSale" />Sale
+                <input  type="checkbox" id="isOnSale" value="Sale" formControlName="onSale" />Discount
               </label>
             </div>
             <div class="form-group">
@@ -51,15 +51,14 @@
                 <div  *ngIf="mainImages[dish.id]">
                   <img [src]="mainImages[dish.id]" class="card-img">
                 </div>
-                <!-- <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect fill="#55595c" width="100%" height="100%"></rect><text fill="#eceeef" dy=".3em" x="50%" y="50%">Thumbnail</text></svg> -->
                 <div class="card-body">
-                  <p class="card-text">{{dish.description}}</p>
+                  <p class="card-text">Description: {{dish.description}}</p>
                   <ul class="list-group">
                     <li class="list-group-item">Cost: {{dish.cost}}$</li>
-                    <li class="list-group-item">Sale: {{dish.sale}}%</li>
-                    <li class="list-group-item">Final cost: {{dish.finaleCost}}$</li>
+                    <li class="list-group-item">Discount: {{dish.sale}}%</li>
+                    <li class="list-group-item">Total cost: {{dish.finaleCost}}$</li>
                   </ul>
-                    <p class="card-text">{{dish.composition}}, {{dish.weigh}}</p>
+                    <p class="card-text">Ingredients: {{dish.composition}}, weight: {{dish.weigh}}</p>
                     <div class="form-group" *ngIf="isAuthenticated">
                       <input type="number" class="form-control" max="20" min="1" placeholder="0" formControlName="quantity">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">Add to basket</button>

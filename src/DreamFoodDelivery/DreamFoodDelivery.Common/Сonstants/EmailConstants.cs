@@ -35,5 +35,8 @@ namespace DreamFoodDelivery.Common.Сonstants
         public const string EMAIL_MESSAGE = "\nHi, and we hope you are familiar with this email. \nOtherwise, please contact us by phone." +
                                             "\nBecause we received a request for his change of mail from this to the above. " +
                                             "\n\n\nHappy eating time! \nThe Dream Food Delivery";
+
+        public const string NEW_ORDER_SUBJECT = "New order!";
+        public const string NEW_ORDER_MESSAGE = "Hi, we have a new order!\n\n\nHappy eating time! \nThe Dream Food Delivery";
     }
 }

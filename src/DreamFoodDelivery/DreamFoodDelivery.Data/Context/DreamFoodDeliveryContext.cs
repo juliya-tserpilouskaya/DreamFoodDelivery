@@ -54,6 +54,7 @@ namespace DreamFoodDelivery.Data.Context
             {
                 if (entry.Entity is User ||
                     entry.Entity is UserDB ||
+                    entry.Entity is BasketDB ||
                     entry.Entity is BasketDishDB)
                 {
                     continue;

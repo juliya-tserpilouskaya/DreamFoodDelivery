@@ -165,13 +165,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             Guid id = Guid.Parse(userId);
             var userDB = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-            if (userDB is null)
+            var basket = await _context.Baskets.Where(_ => _.UserId == id).FirstOrDefaultAsync();
+            if (userDB is null || basket is null)
             {
                 return await Task.FromResult(Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND));
             }
             try
             {
                 _context.Users.Remove(userDB);
+                _context.Baskets.Remove(basket);
                 await _context.SaveChangesAsync(cancellationToken);
                 var userIdentity = await _userManager.FindByIdAsync(userDB.IdFromIdentity);
                 var result = await _userManager.DeleteAsync(userIdentity); 
@@ -246,5 +248,56 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_CHANGE_ROLE + ex.Message));
             }
         }
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        [LoggerAttribute]
+        public async Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default)
+        {
+            User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
+            if (usersIdentity is null)
+            {
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
+            }
+            try
+            {
+                var myToken = await _userManager.GenerateEmailConfirmationTokenAsync(usersIdentity);
+                var result = await _userManager.ConfirmEmailAsync(usersIdentity, myToken);
+                if (result.Succeeded)
+                {
+                    usersIdentity.EmailConfirmed = true;
+                    await _userManager.UpdateAsync(usersIdentity);
+                }
+
+                var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(idFromIdentity);
+                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                if (userProfile.IsError)
+                {
+                    UserView failProfile = new UserView()
+                    {
+                        UserProfile = null,
+                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                    };
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
+                }
+                UserView view = new UserView()
+                {
+                    UserProfile = userProfile.Data,
+                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
+                };
+                return Result<UserView>.Ok(view);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+            }
+        }
+
     }
 }

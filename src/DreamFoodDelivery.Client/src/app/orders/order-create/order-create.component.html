@@ -13,42 +13,44 @@
 </div>
 
 <div class="row justify-content-center" *ngIf="user else loading">
-  <form  [formGroup]="orderAddForm" novalidate (ngSubmit)="addNewOrder()" #formDir="ngForm">
-    <div class="form-group">
-      <label>Name</label>
-      <input type="text" class="form-control" value = {{user.userProfile.name}} formControlName="name" placeholder="Place for name">
-      <small *ngIf="!orderAddForm.controls.name.valid" class="text-danger">
-        Name is required (minimum 3 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label>Surname</label>
-      <input type="text" class="form-control" value = {{user.userProfile.surname}} formControlName="surname" placeholder="Place for surname">
-      <small *ngIf="!orderAddForm.controls.surname.valid" class="text-danger">
-        Surname is required (minimum 3 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label>Address</label>
-      <input type="text" class="form-control" value = {{user.userProfile.address}} formControlName="address" placeholder="Enter the address, building and apartment number.">
-      <small *ngIf="!orderAddForm.controls.address.valid" class="text-danger">
-        Address is required (minimum 3 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label>Phone number</label>
-      <input type="text" class="form-control" value = {{user.userProfile.phoneNumber}} formControlName="phoneNumber" placeholder="Place for phone number">
-      <small *ngIf="!orderAddForm.controls.phoneNumber.valid" class="text-danger">
-        Phone number is required (minimum 10 characters, maximum 13 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label for="horns">Do you want add this data to your prifile?</label>
-      <input type="checkbox" formControlName="updateProfile">
-    </div>
+  <div class="col-8 col-md-8 col-lg-8" >
+    <form novalidate [formGroup]="orderAddForm" novalidate (ngSubmit)="addNewOrder()" #formDir="ngForm">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" value = {{user.userProfile.name}} formControlName="name" placeholder="Place for name">
+        <small *ngIf="!orderAddForm.controls.name.valid" class="text-danger">
+          Name is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Surname</label>
+        <input type="text" class="form-control" value = {{user.userProfile.surname}} formControlName="surname" placeholder="Place for surname">
+        <small *ngIf="!orderAddForm.controls.surname.valid" class="text-danger">
+          Surname is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" class="form-control" value = {{user.userProfile.address}} formControlName="address" placeholder="Enter the address, building and apartment number.">
+        <small *ngIf="!orderAddForm.controls.address.valid" class="text-danger">
+          Address is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Phone number</label>
+        <input type="text" class="form-control" value = {{user.userProfile.phoneNumber}} formControlName="phoneNumber" placeholder="Place for phone number">
+        <small *ngIf="!orderAddForm.controls.phoneNumber.valid" class="text-danger">
+          Phone number is required (minimum 10 characters, maximum 13 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="horns">Do you want add this data to your prifile?</label>
+        <input type="checkbox" formControlName="updateProfile">
+      </div>
 
-    <button type="submit" [disabled]="!orderAddForm.valid">Make order</button>
-  </form>
+      <button type="submit" [disabled]="!orderAddForm.valid">Make order</button>
+    </form>
+  </div>
 </div>
 
 <ng-template #loading>

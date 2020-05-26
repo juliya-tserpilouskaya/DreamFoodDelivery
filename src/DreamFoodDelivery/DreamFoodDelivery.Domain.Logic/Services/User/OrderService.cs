@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Helpers;
 using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
@@ -26,14 +25,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     {
         private readonly DreamFoodDeliveryContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailSenderService _emailSender;
         private readonly IMapper _mapper;
         IDishService _dishService;
 
-        public OrderService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IDishService dishService)
+        public OrderService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IDishService dishService, IEmailSenderService emailSender)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
+            _emailSender = emailSender;
             _dishService = dishService;
         }
 
@@ -45,7 +46,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             try
             {
-                var orders = await _context.Orders.IgnoreQueryFilters().AsNoTracking().ToListAsync(cancellationToken);
+                var orders = await _context.Orders.AsNoTracking().ToListAsync(cancellationToken);
                 if (!orders.Any())
                 {
                     return Result<IEnumerable<OrderView>>.Quite<IEnumerable<OrderView>>(ExceptionConstants.ORDERS_WERE_NOT_FOUND);
@@ -184,6 +185,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
+                }
+                var users = await _userManager.GetUsersInRoleAsync("Admin");
+                foreach (var user in users)
+                {
+                    var sendEmailBefore = await _emailSender.SendEmailAsync(user.Email, EmailConstants.NEW_ORDER_SUBJECT, EmailConstants.NEW_ORDER_MESSAGE, cancellationToken);
                 }
                 return Result<OrderView>.Ok(view);
             }

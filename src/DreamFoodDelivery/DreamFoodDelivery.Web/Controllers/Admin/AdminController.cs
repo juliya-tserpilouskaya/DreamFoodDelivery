@@ -184,13 +184,11 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// <returns>Result information</returns>
         [HttpPost, Route("{identityId}/role_update")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> ChangeRoleAsync(string identityId)
+        public async Task<IActionResult> ChangeRoleAsync(string identityId, CancellationToken cancellationToken = default)
         {
             if (identityId == null)
             {
@@ -198,8 +196,37 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             try
             {
-                var result = await _adminService.ChangeRoleAsync(identityId);
-                return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                var result = await _adminService.ChangeRoleAsync(identityId, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.IsSuccess);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Confirm the user email for user
+        /// </summary>
+        /// <returns>Returns user information after email confirm</returns>
+        [HttpPost, Route("{identityId}/email/confirm")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> ConfirmUserEmail(string identityId, CancellationToken cancellationToken = default)
+        {
+            if (identityId == null)
+            {
+                return BadRequest("Invalid id");
+            }
+            try
+            {
+                var result = await _adminService.ConfirmEmailAsync(identityId, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {

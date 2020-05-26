@@ -13,10 +13,9 @@ namespace DreamFoodDelivery.Common
         public override void OnEntry(MethodExecutionArgs args)
         {
             string writePath = InitMyLogger();
-            Debug.WriteLine($"{DateTime.Now} - CLASS: {args.Method.DeclaringType.Name} \n" +
-                $"METHOD: {args.Method.Name} started.");
             string message = $"{DateTime.Now} - CLASS: {args.Method.DeclaringType.Name} \n" +
                 $"METHOD: {args.Method.Name} started.";
+            Debug.WriteLine(message);
             LogWrite(message, writePath);
             
         }
@@ -24,26 +23,21 @@ namespace DreamFoodDelivery.Common
         public override void OnExit(MethodExecutionArgs args)
         {
             string writePath = InitMyLogger();
-            Debug.WriteLine($"{DateTime.Now} - {args.ReturnValue.ToString()} \n" +
-                $"METHOD Finished.");
             string message = $"{DateTime.Now} - {args.ReturnValue.ToString()} \n" +
                 $"METHOD Finished.";
+            Debug.WriteLine(message);
             LogWrite(message, writePath);
         }
 
         public override void OnException(MethodExecutionArgs args)
         {
             string writePath = InitMyLogger();
-            Debug.WriteLine($"{DateTime.Now} - CLASS: {args.Method.DeclaringType.Name} \n" +
-                $"METHOD: {args.Method.Name} has exception: " +
-                $"\n{args.Exception.Data}\n" +
-                $"{args.Exception.Message}\n" +
-                $"{args.Exception.InnerException?.Message}");
             string message = $"{DateTime.Now} - CLASS: {args.Method.DeclaringType.Name} \n" +
                 $"METHOD: {args.Method.Name} has exception: " +
                 $"\n{args.Exception.Data}\n" +
                 $"{args.Exception.Message}\n" +
                 $"{args.Exception.InnerException?.Message}";
+            Debug.WriteLine(message);
             LogWrite(message, writePath);
         }
 

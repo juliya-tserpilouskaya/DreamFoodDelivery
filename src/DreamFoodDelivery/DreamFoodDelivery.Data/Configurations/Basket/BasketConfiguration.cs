@@ -17,12 +17,9 @@ namespace DreamFoodDelivery.Data.Configurations
 
             builder.HasOne(_ => _.User).WithOne(_ => _.Basket)
                    .HasForeignKey<UserDB>(_ => _.BasketId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
-
-            builder.Property<bool>("IsDeleted");
-            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }

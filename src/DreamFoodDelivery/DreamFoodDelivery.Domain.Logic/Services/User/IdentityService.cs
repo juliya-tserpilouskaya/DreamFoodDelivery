@@ -25,22 +25,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly TokenSecret _tokenSecret;
         private readonly IEmailSenderService _emailSender;
-        private readonly IEmailBuilder _emailConfirmation;
-        IUserService _service;
+        private readonly IEmailBuilder _emailBuilder;
+        IUserService _userService;
+        IAdminService _adminService;
 
         public IdentityService(UserManager<User> userManager,
-                               IUserService service, 
+                               IUserService userService,
+                               IAdminService adminService,
                                RoleManager<IdentityRole> roleManager, 
                                TokenSecret tokenSecret, 
                                IEmailSenderService emailSender,
-                               IEmailBuilder emailConfirmation)
+                               IEmailBuilder emailBuilder)
         {
             _userManager = userManager;
-            _service = service;
+            _userService = userService;
+            _adminService = adminService;
             _roleManager = roleManager;
             _tokenSecret = tokenSecret;
             _emailSender = emailSender;
-            _emailConfirmation = emailConfirmation;
+            _emailBuilder = emailBuilder;
         }
 
         /// <summary>
@@ -57,6 +60,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 UserName = SuperAdminData.USER_NAME,
                 PersonalDiscount = 0,
                 Role = "Admin",
+                EmailConfirmed = false
             };
             var createUser = await _userManager.CreateAsync(user, password);
             if (!createUser.Succeeded)
@@ -64,10 +68,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return Result.Fail(createUser.Errors.Select(_ => _.Description).Join("\n"));
             }
             await _userManager.AddToRoleAsync(user, user.Role);
-            var profile = await _service.CreateAccountAsyncById(user.Id, cancellationToken);
+            var profile = await _userService.CreateAccountAsyncById(user.Id, cancellationToken);
             var admin = await _userManager.FindByEmailAsync(user.Email);
-            //await _emailConfirmation.MakeConfirmMessage(admin, "http://localhost:4200/confirmation", cancellationToken);
-            await _service.ConfirmEmailAsync(admin.Id);
+            //await _emailBuilder.SendConfirmMessage(admin, "http://localhost:4200/confirmation", cancellationToken);
+            var result = await _adminService.ConfirmEmailAsync(admin.Id);
+            if (result.IsSuccess)
+            {
+                admin.EmailConfirmed = true;
+                await _userManager.UpdateAsync(admin);
+            }
             return Result.Ok();
         }
 
@@ -106,7 +115,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 Email = user.Email,
                 UserName = user.Email,
                 PersonalDiscount = 0,
-                Role = defaultRole
+                Role = defaultRole,
+                EmailConfirmed = false
             };
 
             var createUser = await _userManager.CreateAsync(newUser, user.Password);
@@ -116,13 +126,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var profile = await _service.CreateAccountAsyncById(newUser.Id, cancellationToken);
+            var profile = await _userService.CreateAccountAsyncById(newUser.Id, cancellationToken);
             var token = await GenerateToken(newUser);
             UserWithToken result = new UserWithToken()
             {
                 UserView = profile.Data,
                 UserToken = token.Data               
             };
+            await _emailBuilder.SendConfirmMessage(newUser, user.CallBackUrl, cancellationToken);
             return Result<UserWithToken>.Ok(result);
         }
 
@@ -146,7 +157,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return await Task.FromResult(Result.Quite(ExceptionConstants.WRONG_PASSWORD));
             }
 
-            var isUserDeleted = await _service.DeleteUserByIdFromIdentityAsync(user.Id, cancellationToken);
+            var isUserDeleted = await _userService.DeleteUserByIdFromIdentityAsync(user.Id, cancellationToken);
             if (isUserDeleted.IsError)
             {
                 return await Task.FromResult(Result.Fail(isUserDeleted.Message));
@@ -182,7 +193,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return Result<string>.Fail<UserWithToken>(ExceptionConstants.WRONG_PASSWORD);
             }
             
-            var profile = await _service.GetUserByIdFromIdentityAsync(user.Id, cancellationToken);
+            var profile = await _userService.GetUserByIdFromIdentityAsync(user.Id, cancellationToken);
             var token = await GenerateToken(user);
             if (profile.IsError || string.IsNullOrEmpty(token.Data))
             {

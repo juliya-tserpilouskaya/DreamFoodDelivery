@@ -10,7 +10,7 @@ namespace DreamFoodDelivery.Domain.DTO
         public string Composition { get; set; }
         public string Description { get; set; }
         public double Cost { get; set; }
-        public string Weigh { get; set; }
+        public string Weight { get; set; }
         public double Sale { get; set; }
         public HashSet<TagToAdd> TagNames { get; set; }
     }

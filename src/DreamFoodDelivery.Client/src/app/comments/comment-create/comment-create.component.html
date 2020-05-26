@@ -6,30 +6,32 @@
 </div>
 
 <div class="row justify-content-center">
-  <form  [formGroup]="reviewAddForm" novalidate (ngSubmit)="addNewReview()" #formDir="ngForm">
-    <div class="form-group">
-      <label>Headline</label>
-      <input type="text" class="form-control" formControlName="headline" placeholder="Place for headline">
-      <small *ngIf="!reviewAddForm.controls.headline.valid" class="text-danger">
-        Headline is required (minimum 3 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label>Content</label>
-      <input type="text" class="form-control" formControlName="content" placeholder="Place for content">
-      <small *ngIf="!reviewAddForm.controls.content.valid" class="text-danger">
-        Content is required (minimum 3 characters).
-      </small>
-    </div>
-    <div class="form-group">
-      <label>Rating</label>
-      <input type="number" max="5" min="0"  class="form-control" formControlName="rating" placeholder="Place for rating">
-      <small *ngIf="!reviewAddForm.controls.rating.valid" class="text-danger">
-        Select a rating.
-      </small>
-    </div>
-    <button type="submit" [disabled]="!reviewAddForm.valid">Add new review</button>
-  </form>
+  <div class="col-8 col-md-8 col-lg-8" >
+    <form  [formGroup]="reviewAddForm" novalidate (ngSubmit)="addNewReview()" #formDir="ngForm">
+      <div class="form-group">
+        <label>Headline</label>
+        <input type="text" class="form-control" formControlName="headline" placeholder="Place for headline">
+        <small *ngIf="!reviewAddForm.controls.headline.valid" class="text-danger">
+          Headline is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Content</label>
+        <input type="text" class="form-control" formControlName="content" placeholder="Place for content">
+        <small *ngIf="!reviewAddForm.controls.content.valid" class="text-danger">
+          Content is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Rating</label>
+        <input type="number" max="5" min="0"  class="form-control" formControlName="rating" placeholder="Place for rating">
+        <small *ngIf="!reviewAddForm.controls.rating.valid" class="text-danger">
+          Select a rating.
+        </small>
+      </div>
+      <button type="submit" [disabled]="!reviewAddForm.valid">Add new review</button>
+    </form>
+  </div>
 </div>
 
 <ng-template #loading>

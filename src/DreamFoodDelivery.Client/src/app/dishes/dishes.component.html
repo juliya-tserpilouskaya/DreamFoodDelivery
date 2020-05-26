@@ -9,11 +9,11 @@
       </div>
       <div *ngIf="dishes; else loading">
         <div class="card" *ngFor="let dish of dishes">
-          <h5 class="card-header">{{dish.name}}</h5>
+          <h5 class="card-header">Name: {{dish.name}}</h5>
           <div class="card-body">
             <div class="col-12 col-md-12 col-lg-12 row">
               <div class="col-4 col-md-4 col-lg-4">
-                {{dish.description}}
+                Description: {{dish.description}}
               </div>
               <div class="col-4 col-md-4 col-lg-4">
                 <div  *ngIf="mainImages[dish.id]">

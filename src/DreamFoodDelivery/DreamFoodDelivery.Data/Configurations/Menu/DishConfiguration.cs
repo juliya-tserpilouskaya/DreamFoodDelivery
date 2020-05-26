@@ -21,7 +21,7 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.Property(i => i.Name).HasColumnName("Name").IsRequired().HasMaxLength(63);
             builder.Property(i => i.Composition).HasColumnName("Сomposition").IsRequired().HasMaxLength(255);
             builder.Property(i => i.Description).HasColumnName("Description").IsRequired().HasMaxLength(255);
-            builder.Property(i => i.Weigh).HasColumnName("Weigh").IsRequired().HasMaxLength(127);
+            builder.Property(i => i.Weight).HasColumnName("Weight").IsRequired().HasMaxLength(127);
             builder.Property(i => i.Cost).HasColumnName("Cost").IsRequired();
             builder.Property(i => i.Sale).HasColumnName("Sale").IsRequired();
             builder.Property<bool>("IsDeleted");

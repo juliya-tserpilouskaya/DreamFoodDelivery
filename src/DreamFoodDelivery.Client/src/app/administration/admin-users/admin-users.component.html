@@ -5,25 +5,25 @@
         <h1 class="h2">Users</h1>
       </div>
       <div class="card" *ngFor="let item of users | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
-        <h5 class="card-header">{{item.userProfile.name}}</h5>
+        <h5 class="card-header">Name: {{item.userProfile.name}} Email: {{item.userProfile.email}}</h5>
         <div class="card-body">
           <div class="col-12 col-md-12 col-lg-12 row">
-            <div class="col-3 col-md-3 col-lg-3">
-              {{item.userProfile.email}}
+            <div class="col-4 col-md-4 col-lg-4">
+              Role: {{item.userProfile.role}}
+              <br>
+              Email confirmed: {{item.userProfile.emailConfirmed}}
             </div>
-            <div class="col-3 col-md-3 col-lg-3">
-              {{item.userProfile.role}}
-            </div>
-            <div class="col-3 col-md-3 col-lg-3">
+            <div class="col-4 col-md-4 col-lg-4">
               <a [routerLink]="['/administration/user', item.userDTO.id]">Change users details</a>
               <br>
               <a [routerLink]="['/administration/orders/user/', item.userDTO.id]">Change users orders</a>
               <br>
               <a [routerLink]="['/administration/reviews/user/', item.userDTO.id]">Change users reviews</a>
             </div>
-            <div class="col-3 col-md-3 col-lg-3">
-              <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeUser(item.userDTO.id)" type="submit">Delete</button>
-              <button class="btn btn-outline-success my-2 my-sm-0" (click)="changeRole(item.userDTO.idFromIdentity)" type="submit">Change role</button>
+            <div class="btn-group-vertical col-4 col-md-4 col-lg-4">
+              <button class="btn btn-outline-success " (click)="removeUser(item.userDTO.id)" type="submit">Delete</button>
+              <button class="btn btn-outline-success " (click)="changeRole(item.userDTO.idFromIdentity)" type="submit">Change role</button>
+              <button class="btn btn-outline-success " (click)="confirmEmail(item.userDTO.idFromIdentity)" type="submit">Confirm email</button>
             </div>
           </div>
         </div>

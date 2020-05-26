@@ -24,6 +24,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         public AuthMessageSenderOptions Options { get; }
 
+        [LoggerAttribute]
         public async Task<Result> SendEmailAsync(string email,
                                    string subject,
                                    string message,

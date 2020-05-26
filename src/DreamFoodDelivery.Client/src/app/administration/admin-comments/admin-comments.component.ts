@@ -29,9 +29,9 @@ export class AdminCommentsComponent implements OnInit {
   }
 
   removeById(id: string): void {
-    this.reviewsService.removeById(id).subscribe(data => {
-      const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
-      this.reviews.splice(indexToDelete, 1);
+    this.reviewsService.removeById(id).subscribe(data => { this.ngOnInit();
+      // const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
+      // this.reviews.splice(indexToDelete, 1);
     },
     error => {
 

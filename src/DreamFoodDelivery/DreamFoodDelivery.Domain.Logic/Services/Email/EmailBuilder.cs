@@ -22,6 +22,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _emailSender = emailSender;
         }
 
+        [LoggerAttribute]
         public async Task<Result> SendConfirmMessage(User user, string callBackUrl, CancellationToken cancellationToken = default)
         {
             var t = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -38,6 +39,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
             return await _emailSender.SendEmailAsync(emailForSending, subject, message, cancellationToken);
         }
+
+        [LoggerAttribute]
         public async Task<Result> SendEmailWithLinkAsync(string email, string subject, string link, string message, string callBackUrl = null, CancellationToken cancellationToken = default)
         {
             string finalMessage;
@@ -54,6 +57,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             return await _emailSender.SendEmailAsync(email, subject, finalMessage, cancellationToken);
         }
 
+        [LoggerAttribute]
         public async Task<Result> SendPasswordResetMessageAsync(User user, string callBackUrl, CancellationToken cancellationToken = default)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);

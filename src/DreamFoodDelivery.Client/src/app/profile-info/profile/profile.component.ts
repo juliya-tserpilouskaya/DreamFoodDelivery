@@ -13,6 +13,9 @@ export class ProfileComponent implements OnInit {
   user: UserView;
   userDTO: UserDTO;
   userProfile: UserProfile;
+  isNotFillProfile = false;
+  isEmailConfirm = false;
+  message: string;
 
   constructor(
     private authService: AuthService,
@@ -25,6 +28,13 @@ export class ProfileComponent implements OnInit {
     this.userService.getProfile().subscribe(data => {this.user = data;
                                                      this.userDTO = data.userDTO;
                                                      this.userProfile = data.userProfile;
+                                                     if (this.userProfile.address == null || this.userProfile.email == null
+                                                      || this.userProfile.name == null || this.userProfile.surname == null)
+                                                     {
+                                                      this.isNotFillProfile = true;
+                                                      this.message = 'Please, fill your profile. You can do this here, or with order creating.';
+                                                     }
+                                                     this.isEmailConfirm = this.userProfile.emailConfirmed;
                                                     },
                                                     error => {
                                                       // if (error.status === 500){
@@ -47,6 +57,8 @@ export class ProfileComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
+
+  // TODO:  is email confirm
 
   get isAuthenticated(): boolean {
     return this.authService.isLoggedIn;

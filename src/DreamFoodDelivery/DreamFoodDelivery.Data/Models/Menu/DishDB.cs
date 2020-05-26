@@ -11,7 +11,7 @@ namespace DreamFoodDelivery.Data.Models
         public string Composition { get; set; }
         public string Description { get; set; }
         public double? Cost { get; set; }
-        public string Weigh { get; set; }
+        public string Weight { get; set; }
         public double? Sale { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }

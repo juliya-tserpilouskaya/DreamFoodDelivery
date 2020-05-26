@@ -12,9 +12,9 @@ namespace DreamFoodDelivery.Domain.View
         public string Composition { get; set; }
         public string Description { get; set; }
         public double Cost { get; set; }
-        public string Weigh { get; set; }
+        public string Weight { get; set; }
         public double Sale { get; set; }
-        public double FinaleCost { get; set; }
+        public double TotalCost { get; set; }
         public DateTime? Added { get; set; }
         public DateTime? Modified { get; set; }
         public HashSet<TagToAdd> TagList { get; set; }

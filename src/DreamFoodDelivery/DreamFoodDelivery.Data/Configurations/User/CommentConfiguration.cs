@@ -11,7 +11,7 @@ namespace DreamFoodDelivery.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<CommentDB> builder)
         {
-            builder.ToTable("Comment");
+            builder.ToTable("Review");
             builder.HasKey(i => i.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 

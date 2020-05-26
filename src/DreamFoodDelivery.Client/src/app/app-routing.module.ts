@@ -74,7 +74,8 @@ const routes: Routes = [
   { path: 'dish/:id/details', component: DishUpdateComponent, canActivate: [AuthGuard]},
   { path: 'dish/create', component: DishAddNewComponent, canActivate: [AuthGuard]},
 
-  { path: '', component: HomeComponent, pathMatch: 'full' },
+  { path: 'about', component: HomeComponent },
+  { path: '', redirectTo: '/menu', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 ];
 

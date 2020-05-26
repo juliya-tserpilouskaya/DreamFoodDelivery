@@ -40,5 +40,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="idFromIdentity">Existing user ID</param>
         /// <param name="cancellationToken"></param>
         Task<Result> ChangeRoleAsync(string idFromIdentity, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default);
     }
 }
