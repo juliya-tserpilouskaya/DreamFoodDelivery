@@ -17,22 +17,17 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<IEnumerable<DishView>>> GetAllAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///  Asynchronously get dish by dish Id. Id must be verified 
+        /// Get all dishes by request
         /// </summary>
-        /// <param name="dishId">ID of existing dish</param>
-        Task<Result<DishView>> GetByIdAsync(string dishId, CancellationToken cancellationToken = default);
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<Result<IEnumerable<DishView>>> GetAllDishesByRequestAsync(RequestParameters request, CancellationToken cancellationToken);
 
         /// <summary>
         ///  Asynchronously returns dish by nam. Id must be verified 
         /// </summary>
         /// <param name="name">Dish name</param>
         Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-
-        ///// <summary>
-        /////  Asynchronously returns dish by category. Id must be verified 
-        ///// </summary>
-        ///// <param name="categoryString">Dish category</param>
-        //Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString, CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 

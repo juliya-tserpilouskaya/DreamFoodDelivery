@@ -15,7 +15,6 @@ using DreamFoodDelivery.Domain.View;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
-    // !!! Obsolete controller. If necessary, review their return data types and status codes!!!
     /// <summary>
     /// Work with tags
     /// </summary>
@@ -30,25 +29,21 @@ namespace DreamFoodDelivery.Web.Controllers
             _tagService = tagService;
         }
 
-
         /// <summary>
-        /// Get all tags
-        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
+        /// Get all tags from DB
         /// </summary>
-        /// <returns>Returns all tags stored</returns>
-        [ObsoleteAttribute]
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<TagView>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllTagsAsync(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _tagService.GetAllAsync(cancellationToken);
+                var result = await _tagService.GetAllTagsAsync(cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : NoContent();

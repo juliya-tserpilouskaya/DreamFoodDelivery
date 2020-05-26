@@ -37,7 +37,8 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         /// Make admin from user or vice versa
         /// </summary>
-        /// <param name="id"></param>
-        Task<Result> ChangeRoleAsync(string id);
+        /// <param name="idFromIdentity">Existing user ID</param>
+        /// <param name="cancellationToken"></param>
+        Task<Result> ChangeRoleAsync(string idFromIdentity, CancellationToken cancellationToken = default);
     }
 }

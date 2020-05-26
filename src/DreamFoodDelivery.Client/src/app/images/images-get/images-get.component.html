@@ -1,3 +1,4 @@
+<button *ngIf="isAdmin" class="btn btn-outline-secondary border btn-sm" (click)="show()">Click here after uploading images</button>
 <div *ngIf="currentImage">
   <div id="carouselExampleFade" class="carousel slide carousel-fade m-3" data-ride="carousel">
     <div class="carousel-inner">
@@ -18,14 +19,14 @@
   <div class="form-group btn-group m-2">
     <div *ngFor="let imageNumber of imagesCount">
         <button [ngClass]="imageNumber === currentImageNumber
-          ? 'btn btn-success border btn-sm custom'
-          : 'btn btn-warning border btn-sm custom'"
+          ? 'btn btn-outline-success border btn-sm custom'
+          : 'btn btn-outline-primary border btn-sm custom'"
           (click)="getImage(imageNumber)"
           >{{imageNumber}}</button>
     </div>
 
-    <button *ngIf="isAdmin" class="btn btn-danger border btn-sm" (click)="deleteImage()">Delete Image</button>
+    <button *ngIf="isAdmin" class="btn btn-outline-dark border btn-sm" (click)="deleteImage()">Delete Image</button>
   </div>
 </div>
-<button *ngIf="isAdmin" class="btn btn-success border btn-sm" (click)="show()">Show Updates</button>
+
 

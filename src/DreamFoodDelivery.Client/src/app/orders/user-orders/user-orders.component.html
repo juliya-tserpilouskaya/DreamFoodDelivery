@@ -1,3 +1,4 @@
+<h3>Orders:</h3>
 <div class="card" *ngFor="let item of orders">
   <h5 class="card-header">{{item.name}} {{item.surname}}</h5>
   <div class="card-body">
@@ -13,7 +14,8 @@
         <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
         <a [routerLink]="['/order', item.id, 'details']">Change orders details</a>
         <br>
-        <a *ngIf="item.status == 'Delivered'" [routerLink]="['/comment/create/for/', item.id]">Add comment</a>
+        <a *ngIf="item.status == 'Delivered' && item.commentId == null" [routerLink]="['/review/create/for/', item.id]">Add review</a>
+        <a *ngIf="item.status == 'Delivered' && item.commentId != null" [routerLink]="['/review', item.commentId, 'details']">Update review</a>
       </div>
     </div>
   </div>

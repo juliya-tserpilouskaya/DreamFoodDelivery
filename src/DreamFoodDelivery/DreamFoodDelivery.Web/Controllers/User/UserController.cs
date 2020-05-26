@@ -147,6 +147,7 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Confirm the user email - send token
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <returns>Result information</returns>
         [HttpPost, Route("email/send_token")]
@@ -155,6 +156,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
+        [ObsoleteAttribute]
         public async Task<IActionResult> ConfirmUserEmailSend()
         {
             try
@@ -170,6 +172,7 @@ namespace DreamFoodDelivery.Web.Controllers
 
         /// <summary>
         /// Confirm the user email - get token
+        /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="token">Token from email</param>
         /// <returns>Returns user information after email confirm</returns>
@@ -180,6 +183,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
+        [ObsoleteAttribute]
         public async Task<IActionResult> ConfirmUserEmailGet([FromBody]string token, CancellationToken cancellationToken = default)
         {
             if (token is null)
@@ -223,6 +227,101 @@ namespace DreamFoodDelivery.Web.Controllers
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
                      : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("confirm/email")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> ConfirmEmail([FromQuery]string userId, [FromQuery] string token)
+        {
+            if (userId == null || token == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var result = await _userService.ConfirmEmailByLinkAsync(userId, token);
+
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Send password reset email
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("recovery/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> ForgotPasswordAsync([FromBody]PasswordRecoveryRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request is null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _userService.ForgotPasswordAsync(request, cancellationToken);
+
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpDelete]
+        [Route("reset/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> ResetPasswordAsync([FromBody]PasswordRecoveryInfo model, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _userService.ResetPasswordAsync(model, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {

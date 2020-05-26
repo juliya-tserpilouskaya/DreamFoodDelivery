@@ -23,6 +23,7 @@ using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Domain.Logic.Validation;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using DreamFoodDelivery.Common.Ñonstants;
 
 namespace DreamFoodDelivery.Web
 {
@@ -70,14 +71,14 @@ namespace DreamFoodDelivery.Web
             {
                 config.PostProcess = document =>
                 {
-                    document.Info.Title = "~Dream food for you~";
-                    document.Info.Description = "Intership ASP.NET Core web API";
-                    document.Info.Version = "v0.1";
+                    document.Info.Title = ApiDocConstants.TITLE;
+                    document.Info.Description = ApiDocConstants.DESCRIPTION;
+                    document.Info.Version = ApiDocConstants.VERSION;
                     document.Info.Contact = new NSwag.OpenApiContact
                     {
-                        Name = "Yuliya Tserpilouskaya",
-                        Email = "yuliya.tserpilouskaya@gmail.com",
-                        Url = string.Empty
+                        Name = ApiDocConstants.CONTACT_NAME,
+                        Email = ApiDocConstants.CONTACT_EMAIL,
+                        Url = ApiDocConstants.CONTACT_URL
                     };
                 };
                 config.DocumentProcessors.Add(
@@ -112,6 +113,7 @@ namespace DreamFoodDelivery.Web
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<SearchValidation>();
             });
+
             services.AddAutoMapper(typeof(Startup).Assembly);
 
             services.AddCors(options =>
@@ -122,11 +124,6 @@ namespace DreamFoodDelivery.Web
                         .AllowAnyHeader()
                         .AllowCredentials()
                         .SetIsOriginAllowedToAllowWildcardSubdomains());
-
-                //options.AddPolicy("CorsPolicy",
-                //    builder => builder.AllowAnyOrigin()
-                //        .AllowAnyMethod()
-                //        .AllowAnyHeader());
             });
         }
 

@@ -11,18 +11,18 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class CommentCreateComponent implements OnInit {
   idFromURL = '';
-  comment: CommentView;
-  commentAddForm: FormGroup;
+  review: CommentView;
+  reviewAddForm: FormGroup;
 
   constructor(
-    private commentService: CommentService,
+    private reviewService: CommentService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
     public fb: FormBuilder,
   ) {
     route.params.subscribe(params => this.idFromURL = params.orderId);
-    this.commentAddForm = this.fb.group({
+    this.reviewAddForm = this.fb.group({
       orderId: [''],
       headline: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       content: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(511)]],
@@ -34,12 +34,12 @@ export class CommentCreateComponent implements OnInit {
     console.log (this.idFromURL);
   }
 
-  addNewComment(): void {
-    if (this.commentAddForm.valid) {
-      this.commentAddForm.value.orderId = this.idFromURL;
-      this.commentService.create(this.commentAddForm.value)
-        .subscribe(data => { this.comment = data;
-                             this.router.navigate(['/comment', this.comment.id, 'details']);
+  addNewReview(): void {
+    if (this.reviewAddForm.valid) {
+      this.reviewAddForm.value.orderId = this.idFromURL;
+      this.reviewService.create(this.reviewAddForm.value)
+        .subscribe(data => { this.review = data;
+                             this.router.navigate(['/review', data.id, 'details']);
                             },
                             error => {
                               if (error.status === 500){

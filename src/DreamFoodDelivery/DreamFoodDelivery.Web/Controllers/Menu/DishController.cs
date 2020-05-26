@@ -60,6 +60,36 @@ namespace DreamFoodDelivery.Web.Controllers.Menu
         }
 
         /// <summary>
+        /// Get dish by id
+        /// </summary>
+        /// <param name="id">Dish id</param>
+        /// <returns>Returns ID matching dish</returns>
+        [HttpGet, Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DishView))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _dishService.GetByIdAsync(id, cancellationToken);
+                return result == null ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
         /// Update dish with tags
         /// </summary>
         /// <param name="dish">Dish to update</param>

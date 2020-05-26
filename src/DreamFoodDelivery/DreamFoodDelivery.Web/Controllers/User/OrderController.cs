@@ -12,12 +12,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
     /// <summary>
     /// Work with orders
     /// </summary>
+    //[Produces("application/json")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
@@ -37,6 +39,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all orders stored</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet, Route("all")]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status200OK, typeof(IEnumerable<OrderView>))]
+        //[ProducesResponseType(typeof(IEnumerable<OrderView>), StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<OrderView>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -123,8 +128,14 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="order">New order to add</param>
         /// <returns>Order info after adding</returns>
         [HttpPost, Route("")]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status200OK, typeof(IEnumerable<OrderView>))]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status400BadRequest, typeof(ProblemDetails))]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status401Unauthorized, typeof(ProblemDetails))]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status403Forbidden, typeof(ProblemDetails), Description = "Please, confirm your email")]
+        //[NSwag.Annotations.SwaggerResponse(StatusCodes.Status500InternalServerError, typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
@@ -144,7 +155,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 }
                 else
                 {
-                    return StatusCode(StatusCodes.Status403Forbidden, "Confirm your email");
+                    //return StatusCode(StatusCodes.Status500InternalServerError, "Confirm your email");
+                    //BadRequest("Confirm your email");
+                    //Unauthorized("Confirm your email");
+                    //StatusCode(403, "Confirm your email");
+                    return StatusCode(StatusCodes.Status403Forbidden);
                 }
             }
             catch (InvalidOperationException ex)

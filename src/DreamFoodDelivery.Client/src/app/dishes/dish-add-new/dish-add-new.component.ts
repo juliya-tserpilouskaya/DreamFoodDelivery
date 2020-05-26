@@ -26,7 +26,7 @@ export class DishAddNewComponent implements OnInit {
       composition: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       cost: ['', [Validators.required]],
-      weigh: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(250)]],
+      weigh: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]],
       sale: ['', [Validators.required]],
       tagNames: this.fb.array([
           this.initTag(), ])

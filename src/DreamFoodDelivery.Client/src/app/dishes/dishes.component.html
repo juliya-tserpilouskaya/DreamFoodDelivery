@@ -16,7 +16,9 @@
                 {{dish.description}}
               </div>
               <div class="col-4 col-md-4 col-lg-4">
-                {{dish.modified}}
+                <div  *ngIf="mainImages[dish.id]">
+                  <img [src]="mainImages[dish.id]" class="card-img">
+                </div>
               </div>
 
               <div class="col-4 col-md-4 col-lg-4">

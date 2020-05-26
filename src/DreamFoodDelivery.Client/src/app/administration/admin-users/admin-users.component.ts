@@ -11,6 +11,9 @@ export class AdminUsersComponent implements OnInit {
   users: UserView[] = [];
   usersDTO: UserDTO[] = [];
 
+  page = 2;
+  pageSize = 5;
+
   constructor(
     private adminService: AdminService,
     public router: Router,
@@ -53,7 +56,8 @@ export class AdminUsersComponent implements OnInit {
 
   changeRole(idIdentity: string): void {
     this.adminService.changeRole(idIdentity).subscribe(data => {
-      window.location.reload();
+      this.ngOnInit();
+      // window.location.reload();
     },
     error => {
       if (error.status === 500){

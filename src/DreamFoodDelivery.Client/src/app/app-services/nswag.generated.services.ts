@@ -338,36 +338,37 @@ export class MenuService {
         return _observableOf<DishView[]>(<any>null);
     }
 
-    getById(id: string | null): Observable<DishView> {
-        let url_ = this.baseUrl + "/api/Menu/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    getAllDishesByRequest(request: RequestParameters): Observable<DishView[]> {
+        let url_ = this.baseUrl + "/api/Menu/request";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(request);
+
         let options_ : any = {
+            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetById(response_);
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllDishesByRequest(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetById(<any>response_);
+                    return this.processGetAllDishesByRequest(<any>response_);
                 } catch (e) {
-                    return <Observable<DishView>><any>_observableThrow(e);
+                    return <Observable<DishView[]>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<DishView>><any>_observableThrow(response_);
+                return <Observable<DishView[]>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetById(response: HttpResponseBase): Observable<DishView> {
+    protected processGetAllDishesByRequest(response: HttpResponseBase): Observable<DishView[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -378,12 +379,12 @@ export class MenuService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = DishView.fromJS(resultData200);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(DishView.fromJS(item));
+            }
             return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -401,7 +402,7 @@ export class MenuService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<DishView>(<any>null);
+        return _observableOf<DishView[]>(<any>null);
     }
 
     /**
@@ -622,7 +623,7 @@ export class MenuService {
     }
 
     /**
-     * @param tagName (optional)
+     * @param tagName (optional) 
      * @deprecated
      */
     getByTagIndex(tagName: string | null | undefined, tagIndex: string): Observable<DishView[]> {
@@ -709,10 +710,7 @@ export class TagService {
         this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
     }
 
-    /**
-     * @deprecated
-     */
-    getAll(): Observable<TagView[]> {
+    getAllTags(): Observable<TagView[]> {
         let url_ = this.baseUrl + "/api/Tag";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -725,11 +723,11 @@ export class TagService {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
+            return this.processGetAllTags(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAll(<any>response_);
+                    return this.processGetAllTags(<any>response_);
                 } catch (e) {
                     return <Observable<TagView[]>><any>_observableThrow(e);
                 }
@@ -738,7 +736,7 @@ export class TagService {
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<TagView[]> {
+    protected processGetAllTags(response: HttpResponseBase): Observable<TagView[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -759,13 +757,6 @@ export class TagService {
         } else if (status === 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result403: any = null;
-            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result403 = ProblemDetails.fromJS(resultData403);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1041,7 +1032,7 @@ export class CommentService {
         this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
     }
 
-    getAll(request: PageRequest): Observable<PageResponseOfCommentView> {
+    getAll(request: PageRequest): Observable<PageResponseOfCommentForUsersView> {
         let url_ = this.baseUrl + "/api/Comment/all";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1064,14 +1055,14 @@ export class CommentService {
                 try {
                     return this.processGetAll(<any>response_);
                 } catch (e) {
-                    return <Observable<PageResponseOfCommentView>><any>_observableThrow(e);
+                    return <Observable<PageResponseOfCommentForUsersView>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<PageResponseOfCommentView>><any>_observableThrow(response_);
+                return <Observable<PageResponseOfCommentForUsersView>><any>_observableThrow(response_);
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<PageResponseOfCommentView> {
+    protected processGetAll(response: HttpResponseBase): Observable<PageResponseOfCommentForUsersView> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1082,7 +1073,7 @@ export class CommentService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PageResponseOfCommentView.fromJS(resultData200);
+            result200 = PageResponseOfCommentForUsersView.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status === 204) {
@@ -1105,7 +1096,74 @@ export class CommentService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<PageResponseOfCommentView>(<any>null);
+        return _observableOf<PageResponseOfCommentForUsersView>(<any>null);
+    }
+
+    getAllAdmin(): Observable<CommentView[]> {
+        let url_ = this.baseUrl + "/api/Comment/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllAdmin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllAdmin(<any>response_);
+                } catch (e) {
+                    return <Observable<CommentView[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CommentView[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllAdmin(response: HttpResponseBase): Observable<CommentView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(CommentView.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CommentView[]>(<any>null);
     }
 
     removeAll(): Observable<void> {
@@ -1753,7 +1811,7 @@ export class IdentityService {
         return _observableOf<UserWithToken>(<any>null);
     }
 
-    login(user: UserRegistration): Observable<UserWithToken> {
+    login(user: UserLoginData): Observable<UserWithToken> {
         let url_ = this.baseUrl + "/api/Identity/login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1867,7 +1925,7 @@ export class IdentityService {
         return _observableOf<void>(<any>null);
     }
 
-    delete(user: UserRegistration): Observable<void> {
+    delete(user: UserLoginData): Observable<void> {
         let url_ = this.baseUrl + "/api/Identity/delete";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2353,6 +2411,13 @@ export class OrderService {
             let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 401) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3091,6 +3156,9 @@ export class UserService {
         return _observableOf<UserView>(<any>null);
     }
 
+    /**
+     * @deprecated
+     */
     confirmUserEmailSend(): Observable<void> {
         let url_ = this.baseUrl + "/api/User/email/send_token";
         url_ = url_.replace(/[?&]$/, "");
@@ -3153,6 +3221,9 @@ export class UserService {
         return _observableOf<void>(<any>null);
     }
 
+    /**
+     * @deprecated
+     */
     confirmUserEmailGet(token: string): Observable<void> {
         let url_ = this.baseUrl + "/api/User/email/get_token";
         url_ = url_.replace(/[?&]$/, "");
@@ -3280,6 +3351,183 @@ export class UserService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    confirmEmail(userId: string | null | undefined, token: string | null | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/User/confirm/email?";
+        if (userId !== undefined)
+            url_ += "userId=" + encodeURIComponent("" + userId) + "&";
+        if (token !== undefined)
+            url_ += "token=" + encodeURIComponent("" + token) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processConfirmEmail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processConfirmEmail(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processConfirmEmail(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    forgotPassword(request: PasswordRecoveryRequest): Observable<void> {
+        let url_ = this.baseUrl + "/api/User/recovery/password";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processForgotPassword(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processForgotPassword(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processForgotPassword(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    resetPassword(model: PasswordRecoveryInfo): Observable<void> {
+        let url_ = this.baseUrl + "/api/User/reset/password";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(model);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processResetPassword(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processResetPassword(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processResetPassword(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3511,6 +3759,72 @@ export class DishService {
         return _observableOf<void>(<any>null);
     }
 
+    getById(id: string | null): Observable<DishView> {
+        let url_ = this.baseUrl + "/api/Dish/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(<any>response_);
+                } catch (e) {
+                    return <Observable<DishView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<DishView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<DishView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = DishView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<DishView>(<any>null);
+    }
+
     removeById(id: string | null): Observable<void> {
         let url_ = this.baseUrl + "/api/Dish/{id}";
         if (id === undefined || id === null)
@@ -3578,148 +3892,6 @@ export class DishService {
             }));
         }
         return _observableOf<void>(<any>null);
-    }
-}
-
-@Injectable()
-export class SearchService {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
-    }
-
-    getAllTags(): Observable<TagView[]> {
-        let url_ = this.baseUrl + "/api/Search/tags";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllTags(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllTags(<any>response_);
-                } catch (e) {
-                    return <Observable<TagView[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<TagView[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAllTags(response: HttpResponseBase): Observable<TagView[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(TagView.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<TagView[]>(<any>null);
-    }
-
-    getAllDishesByRequest(request: RequestParameters): Observable<DishView[]> {
-        let url_ = this.baseUrl + "/api/Search/request";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllDishesByRequest(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllDishesByRequest(<any>response_);
-                } catch (e) {
-                    return <Observable<DishView[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<DishView[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAllDishesByRequest(response: HttpResponseBase): Observable<DishView[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(DishView.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<DishView[]>(<any>null);
     }
 }
 
@@ -4537,7 +4709,7 @@ export class BasketView implements IBasketView {
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
         data["basketCost"] = this.basketCost !== undefined ? this.basketCost : <any>null;
         data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4618,7 +4790,7 @@ export class DishView implements IDishView {
                 data["tagList"].push(item.toJSON());
         }
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4665,7 +4837,7 @@ export class TagToAdd implements ITagToAdd {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4728,7 +4900,7 @@ export class ProblemDetails implements IProblemDetails {
                     data["extensions"][key] = this.extensions[key] !== undefined ? this.extensions[key] : <any>null;
             }
         }
-        return data;
+        return data; 
     }
 }
 
@@ -4772,13 +4944,73 @@ export class DishToBasketAdd implements IDishToBasketAdd {
         data = typeof data === 'object' ? data : {};
         data["dishId"] = this.dishId !== undefined ? this.dishId : <any>null;
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data;
+        return data; 
     }
 }
 
 export interface IDishToBasketAdd {
     dishId?: string | null;
     quantity?: number;
+}
+
+export class RequestParameters implements IRequestParameters {
+    request?: string | null;
+    tagsNames?: string[] | null;
+    onSale?: boolean;
+    lowerPrice?: number;
+    upperPrice?: number;
+
+    constructor(data?: IRequestParameters) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.request = _data["request"] !== undefined ? _data["request"] : <any>null;
+            if (Array.isArray(_data["tagsNames"])) {
+                this.tagsNames = [] as any;
+                for (let item of _data["tagsNames"])
+                    this.tagsNames!.push(item);
+            }
+            this.onSale = _data["onSale"] !== undefined ? _data["onSale"] : <any>null;
+            this.lowerPrice = _data["lowerPrice"] !== undefined ? _data["lowerPrice"] : <any>null;
+            this.upperPrice = _data["upperPrice"] !== undefined ? _data["upperPrice"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): RequestParameters {
+        data = typeof data === 'object' ? data : {};
+        let result = new RequestParameters();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["request"] = this.request !== undefined ? this.request : <any>null;
+        if (Array.isArray(this.tagsNames)) {
+            data["tagsNames"] = [];
+            for (let item of this.tagsNames)
+                data["tagsNames"].push(item);
+        }
+        data["onSale"] = this.onSale !== undefined ? this.onSale : <any>null;
+        data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
+        data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
+        return data; 
+    }
+}
+
+export interface IRequestParameters {
+    request?: string | null;
+    tagsNames?: string[] | null;
+    onSale?: boolean;
+    lowerPrice?: number;
+    upperPrice?: number;
 }
 
 export class DishByCost implements IDishByCost {
@@ -4812,7 +5044,7 @@ export class DishByCost implements IDishByCost {
         data = typeof data === 'object' ? data : {};
         data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
         data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4852,7 +5084,7 @@ export class TagView implements ITagView {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4892,7 +5124,7 @@ export class TagToUpdate implements ITagToUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4901,14 +5133,14 @@ export interface ITagToUpdate {
     tagName?: string | null;
 }
 
-export class PageResponseOfCommentView implements IPageResponseOfCommentView {
-    data?: CommentView[] | null;
+export class PageResponseOfCommentForUsersView implements IPageResponseOfCommentForUsersView {
+    data?: CommentForUsersView[] | null;
     pageNumber?: number;
     totalPages?: number;
     hasNextPage?: boolean;
     hasPreviousPage?: boolean;
 
-    constructor(data?: IPageResponseOfCommentView) {
+    constructor(data?: IPageResponseOfCommentForUsersView) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4922,7 +5154,7 @@ export class PageResponseOfCommentView implements IPageResponseOfCommentView {
             if (Array.isArray(_data["data"])) {
                 this.data = [] as any;
                 for (let item of _data["data"])
-                    this.data!.push(CommentView.fromJS(item));
+                    this.data!.push(CommentForUsersView.fromJS(item));
             }
             this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
             this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
@@ -4931,9 +5163,9 @@ export class PageResponseOfCommentView implements IPageResponseOfCommentView {
         }
     }
 
-    static fromJS(data: any): PageResponseOfCommentView {
+    static fromJS(data: any): PageResponseOfCommentForUsersView {
         data = typeof data === 'object' ? data : {};
-        let result = new PageResponseOfCommentView();
+        let result = new PageResponseOfCommentForUsersView();
         result.init(data);
         return result;
     }
@@ -4949,16 +5181,108 @@ export class PageResponseOfCommentView implements IPageResponseOfCommentView {
         data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
         data["hasNextPage"] = this.hasNextPage !== undefined ? this.hasNextPage : <any>null;
         data["hasPreviousPage"] = this.hasPreviousPage !== undefined ? this.hasPreviousPage : <any>null;
-        return data;
+        return data; 
     }
 }
 
-export interface IPageResponseOfCommentView {
-    data?: CommentView[] | null;
+export interface IPageResponseOfCommentForUsersView {
+    data?: CommentForUsersView[] | null;
     pageNumber?: number;
     totalPages?: number;
     hasNextPage?: boolean;
     hasPreviousPage?: boolean;
+}
+
+export class CommentForUsersView implements ICommentForUsersView {
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    name?: string | null;
+    surname?: string | null;
+
+    constructor(data?: ICommentForUsersView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): CommentForUsersView {
+        data = typeof data === 'object' ? data : {};
+        let result = new CommentForUsersView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
+        return data; 
+    }
+}
+
+export interface ICommentForUsersView {
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    name?: string | null;
+    surname?: string | null;
+}
+
+export class PageRequest implements IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IPageRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PageRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PageRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        return data; 
+    }
+}
+
+export interface IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
 }
 
 export class CommentView implements ICommentView {
@@ -5013,7 +5337,7 @@ export class CommentView implements ICommentView {
         data["content"] = this.content !== undefined ? this.content : <any>null;
         data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>null;
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5107,7 +5431,7 @@ export class OrderView implements IOrderView {
         data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>null;
         data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>null;
         data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5127,46 +5451,6 @@ export interface IOrderView {
     orderTime?: Date | null;
     deliveryTime?: Date | null;
     paymentTime?: Date | null;
-}
-
-export class PageRequest implements IPageRequest {
-    pageNumber?: number;
-    pageSize?: number;
-
-    constructor(data?: IPageRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
-            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): PageRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new PageRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
-        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
-        return data;
-    }
-}
-
-export interface IPageRequest {
-    pageNumber?: number;
-    pageSize?: number;
 }
 
 export class CommentToAdd implements ICommentToAdd {
@@ -5206,7 +5490,7 @@ export class CommentToAdd implements ICommentToAdd {
         data["headline"] = this.headline !== undefined ? this.headline : <any>null;
         data["rating"] = this.rating !== undefined ? this.rating : <any>null;
         data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5254,7 +5538,7 @@ export class CommentToUpdate implements ICommentToUpdate {
         data["headline"] = this.headline !== undefined ? this.headline : <any>null;
         data["rating"] = this.rating !== undefined ? this.rating : <any>null;
         data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5296,7 +5580,7 @@ export class UserWithToken implements IUserWithToken {
         data = typeof data === 'object' ? data : {};
         data["userToken"] = this.userToken !== undefined ? this.userToken : <any>null;
         data["userView"] = this.userView ? this.userView.toJSON() : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5336,7 +5620,7 @@ export class UserView implements IUserView {
         data = typeof data === 'object' ? data : {};
         data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>null;
         data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5379,7 +5663,7 @@ export class UserDTO implements IUserDTO {
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["basketId"] = this.basketId !== undefined ? this.basketId : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5438,7 +5722,7 @@ export class UserProfile implements IUserProfile {
         data["login"] = this.login !== undefined ? this.login : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5456,8 +5740,52 @@ export interface IUserProfile {
 export class UserRegistration implements IUserRegistration {
     email!: string;
     password!: string;
+    callBackUrl?: string | null;
 
     constructor(data?: IUserRegistration) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
+            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
+            this.callBackUrl = _data["callBackUrl"] !== undefined ? _data["callBackUrl"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): UserRegistration {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRegistration();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email !== undefined ? this.email : <any>null;
+        data["password"] = this.password !== undefined ? this.password : <any>null;
+        data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
+        return data; 
+    }
+}
+
+export interface IUserRegistration {
+    email: string;
+    password: string;
+    callBackUrl?: string | null;
+}
+
+export class UserLoginData implements IUserLoginData {
+    email!: string;
+    password!: string;
+
+    constructor(data?: IUserLoginData) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -5473,9 +5801,9 @@ export class UserRegistration implements IUserRegistration {
         }
     }
 
-    static fromJS(data: any): UserRegistration {
+    static fromJS(data: any): UserLoginData {
         data = typeof data === 'object' ? data : {};
-        let result = new UserRegistration();
+        let result = new UserLoginData();
         result.init(data);
         return result;
     }
@@ -5484,11 +5812,11 @@ export class UserRegistration implements IUserRegistration {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
-        return data;
+        return data; 
     }
 }
 
-export interface IUserRegistration {
+export interface IUserLoginData {
     email: string;
     password: string;
 }
@@ -5524,7 +5852,7 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5573,7 +5901,7 @@ export class OrderToAdd implements IOrderToAdd {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5625,7 +5953,7 @@ export class OrderToUpdate implements IOrderToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5668,7 +5996,7 @@ export class OrderStatus implements IOrderStatus {
         data = typeof data === 'object' ? data : {};
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
         data["statusName"] = this.statusName !== undefined ? this.statusName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5714,7 +6042,7 @@ export class UserToUpdate implements IUserToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5727,7 +6055,7 @@ export interface IUserToUpdate {
 
 export class UserEmailToChange implements IUserEmailToChange {
     idFromIdentity?: string | null;
-    newEmail?: string | null;
+    newEmail!: string;
 
     constructor(data?: IUserEmailToChange) {
         if (data) {
@@ -5756,13 +6084,13 @@ export class UserEmailToChange implements IUserEmailToChange {
         data = typeof data === 'object' ? data : {};
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["newEmail"] = this.newEmail !== undefined ? this.newEmail : <any>null;
-        return data;
+        return data; 
     }
 }
 
 export interface IUserEmailToChange {
     idFromIdentity?: string | null;
-    newEmail?: string | null;
+    newEmail: string;
 }
 
 export class UserPasswordToChange implements IUserPasswordToChange {
@@ -5799,7 +6127,7 @@ export class UserPasswordToChange implements IUserPasswordToChange {
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["currentPassword"] = this.currentPassword !== undefined ? this.currentPassword : <any>null;
         data["newPassword"] = this.newPassword !== undefined ? this.newPassword : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5807,6 +6135,90 @@ export interface IUserPasswordToChange {
     idFromIdentity?: string | null;
     currentPassword?: string | null;
     newPassword?: string | null;
+}
+
+export class PasswordRecoveryRequest implements IPasswordRecoveryRequest {
+    email!: string;
+    callBackUrl?: string | null;
+
+    constructor(data?: IPasswordRecoveryRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"] !== undefined ? _data["email"] : <any>null;
+            this.callBackUrl = _data["callBackUrl"] !== undefined ? _data["callBackUrl"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PasswordRecoveryRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PasswordRecoveryRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email !== undefined ? this.email : <any>null;
+        data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
+        return data; 
+    }
+}
+
+export interface IPasswordRecoveryRequest {
+    email: string;
+    callBackUrl?: string | null;
+}
+
+export class PasswordRecoveryInfo implements IPasswordRecoveryInfo {
+    password!: string;
+    callBackUrl!: string;
+    token!: string;
+
+    constructor(data?: IPasswordRecoveryInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.password = _data["password"] !== undefined ? _data["password"] : <any>null;
+            this.callBackUrl = _data["callBackUrl"] !== undefined ? _data["callBackUrl"] : <any>null;
+            this.token = _data["token"] !== undefined ? _data["token"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PasswordRecoveryInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new PasswordRecoveryInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["password"] = this.password !== undefined ? this.password : <any>null;
+        data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
+        data["token"] = this.token !== undefined ? this.token : <any>null;
+        return data; 
+    }
+}
+
+export interface IPasswordRecoveryInfo {
+    password: string;
+    callBackUrl: string;
+    token: string;
 }
 
 export class DishToAdd implements IDishToAdd {
@@ -5863,7 +6275,7 @@ export class DishToAdd implements IDishToAdd {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
@@ -5934,7 +6346,7 @@ export class DishToUpdate implements IDishToUpdate {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
@@ -5947,66 +6359,6 @@ export interface IDishToUpdate {
     weigh?: string | null;
     sale?: number;
     tagNames?: TagToAdd[] | null;
-}
-
-export class RequestParameters implements IRequestParameters {
-    request?: string | null;
-    tagsNames?: string[] | null;
-    onSale?: boolean;
-    lowerPrice?: number;
-    upperPrice?: number;
-
-    constructor(data?: IRequestParameters) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.request = _data["request"] !== undefined ? _data["request"] : <any>null;
-            if (Array.isArray(_data["tagsNames"])) {
-                this.tagsNames = [] as any;
-                for (let item of _data["tagsNames"])
-                    this.tagsNames!.push(item);
-            }
-            this.onSale = _data["onSale"] !== undefined ? _data["onSale"] : <any>null;
-            this.lowerPrice = _data["lowerPrice"] !== undefined ? _data["lowerPrice"] : <any>null;
-            this.upperPrice = _data["upperPrice"] !== undefined ? _data["upperPrice"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): RequestParameters {
-        data = typeof data === 'object' ? data : {};
-        let result = new RequestParameters();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["request"] = this.request !== undefined ? this.request : <any>null;
-        if (Array.isArray(this.tagsNames)) {
-            data["tagsNames"] = [];
-            for (let item of this.tagsNames)
-                data["tagsNames"].push(item);
-        }
-        data["onSale"] = this.onSale !== undefined ? this.onSale : <any>null;
-        data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
-        data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data;
-    }
-}
-
-export interface IRequestParameters {
-    request?: string | null;
-    tagsNames?: string[] | null;
-    onSale?: boolean;
-    lowerPrice?: number;
-    upperPrice?: number;
 }
 
 export interface FileParameter {

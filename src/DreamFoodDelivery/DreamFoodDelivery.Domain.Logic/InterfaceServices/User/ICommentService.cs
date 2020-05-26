@@ -12,11 +12,18 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
     public interface ICommentService
     {
         /// <summary>
-        /// Asynchronously returns all comments
+        /// Asynchronously returns all comments for users
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// </summary>
-        Task<Result<PageResponse<CommentView>>> GetAllAsync(PageRequest request, CancellationToken cancellationToken = default);
+        Task<Result<PageResponse<CommentForUsersView>>> GetAllAsync(PageRequest request, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Asynchronously returns all comments for admin
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// </summary>
+        Task<Result<IEnumerable<CommentView>>> GetAllAdminAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         ///  Asynchronously get comment by comment Id. Id must be verified 

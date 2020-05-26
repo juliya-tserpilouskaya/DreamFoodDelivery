@@ -13,12 +13,12 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class CommentUpdateComponent implements OnInit {
   idFromURL = '';
-  comment: CommentView;
-  commentUpdateForm: FormGroup;
+  review: CommentView;
+  reviewUpdateForm: FormGroup;
   done = false;
 
   constructor(
-    private commentService: CommentService,
+    private reviewService: CommentService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private location: Location,
@@ -26,7 +26,7 @@ export class CommentUpdateComponent implements OnInit {
     public fb: FormBuilder,
     ) {
     route.params.subscribe(params => this.idFromURL = params.id);
-    this.commentUpdateForm = this.fb.group({
+    this.reviewUpdateForm = this.fb.group({
       id: [''],
       headline: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       content: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(511)]],
@@ -35,7 +35,7 @@ export class CommentUpdateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.commentService.getById(this.idFromURL).subscribe(data => {this.comment = data;
+    this.reviewService.getById(this.idFromURL).subscribe(data => {this.review = data;
     },
     error => {
       if (error.status === 500){
@@ -50,11 +50,11 @@ export class CommentUpdateComponent implements OnInit {
       });
   }
 
-  commentUpdate(id: string): void {
-    this.commentUpdateForm.value.id = id;
-    if (this.commentUpdateForm.valid) {
-      this.commentService.update(this.commentUpdateForm.value).subscribe(data => {this.comment = data;
-                                                                                  this.done = true;
+  reviewUpdate(id: string): void {
+    this.reviewUpdateForm.value.id = id;
+    if (this.reviewUpdateForm.valid) {
+      this.reviewService.update(this.reviewUpdateForm.value).subscribe(data => {this.review = data;
+                                                                                this.done = true;
                                                                                 },
                                                                                 error => {
                                                                                   if (error.status === 500){
@@ -73,7 +73,7 @@ export class CommentUpdateComponent implements OnInit {
   }
 
   removeById(id: string): void {
-    this.commentService.removeById(id).subscribe(data => {},
+    this.reviewService.removeById(id).subscribe(data => {},
       error => {
         if (error.status === 500){
           this.router.navigate(['/error/500']);
@@ -94,9 +94,9 @@ export class CommentUpdateComponent implements OnInit {
 
   get isAdmin(): boolean {
     const token = this.authService.getToken();
-    const decodedoken = jwt_decode(token);
+    const decodedToken = jwt_decode(token);
     // tslint:disable-next-line: no-string-literal
-    const currentRole = decodedoken['role'];
+    const currentRole = decodedToken['role'];
     if (currentRole.includes('Admin')) {
       return true;
     }

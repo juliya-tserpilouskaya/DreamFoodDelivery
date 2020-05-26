@@ -10,7 +10,10 @@ namespace DreamFoodDelivery.Domain.DTO
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
         [Required]
         public string Password { get; set; }
+
+        public string CallBackUrl { get; set; }
     }
 }

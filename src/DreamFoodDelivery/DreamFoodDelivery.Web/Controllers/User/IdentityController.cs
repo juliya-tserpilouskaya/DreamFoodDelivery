@@ -70,7 +70,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> LoginAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -116,7 +116,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> DeleteAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {

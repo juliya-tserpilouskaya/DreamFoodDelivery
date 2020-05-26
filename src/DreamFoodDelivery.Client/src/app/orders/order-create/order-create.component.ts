@@ -13,6 +13,7 @@ export class OrderCreateComponent implements OnInit {
   orderAddForm: FormGroup;
   user: UserView;
   order: OrderView;
+  isNotConfirmed = false;
 
   constructor(
     private orderService: OrderService,
@@ -22,10 +23,12 @@ export class OrderCreateComponent implements OnInit {
     public fb: FormBuilder,
   ) {this.orderAddForm = this.fb.group({
       isInfoFromProfile: [false],
+      updateProfile: [false],
       address: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
-      phoneNumber: ['', [Validators.required, Validators.minLength(12), Validators.maxLength(13)]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(13)]],
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       surname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]]});
+
  }
 
   ngOnInit(): void {
@@ -37,9 +40,6 @@ export class OrderCreateComponent implements OnInit {
          else if (error.status === 404) {
           this.router.navigate(['/error/404']);
          }
-        //  else {
-        //   this.router.navigate(['/error/unexpected']);
-        //  }
     });
   }
 
@@ -58,21 +58,22 @@ export class OrderCreateComponent implements OnInit {
                              this.router.navigate(['/order', this.order.id, 'details']);
                             },
                             error => {
+                              console.log(error);
+                              console.log(error.status);
+                              console.log(error._responseText);
+                              console.log(error._headers);
                               if (error.status === 500){
                                 this.router.navigate(['/error/500']);
                                }
                                else if (error.status === 404) {
                                 this.router.navigate(['/error/404']);
                                }
-                              //  else {
-                              //   this.router.navigate(['/error/unexpected']);
-                              //  }
+                               else if (error.status === 403) {
+                                this.isNotConfirmed = true; // TODO: ??? in console i see status, but not here
+                               }
        });
-    } else {
-      // TODO: message
+      this.userService.updateUserProfile(this.orderAddForm.value).subscribe();
     }
-
-
   }
 
   getdataFromProfile(): void {
@@ -82,6 +83,7 @@ export class OrderCreateComponent implements OnInit {
       phoneNumber: this.user.userProfile.phoneNumber,
       name: this.user.userProfile.name,
       surname: this.user.userProfile.surname,
+      // TODO: if null - message
     });
   }
 

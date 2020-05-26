@@ -1,16 +1,30 @@
-<div>
-    <form [formGroup]="registerForm" (ngSubmit)="register()">
+<div class="col-8">
+    <form class="was-validated" [formGroup]="registerForm" (ngSubmit)="register()">
         <h3>Please enter information to sign up</h3>
         <div class="form-group">
             <label for="inputEmail">Email</label>
             <input type="email" class="form-control" formControlName="email" placeholder="Enter email" required>
+            <div class="valid-feedback">
+              Looks good!
+            </div>
+            <div class="invalid-feedback">
+              Please, enter the email!
+            </div>
         </div>
         <div class="form-group">
             <label for="inputPassword">Password</label>
             <input type="password" class="form-control" formControlName="password" placeholder="Password" required>
+            <div class="valid-feedback">
+              Looks good!
+            </div>
+            <div class="invalid-feedback">
+              Please, enter the password!
+            </div>
         </div>
         <div>
-          <button class="btn btn-lg btn btn-success" type="submit" >Sign up</button>
+          <!-- <button class="btn btn-lg btn btn-success" type="submit" >Sign up</button> -->
+          <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" class="spinner-border spinner-border customSpin" role="status" aria-hidden="true"></span>Sign up</button>
           <a  class="btn btn-link" [routerLink]="['/login']">Login</a>
         </div>
         <p class="mt-5 mb-3 text-muted">&copy; 2020</p>

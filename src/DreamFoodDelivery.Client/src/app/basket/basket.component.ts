@@ -47,7 +47,7 @@ export class BasketComponent implements OnInit {
   }
   onBasketUpdate(id: string): void {
     this.updateForm.value.dishId = id;
-    this.basketService.addDish(this.updateForm.value).subscribe(data => {},
+    this.basketService.addDish(this.updateForm.value).subscribe(data => {this.ngOnInit(); },
       error => {
         if (error.status === 500){
           this.router.navigate(['/error/500']);
@@ -63,8 +63,9 @@ export class BasketComponent implements OnInit {
 
   removeDish(id: string): void {
     this.basketService.removeById(id).subscribe(data => {
-      const indexToDelete = this.dishes.findIndex((mark: DishView) => mark.id === id);
-      this.dishes.splice(indexToDelete, 1);
+      // const indexToDelete = this.dishes.findIndex((mark: DishView) => mark.id === id);
+      // this.dishes.splice(indexToDelete, 1);
+      this.ngOnInit();
     },
     error => {
       if (error.status === 500){
@@ -81,7 +82,7 @@ export class BasketComponent implements OnInit {
 
   removeAll(): void {
     this.basketService.removeAll().subscribe(data => {
-      window.location.reload();
+      this.ngOnInit();
     },
     error => {
       if (error.status === 500){

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -38,14 +39,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync(cancellationToken);
             if (!dishes.Any())
             {
-                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                return Result<IEnumerable<DishView>>.Quite<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
             }
 
             List<DishView> views = new List<DishView>();
             foreach (var dish in dishes)
             {
                 DishView viewItem = _mapper.Map<DishView>(dish);
-                viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
+                viewItem.FinaleCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
                 viewItem.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {
@@ -58,34 +59,91 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
         }
 
-        /// <summary>
-        ///  Asynchronously get dish by dish Id. Id must be verified 
-        /// </summary>
-        /// <param name="dishId">ID of existing dish</param>
-        [LoggerAttribute]
-        public async Task<Result<DishView>> GetByIdAsync(string dishId, CancellationToken cancellationToken = default)
+        public async Task<Result<IEnumerable<DishView>>> GetAllDishesByRequestAsync(RequestParameters request, CancellationToken cancellationToken)
         {
-            Guid id = Guid.Parse(dishId); 
             try
             {
-                DishDB dish = await _context.Dishes.Where(_ => _.Id == id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                DishView view = _mapper.Map<DishView>(dish);
-                view.FinaleCost = view.Cost * (1 - view.Sale / 100);
-                view.TagList = new HashSet<TagToAdd>();
-                foreach (var item in dish.DishTags)
+                List<DishDB> dishesList = new List<DishDB>();
+                if (request.TagsNames.Any())
                 {
-                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    HashSet<DishTagDB> dishTagsList = new HashSet<DishTagDB>();
+                    foreach (var tagName in request.TagsNames)
+                    {
+                        TagDB tag = await _context.Tags.Where(_ => _.TagName == tagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                        if (!(tag is null))
+                        {
+                            var dishTags = await _context.DishTags.Where(_ => _.TagId == tag.Id).AsNoTracking().ToListAsync(cancellationToken);
+                            if (dishTags.Any())
+                            {
+                                foreach (var dishTag in dishTags)
+                                {
+                                    if (dishTagsList.Count is 0)
+                                    {
+                                        dishTagsList.Add(dishTag);
+                                    }
+                                    var dishTagToCompare = dishTagsList.Where(_ => _.DishId == dishTag.DishId).FirstOrDefault();
+                                    if (!dishTagsList.Where(_ => _.DishId == dishTag.DishId).Any())
+                                    {
+                                        dishTagsList.Add(dishTag);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (!dishTagsList.Any())
+                    {
+                        return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
+                    }
+                    foreach (DishTagDB dishTag in dishTagsList)
+                    {
+                        DishDB dish = await _context.Dishes.Where(_ => _.Id == dishTag.DishId).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                        dishesList.Add(dish);
+                    }
                 }
-                if (dish is null)
+                else
                 {
-                    return Result<DishView>.Fail<DishView>($"Dish was not found");
+                    dishesList = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync(cancellationToken);
                 }
-                return Result<DishView>.Ok(view);
+
+                if (!dishesList.Any())
+                {
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
+                }
+                if (!string.IsNullOrEmpty(request.Request) && dishesList.Any())
+                {
+                    dishesList = dishesList.Where(_ => _.Name.Contains(request.Request) || _.Composition.Contains(request.Request) || _.Description.Contains(request.Request)).ToList();
+                }
+                if (request.OnSale && dishesList.Any())
+                {
+                    dishesList = dishesList.Where(_ => _.Sale > 0).ToList();
+                }
+                if (request.LowerPrice > 0 && dishesList.Any())
+                {
+                    dishesList = dishesList.Where(_ => _.Cost >= request.LowerPrice).ToList();
+                }
+                if (request.UpperPrice > 0 && request.UpperPrice >= request.LowerPrice && dishesList.Any())
+                {
+                    dishesList = dishesList.Where(_ => _.Cost <= request.UpperPrice).ToList();
+                }
+
+                List<DishView> views = new List<DishView>();
+                foreach (var dish in dishesList)
+                {
+                    DishView viewItem = _mapper.Map<DishView>(dish);
+
+                    viewItem.TagList = new HashSet<TagToAdd>();
+                    foreach (var item in dish.DishTags)
+                    {
+                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    }
+                    views.Add(viewItem);
+                }
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
             }
             catch (ArgumentNullException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -101,14 +159,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var dishes = await _context.Dishes.Where(_ => _.Name.Contains(name)).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
                 if (!dishes.Any())
                 {
-                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
                 List<DishView> views = new List<DishView>();
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
+                    viewItem.FinaleCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -121,45 +179,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
-
-        ///// <summary>
-        /////  Asynchronously returns dish by category. Id must be verified 
-        ///// </summary>
-        ///// <param name="categoryString">Dish category</param>
-        //[LoggerAttribute]
-        //public async Task<Result<IEnumerable<DishView>>> GetByCategoryAsync(string categoryString, CancellationToken cancellationToken = default)
-        //{
-        //    var category = double.Parse(categoryString); //make tryParse
-        //    try
-        //    {
-        //        var dishes = await  _context.Dishes.Where(_ => _.Category == category).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
-        //        if (!dishes.Any())
-        //        {
-        //            return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
-        //        }
-
-        //        List<DishView> views = new List<DishView>();
-        //        foreach (var dish in dishes)
-        //        {
-        //            DishView viewItem = _mapper.Map<DishView>(dish);
-        //            viewItem.TagList = new HashSet<TagToAdd>();
-        //            foreach (var item in dish.DishTags)
-        //            {
-        //                var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-        //                viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
-        //            }
-        //            views.Add(viewItem);
-        //        }
-        //        return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
-        //    }
-        //    catch (ArgumentNullException ex)
-        //    {
-        //        return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
-        //    }
-        //}
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
@@ -174,14 +196,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var dishes = await _context.Dishes.Where(_ => _.Cost >= lowerPrice).Where(_ => _.Cost <= upperPrice).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
                 if (!dishes.Any())
                 {
-                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
                 List<DishView> views = new List<DishView>();
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
+                    viewItem.FinaleCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -194,7 +216,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -209,14 +231,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var dishes = await _context.Dishes.Where(_ => _.Sale > 0).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
                 if (!dishes.Any())
                 {
-                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                    return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
                 List<DishView> views = new List<DishView>();
                 foreach (var dish in dishes)
                 {
                     DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
+                    viewItem.FinaleCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
                     viewItem.TagList = new HashSet<TagToAdd>();
                     foreach (var item in dish.DishTags)
                     {
@@ -229,7 +251,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -245,7 +267,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var dishTags = await _context.DishTags.Where(_ => _.TagId  == tag.Id).AsNoTracking().ToListAsync(cancellationToken);
             if (!dishTags.Any())
             {
-                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>("No dishes found");
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
             }
 
             List<DishView> views = new List<DishView>();
@@ -253,7 +275,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 DishDB dish = await _context.Dishes.Where(_ => _.Id == dishTag.DishId).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView viewItem = _mapper.Map<DishView>(dish);
-                viewItem.FinaleCost = viewItem.Cost * (1 - viewItem.Sale / 100);
+                viewItem.FinaleCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
                 viewItem.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {

@@ -30,15 +30,14 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get all comments
+        /// Get all comments for users
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// </summary>
         /// <returns>Returns all comments stored</returns>
-        [Authorize(Roles = "Admin")]
-        //[HttpGet, Route("all")]
+        [AllowAnonymous]
         [HttpPost, Route("all")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponse<CommentView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponse<CommentForUsersView>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -61,6 +60,32 @@ namespace DreamFoodDelivery.Web.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+        /// <summary>
+        /// Get all comments for admin
+        /// <param name="cancellationToken"></param>
+        /// </summary>
+        /// <returns>Returns all comments stored</returns>
+        [Authorize(Roles = "Admin")]
+        [HttpGet, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CommentView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetAllAdmin(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _commentService.GetAllAdminAsync(cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
 
         /// <summary>
         /// Get comment by comment id
@@ -68,7 +93,6 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="id">Comment id</param>
         /// <returns>Returns ID matching comment</returns>
         [HttpGet, Route("{id}")]
-        [Authorize(Roles = "Admin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CommentView))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

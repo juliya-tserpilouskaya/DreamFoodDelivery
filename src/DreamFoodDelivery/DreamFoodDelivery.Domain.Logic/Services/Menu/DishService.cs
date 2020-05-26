@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -32,6 +33,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new dish
         /// </summary>
         /// <param name="dish">New dish to add</param>
+        /// <param name="cancellationToken"></param>
         [LoggerAttribute]
         public async Task<Result<DishView>> AddAsync(DishToAdd dish, CancellationToken cancellationToken = default)
         {
@@ -40,27 +42,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _context.Dishes.Add(dishToAdd);
             try
             {
-                //foreach (var item in dish.TagIndexes)
-                foreach (var item in dish.TagNames)
-                {
-                    //TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    TagDB tag = await _context.Tags.Where(_ => _.TagName == item.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    if (tag is null)
-                    {
-                        var tagAfter = await _tagService.AddTagDBAsync(item);
-                        dishToAdd.DishTags.Add(new DishTagDB { TagId = tagAfter.Data.Id, DishId = dishToAdd.Id });
-                    }
-                    else
-                    {
-                        dishToAdd.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dishToAdd.Id });
-                    }
-                }
+                await UpdateTagLinks(dish.TagNames, dishToAdd);
                 await _context.SaveChangesAsync(cancellationToken);
 
-                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                DishView view = _mapper.Map<DishView>(thingAfterAdding);
+                DishDB dishAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                DishView view = _mapper.Map<DishView>(dishAfterAdding);
                 view.TagList = new HashSet<TagToAdd>();
-                foreach (var item in thingAfterAdding.DishTags)
+                foreach (var item in dishAfterAdding.DishTags)
                 {
                     var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                     view.TagList.Add(_mapper.Map<TagToAdd>(tag));
@@ -69,15 +57,47 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Cannot save model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Cannot save model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Source is null. {ex.Message}");
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously get dish by dish Id. Id must be verified 
+        /// </summary>
+        /// <param name="dishId">ID of existing dish</param>
+        /// <param name="cancellationToken"></param>
+        [LoggerAttribute]
+        public async Task<Result<DishView>> GetByIdAsync(string dishId, CancellationToken cancellationToken = default)
+        {
+            Guid id = Guid.Parse(dishId);
+            try
+            {
+                DishDB dish = await _context.Dishes.IgnoreQueryFilters().Where(_ => _.Id == id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).FirstOrDefaultAsync(cancellationToken);
+                if (dish is null)
+                {
+                    return Result<DishView>.Fail<DishView>(ExceptionConstants.DISH_WAS_NOT_FOUND);
+                }
+                DishView view = _mapper.Map<DishView>(dish);
+                view.FinaleCost = Math.Round(view.Cost * (1 - view.Sale / 100), 2);
+                view.TagList = new HashSet<TagToAdd>();
+                foreach (var item in dish.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
+                return Result<DishView>.Ok(view);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -85,50 +105,37 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously update dish
         /// </summary>
         /// <param name="dish">Existing dish to update</param>
+        /// <param name="cancellationToken"></param>
         [LoggerAttribute]
         public async Task<Result<DishView>> UpdateAsync(DishToUpdate dish, CancellationToken cancellationToken = default)
         {
-            DishDB thingForUpdate = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == dish.Id);
-
+            DishDB dishToUpdate = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == dish.Id);
+            if (dishToUpdate is null)
+            {
+                return Result<DishView>.Quite<DishView>(ExceptionConstants.DISH_WAS_NOT_FOUND);
+            }
             var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync(cancellationToken);
             _context.DishTags.RemoveRange(dishTagList);
-            thingForUpdate.DishTags.Clear();
-            //_context.Entry(thingForUpdate).Collection(c => c.DishTags).IsModified = true;
+            dishToUpdate.DishTags.Clear();
             await _context.SaveChangesAsync(cancellationToken);
-
-            thingForUpdate = _mapper.Map<DishDB>(dish);
-            thingForUpdate.Modified = DateTime.Now;
-
-            _context.Entry(thingForUpdate).Property(c => c.Name).IsModified = true;
-            //_context.Entry(thingForUpdate).Property(c => c.Category).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Composition).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Description).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Cost).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Weigh).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Sale).IsModified = true;
-            _context.Entry(thingForUpdate).Property(c => c.Modified).IsModified = true;
-
-            foreach (var item in dish.TagNames)
-            {
-                //TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == item.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                TagDB tag = await _context.Tags.Where(_ => _.TagName == item.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (tag is null)
-                {
-                    var tagAfter = await _tagService.AddTagDBAsync(item);
-                    thingForUpdate.DishTags.Add(new DishTagDB { TagId = tagAfter.Data.Id, DishId = thingForUpdate.Id });
-                }
-                else
-                {
-                    thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
-                }
-                //thingForUpdate.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = thingForUpdate.Id });
-            }
-
             try
             {
+                dishToUpdate = _mapper.Map<DishDB>(dish);
+                dishToUpdate.Modified = DateTime.Now;
+
+                _context.Entry(dishToUpdate).Property(c => c.Name).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Composition).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Description).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Cost).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Weigh).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Sale).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Modified).IsModified = true;
+
+                await UpdateTagLinks(dish.TagNames, dishToUpdate);
+
                 await _context.SaveChangesAsync(cancellationToken);
 
-                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == thingForUpdate.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToUpdate.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView view = _mapper.Map<DishView>(thingAfterAdding);
                 view.TagList = new HashSet<TagToAdd>();
                 foreach (var item in thingAfterAdding.DishTags)
@@ -140,11 +147,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Cannot update model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<DishView>.Fail<DishView>($"Cannot update model. {ex.Message}");
+                return Result<DishView>.Fail<DishView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -152,31 +159,35 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously remove dish by Id. Id must be verified
         /// </summary>
         /// <param name="dishId">ID of existing dish</param>
+        /// <param name="cancellationToken"></param>
         [LoggerAttribute]
         public async Task<Result> RemoveByIdAsync(string dishId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(dishId);
-            var dish = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().FirstOrDefaultAsync(_ => _.Id == id);
-            var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync(cancellationToken);
-            _context.DishTags.RemoveRange(dishTagList);
-            dish.DishTags.Clear();
+            var dish = await _context.Dishes.IgnoreQueryFilters().Include(c => c.DishTags).ThenInclude(sc => sc.Tag).FirstOrDefaultAsync(_ => _.Id == id);
             if (dish is null)
             {
-                return await Task.FromResult(Result.Fail("Dish was not found"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.DISH_WAS_NOT_FOUND));
             }
+            
             try
             {
+                var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).ToListAsync(cancellationToken);
+                _context.DishTags.RemoveRange(dishTagList);
+                dish.DishTags.Clear();
+                var dishBasketList = await _context.BasketDishes.Where(_ => _.DishId == dish.Id).ToListAsync(cancellationToken);
+                _context.BasketDishes.RemoveRange(dishBasketList);
                 _context.Dishes.Remove(dish);
                 await _context.SaveChangesAsync(cancellationToken);
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_DISH + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_DISH + ex.Message));
             }
         }
 
@@ -189,7 +200,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync(cancellationToken);
             if (dishes is null)
             {
-                return await Task.FromResult(Result.Fail("Dishes were not found"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.DISHES_WERE_NOT_FOUND));
             }
             try
             {
@@ -198,10 +209,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     var dishTagList = await _context.DishTags.Where(_ => _.DishId == dish.Id).AsNoTracking().ToListAsync(cancellationToken);
                     _context.DishTags.RemoveRange(dishTagList);
                     dish.DishTags.Clear();
-                    if (dish is null)
-                    {
-                        return await Task.FromResult(Result.Fail("Dish was not found"));
-                    }
+                    var dishBasketList = await _context.BasketDishes.Where(_ => _.DishId == dish.Id).ToListAsync(cancellationToken);
+                    _context.BasketDishes.RemoveRange(dishBasketList);
                     _context.Dishes.Remove(dish);
                     await _context.SaveChangesAsync(cancellationToken);
                 }
@@ -209,11 +218,40 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_DISHES + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_DISHES + ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Updates tags and dish-tag links
+        /// </summary>
+        /// <param name="dishTagNames">List of tag names for dish</param>
+        /// <param name="dish">Dish</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task UpdateTagLinks(HashSet<TagToAdd> dishTagNames, DishDB dish, CancellationToken cancellationToken = default)
+        {
+            foreach (var item in dishTagNames)
+            {
+                TagDB tag = await _context.Tags.IgnoreQueryFilters().Where(_ => _.TagName == item.TagName).Select(_ => _).FirstOrDefaultAsync(cancellationToken);
+                if (tag is null)
+                {
+                    var tagAfter = await _tagService.AddTagDBAsync(item);
+                    dish.DishTags.Add(new DishTagDB { TagId = tagAfter.Data.Id, DishId = dish.Id });
+                }
+                else if (_context.Entry(tag).Property<bool>("IsDeleted").CurrentValue)
+                {
+                    _context.Entry(tag).Property<bool>("IsDeleted").CurrentValue = false;
+                    dish.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dish.Id });
+                }
+                else
+                {
+                    dish.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dish.Id });
+                }
             }
         }
     }

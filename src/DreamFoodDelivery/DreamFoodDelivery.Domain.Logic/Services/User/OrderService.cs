@@ -9,6 +9,7 @@ using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         private readonly DreamFoodDeliveryContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
-        IMenuService _menuService;
+        IDishService _dishService;
 
-        public OrderService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IMenuService menuService)
+        public OrderService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IDishService dishService)
         {
             _context = context;
             _userManager = userManager;
             _mapper = mapper;
-            _menuService = menuService;
+            _dishService = dishService;
         }
 
         /// <summary>
@@ -44,24 +45,24 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             try
             {
-                var orders = await _context.Orders.AsNoTracking().ToListAsync(cancellationToken);
+                var orders = await _context.Orders.IgnoreQueryFilters().AsNoTracking().ToListAsync(cancellationToken);
                 if (!orders.Any())
                 {
-                    return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                    return Result<IEnumerable<OrderView>>.Quite<IEnumerable<OrderView>>(ExceptionConstants.ORDERS_WERE_NOT_FOUND);
                 }
 
                 List<OrderView> views = new List<OrderView>();
                 foreach (var order in orders)
                 {
                     OrderView viewItem = _mapper.Map<OrderView>(order);
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                     viewItem.Dishes = new HashSet<DishView>();
                     foreach (var dishListItem in dishList)
                     {
-                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                         if (dish.IsError)
                         {
-                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
+                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                         }
                         dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         viewItem.Dishes.Add(dish.Data);
@@ -72,7 +73,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -89,17 +90,17 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var order = await _context.Orders.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (order is null)
                 {
-                    return Result<OrderView>.Fail<OrderView>($"Order was not found");
+                    return Result<OrderView>.Quite<OrderView>(ExceptionConstants.ORDER_WAS_NOT_FOUND);
                 }
                 OrderView view = _mapper.Map<OrderView>(order);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
-                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                        return Result<OrderView>.Fail<OrderView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
@@ -108,7 +109,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Source is null. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -125,7 +126,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             
             if (userDB is null || userIdentity is null)
             {
-                return Result<OrderView>.Fail<OrderView>("User not found");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
 
             OrderDB orderToAdd = _mapper.Map<OrderDB>(order);
@@ -133,7 +134,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 if (userIdentity.Address is null || userIdentity.PhoneNumber is null || userIdentity.Name is null || userIdentity.Surname is null)
                 {
-                    return Result<OrderView>.Fail<OrderView>("Update your profile, please!");
+                    return Result<OrderView>.Quite<OrderView>(NotificationConstans.FILL_PROFILE);
                 }
                 orderToAdd.Address = userIdentity.Address;
                 orderToAdd.PhoneNumber = userIdentity.PhoneNumber;
@@ -144,24 +145,29 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             orderToAdd.UserId = userDB.Id;
             orderToAdd.Status = Enum.GetName(typeof(OrderStatuses), 0);
             orderToAdd.UpdateTime = DateTime.Now;
-            _context.Orders.Add(orderToAdd);
+            orderToAdd.OrderCost = 0;
+            orderToAdd.ShippingCost = 0;
 
             var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             foreach (var connection in connections)
             {
-                orderToAdd.OrderCost += connection.DishCost * (1 - connection.Sale/100) * connection.Quantity;
+                orderToAdd.OrderCost = orderToAdd.OrderCost.Value + connection.DishCost.Value * (1 - (connection.Sale.Value / 100)) * connection.Quantity.Value;
+            }
+            orderToAdd.OrderCost *= (1 - userIdentity.PersonalDiscount / 100);
+            orderToAdd.OrderCost = Math.Round(orderToAdd.OrderCost.Value, 2);
+            if (orderToAdd.OrderCost < NumberСonstants.FREE_SHIPPING_BORDER)
+            {
+                orderToAdd.ShippingCost = NumberСonstants.DELIVERY_COST;
+            }
+            _context.Orders.Add(orderToAdd);
+
+            foreach (var connection in connections)
+            {
                 connection.OrderId = orderToAdd.Id;
                 connection.BasketId = Guid.Empty;
                 _context.Entry(connection).Property(c => c.OrderId).IsModified = true;
                 _context.Entry(connection).Property(c => c.BasketId).IsModified = true;
             }
-            orderToAdd.OrderCost *= userIdentity.PersonalDiscount / 100;
-            if (orderToAdd.OrderCost < Number_Сonstants.FREE_SHIPPING_BORDER)
-            {
-                orderToAdd.ShippingCost = Number_Сonstants.DELIVERY_COST;
-            }
-            _context.Entry(orderToAdd).Property(c => c.OrderCost).IsModified = true; //is it nessesary? 
-            _context.Entry(orderToAdd).Property(c => c.ShippingCost).IsModified = true; //is it nessesary? 
             try
             {
                 await _context.SaveChangesAsync();
@@ -171,10 +177,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
-                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                        return Result<OrderView>.Fail<OrderView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
@@ -183,15 +189,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Cannot save model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Cannot save model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Source is null. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -203,7 +209,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<OrderView>> UpdateAsync(OrderToUpdate order, CancellationToken cancellationToken = default)
         {
             OrderDB orderForUpdate = await _context.Orders.Where(_ => _.Id == Guid.Parse(order.Id)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(Number_Сonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
+            if (DateTime.Now < orderForUpdate.UpdateTime.Value.AddMinutes(NumberСonstants.TIME_TO_CHANGE_ORDER_IN_MINUTES))
             {
                 orderForUpdate = _mapper.Map<OrderDB>(order);
                 orderForUpdate.UpdateTime = DateTime.Now;
@@ -211,21 +217,20 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(orderForUpdate).Property(c => c.PhoneNumber).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Name).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.Surname).IsModified = true;
-                //_context.Entry(orderForUpdate).Property(c => c.ShippingCost).IsModified = true;
                 _context.Entry(orderForUpdate).Property(c => c.UpdateTime).IsModified = true;
                 try
                 {
                     await _context.SaveChangesAsync();
                     OrderDB orderAfterAdding = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == orderAfterAdding.Id).AsNoTracking().ToListAsync(cancellationToken);
                     OrderView view = _mapper.Map<OrderView>(orderAfterAdding);
                     view.Dishes = new HashSet<DishView>();
                     foreach (var dishListItem in dishList)
                     {
-                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                         if (dish.IsError)
                         {
-                            return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                            return Result<OrderView>.Fail<OrderView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                         }
                         dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         view.Dishes.Add(dish.Data);
@@ -234,16 +239,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
-                    return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                    return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
                 }
                 catch (DbUpdateException ex)
                 {
-                    return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                    return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
                 }
             }
             else
             {
-                return Result<OrderView>.Warning("Time is over.");
+                return Result<OrderView>.Quite<OrderView>(NotificationConstans.TIME_IS_OVER);
             }
         }
 
@@ -255,24 +260,24 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<IEnumerable<OrderView>>> GetByUserIdAdminAsync(string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
-            var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
+            var orders = await _context.Orders.IgnoreQueryFilters().Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!orders.Any())
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                return Result<IEnumerable<OrderView>>.Quite<IEnumerable<OrderView>>(ExceptionConstants.ORDERS_WERE_NOT_FOUND);
             }
 
             List<OrderView> views = new List<OrderView>();
             foreach (var order in orders)
             {
                 OrderView viewItem = _mapper.Map<OrderView>(order);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                 viewItem.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
-                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>($"Unable to retrieve data");
+                        return Result< IEnumerable<OrderView>>.Fail< IEnumerable<OrderView>>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
@@ -292,26 +297,26 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"User was not found");
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
             var orders = await _context.Orders.Where(_ => _.UserId == user.Id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             if (!orders.Any())
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>("No orders found");
+                return Result<IEnumerable<OrderView>>.Quite<IEnumerable<OrderView>>(ExceptionConstants.ORDERS_WERE_NOT_FOUND);
             }
 
             List<OrderView> views = new List<OrderView>();
             foreach (var order in orders)
             {
                 OrderView viewItem = _mapper.Map<OrderView>(order);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                 viewItem.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
-                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
+                        return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     viewItem.Dishes.Add(dish.Data);
@@ -332,10 +337,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var order = await _context.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
             if (order is null)
             {
-                return await Task.FromResult(Result.Fail("Order was not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.ORDER_WAS_NOT_FOUND));
             }
 
-            var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+            var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
             try
             {
                 _context.BasketDishes.RemoveRange(dishList);
@@ -345,11 +350,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDER + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete order. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDER + ex.Message));
             }
         }
 
@@ -361,17 +366,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var orders = _context.Orders.AsNoTracking().ToList();
             if (!orders.Any())
             {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.ORDERS_WERE_NOT_FOUND));
             }
             try
             {
                 foreach (var order in orders)
                 {
-                    if (order is null)
-                    {
-                        return await Task.FromResult(Result.Fail("Order was not found"));
-                    }
-                    var dishList = _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToList();
+                    var dishList = _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToList();
                     _context.BasketDishes.RemoveRange(dishList);
                     _context.Orders.Remove(order);
                 }
@@ -380,16 +381,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (ObjectDisposedException ex)
             {
-
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
         }
 
@@ -401,19 +401,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             Guid id = Guid.Parse(userId);
             var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
-            if (orders is null)
+            if (!orders.Any())
             {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.ORDERS_WERE_NOT_FOUND));
             }
             try
             {
                 foreach (var order in orders)
                 {
-                    if (order is null)
-                    {
-                        return await Task.FromResult(Result.Fail("Order was not found"));
-                    }
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync();
                     _context.BasketDishes.RemoveRange(dishList);
                     _context.Orders.Remove(order);
                 }
@@ -423,15 +419,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             catch (ObjectDisposedException ex)
             {
 
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete dish. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
         }
 
@@ -464,7 +460,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     }
                     else
                     {
-                        return Result<OrderView>.Warning("Waiting for payment.");
+                        return Result<OrderView>.Quite<OrderView>(NotificationConstans.WAITING_FOR_PAYMENT);
                     }
                     break;
                 case "Canceled":
@@ -478,21 +474,21 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     _context.Entry(orderForUpdate).Property(c => c.PaymentTime).IsModified = true;
                     break;
                 default:
-                    return Result<OrderView>.Warning("There is nothing to change.");
+                    return Result<OrderView>.Quite<OrderView>(NotificationConstans.NOTHING_TO_CHANGE);
             }
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
                 OrderDB orderAfterUpdate = await _context.Orders.Where(_ => _.Id == orderForUpdate.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                var dishList = await _context.BasketDishes.Where(_ => _.OrderId == orderAfterUpdate.Id).AsNoTracking().ToListAsync(cancellationToken);
+                var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == orderAfterUpdate.Id).AsNoTracking().ToListAsync(cancellationToken);
                 OrderView view = _mapper.Map<OrderView>(orderAfterUpdate);
                 view.Dishes = new HashSet<DishView>();
                 foreach (var dishListItem in dishList)
                 {
-                    var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                     if (dish.IsError)
                     {
-                        return Result<OrderView>.Fail<OrderView>($"Unable to retrieve data");
+                        return Result<OrderView>.Fail<OrderView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                     }
                     dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                     view.Dishes.Add(dish.Data);
@@ -501,11 +497,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<OrderView>.Fail<OrderView>($"Cannot update model. {ex.Message}");
+                return Result<OrderView>.Fail<OrderView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -518,13 +514,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var orders = await _context.Orders.AsNoTracking().ToListAsync(cancellationToken);
             if (!orders.Any())
             {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.ORDERS_WERE_NOT_FOUND));
             }
             try
             {
                 foreach (var order in orders)
                 {
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                     _context.BasketDishes.RemoveRange(dishList);
                     _context.Orders.Remove(order);
                     await _context.SaveChangesAsync(cancellationToken);
@@ -533,11 +529,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete orders. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
         }
 
@@ -552,13 +548,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var orders = await _context.Orders.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync();
             if (!orders.Any())
             {
-                return await Task.FromResult(Result.Fail("Orders were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.ORDERS_WERE_NOT_FOUND));
             }
             try
             {
                 foreach (var order in orders)
                 {
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                     _context.BasketDishes.RemoveRange(dishList);
                     _context.Orders.Remove(order);
                     await _context.SaveChangesAsync(cancellationToken);
@@ -567,11 +563,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_ORDERS + ex.Message));
             }
         }
 
@@ -594,13 +590,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 }
                 if (!orderStatuses.Any())
                 {
-                    return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>("No orders found");
+                    return Result<IEnumerable<OrderStatus>>.Quite<IEnumerable<OrderStatus>>(ExceptionConstants.ORDER_STATUSES_WERE_NOT_FOUND);
                 }
                 return Result<IEnumerable<OrderStatus>>.Ok(_mapper.Map<IEnumerable<OrderStatus>>(orderStatuses));
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<OrderStatus>>.Fail<IEnumerable<OrderStatus>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -623,21 +619,21 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 }
                 if (!orders.Any())
                 {
-                    return Result<IEnumerable<OrderView>>.Warning("No orders found");
+                    return Result<IEnumerable<OrderView>>.Quite<IEnumerable<OrderView>>(ExceptionConstants.ORDERS_WERE_NOT_FOUND);
                 }
 
                 List<OrderView> views = new List<OrderView>();
                 foreach (var order in orders)
                 {
                     OrderView viewItem = _mapper.Map<OrderView>(order);
-                    var dishList = await _context.BasketDishes.Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
+                    var dishList = await _context.BasketDishes.IgnoreQueryFilters().Where(_ => _.OrderId == order.Id).AsNoTracking().ToListAsync(cancellationToken);
                     viewItem.Dishes = new HashSet<DishView>();
                     foreach (var dishListItem in dishList)
                     {
-                        var dish = await _menuService.GetByIdAsync(dishListItem.DishId.ToString());
+                        var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
                         if (dish.IsError)
                         {
-                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Unable to retrieve data");
+                            return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
                         }
                         dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
                         viewItem.Dishes.Add(dish.Data);
@@ -648,7 +644,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
+                return Result<IEnumerable<OrderView>>.Fail<IEnumerable<OrderView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
 
         }

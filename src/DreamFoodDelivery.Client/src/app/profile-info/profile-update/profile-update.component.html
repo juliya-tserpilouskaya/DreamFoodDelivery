@@ -1,5 +1,5 @@
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-  <h1 class="h2">Order data</h1>
+  <h1 class="h2">Profile data</h1>
   <div class="btn-toolbar mb-2 mb-md-0">
     <button type="button" class="btn btn-sm btn-outline-success" (click)="goBack()">Go back</button>
   </div>
@@ -9,7 +9,7 @@
   <div class="col-6">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h4 class="jumbotron-heading"> Name: {{user.userProfile.name}}{{user.userProfile.surname}}</h4>
+        <h4 class="jumbotron-heading"> Name: {{user.userProfile.name}}&nbsp;{{user.userProfile.surname}}</h4>
         <ul class="list-group">
           <li class="list-group-item">Email: {{user.userProfile.email}}</li>
           <li class="list-group-item">Phone number: {{user.userProfile.phoneNumber}}</li>
@@ -48,10 +48,10 @@
         <label>Phone number</label>
         <input type="text" class="form-control" formControlName="phoneNumber" placeholder="Place for phone number">
         <small *ngIf="!userInfoUpdateForm.controls.phoneNumber.valid" class="text-danger">
-          Phone number is required (minimum 12 characters, maximum 13 characters).
+          Phone number is required (minimum 10 characters, maximum 13 characters).
         </small>
       </div>
-      <button type="submit" [disabled]="!userInfoUpdateForm.valid">Update order</button>
+      <button type="submit" [disabled]="!userInfoUpdateForm.valid">Update profile</button>
     </form>
   </div>
 </div>

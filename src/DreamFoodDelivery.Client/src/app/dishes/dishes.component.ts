@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DishView, DishService } from '../app-services/nswag.generated.services';
 import { ManageMenuService } from '../app-services/manage-menu.service';
 import { Router } from '@angular/router';
+import { ImageModifiedService } from '../app-services/image.services';
 
 @Component({
   selector: 'app-dishes',
@@ -10,16 +11,25 @@ import { Router } from '@angular/router';
 })
 export class DishesComponent implements OnInit {
   dishes: DishView[] = [];
+  mainImages: {[id: string]: string} = { };
 
   constructor(
     private manageMenuService: ManageMenuService,
+    private imageService: ImageModifiedService,
     private dishService: DishService,
     public router: Router,
   ) { }
 
   ngOnInit(): void {
     this.manageMenuService.getAllDishes()
-      .then(data => this.dishes = data)
+      .then(data => {this.dishes = data;
+                     if (this.dishes) {
+                    for (const dish of this.dishes){
+                      this.getImages(dish.id);
+          }
+         }
+
+      })
       .catch(msg => console.log(msg));
   }
 
@@ -43,6 +53,18 @@ export class DishesComponent implements OnInit {
       //  else {
       //   this.router.navigate(['/error/unexpected']);
       //  }
+    });
+  }
+
+  getImages(id: string){
+    this.imageService.getImageNamesList(id)
+    .subscribe(allImages => {
+      if (allImages != null && allImages.length > 0) {
+        this.imageService.getImage(id, allImages[0])
+        .subscribe(data => {
+        this.mainImages[id] = data;
+        });
+      }
     });
   }
 }

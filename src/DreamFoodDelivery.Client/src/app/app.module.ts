@@ -16,8 +16,7 @@ import { IdentityService,
          OrderService,
          CommentService,
          TagService,
-         AdminService,
-         SearchService} from './app-services/nswag.generated.services';
+         AdminService} from './app-services/nswag.generated.services';
 
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
@@ -30,7 +29,6 @@ import { BasketComponent } from './basket/basket.component';
 import { LogoutComponent } from './auth/logout/logout.component';
 import { AdministrationComponent } from './administration/administration.component';
 import { MenuSearchComponent } from './menu-search/menu-search.component';
-import { AboutUsComponent } from './pages/about-us/about-us.component';
 import { ProfileComponent } from './profile-info/profile/profile.component';
 import { ProfileUpdateComponent } from './profile-info/profile-update/profile-update.component';
 import { HomeComponent } from './pages/home/home.component';
@@ -62,14 +60,16 @@ import { DishUpdateComponent } from './dishes/dish-update/dish-update.component'
 import { DishAddNewComponent } from './dishes/dish-add-new/dish-add-new.component';
 import { UserOrdersAdminComponent } from './orders/user-orders-admin/user-orders-admin.component';
 import { UserCommentsAdminComponent } from './comments/user-comments-admin/user-comments-admin.component';
-import { DeleteAccountComponent } from './auth/delete-account/delete-account.component';
-import { ChangeEmailComponent } from './auth/change-email/change-email.component';
-import { ChangePasswordComponent } from './auth/change-password/change-password.component';
+import { DeleteAccountComponent } from './user/delete-account/delete-account.component';
+import { ChangeEmailComponent } from './user/change-email/change-email.component';
+import { ChangePasswordComponent } from './user/change-password/change-password.component';
 import { ConfirmEmailComponent } from './auth/confirm-email/confirm-email.component';
-import { UnexpectedComponent } from './pages/unexpected/unexpected.component';
 import { ImageUploadComponent } from './images/image-upload/image-upload.component';
 import { ImagesGetComponent } from './images/images-get/images-get.component';
 import { ImageModifiedService } from './app-services/image.services';
+import { EmailConfirmByLinkComponent } from './auth/email-confirm-by-link/email-confirm-by-link.component';
+import { PasswordResetComponent } from './user/password-reset/password-reset/password-reset.component';
+import { FogotPasswordRequestComponent } from './user/password-reset/fogot-password-request/fogot-password-request.component';
 
 
 
@@ -86,7 +86,6 @@ import { ImageModifiedService } from './app-services/image.services';
     BasketComponent,
     AdministrationComponent,
     HomeComponent,
-    AboutUsComponent,
     PageNotFoundComponent,
     BadRequestComponent,
     InternalServerErrorComponent,
@@ -114,9 +113,11 @@ import { ImageModifiedService } from './app-services/image.services';
     ChangeEmailComponent,
     ChangePasswordComponent,
     ConfirmEmailComponent,
-    UnexpectedComponent,
     ImageUploadComponent,
     ImagesGetComponent,
+    EmailConfirmByLinkComponent,
+    PasswordResetComponent,
+    FogotPasswordRequestComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -145,8 +146,8 @@ import { ImageModifiedService } from './app-services/image.services';
     CommentService,
     TagService,
     AdminService,
-    SearchService,
-    ImageModifiedService
+    ImageModifiedService,
+    TagService
   ],
   bootstrap: [AppComponent]
 })

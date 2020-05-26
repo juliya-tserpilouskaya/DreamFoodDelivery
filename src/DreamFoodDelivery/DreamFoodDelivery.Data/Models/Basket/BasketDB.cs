@@ -10,7 +10,5 @@ namespace DreamFoodDelivery.Data.Models
         public DateTime? ModificationTime { get; set; }
         public Guid UserId { get; set; }
         public UserDB User { get; set; }
-        //public double BasketCost { get; set; }
-        //public double? ShippingCost { get; set; }
     }
 }

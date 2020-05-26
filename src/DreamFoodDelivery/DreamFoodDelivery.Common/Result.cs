@@ -24,24 +24,19 @@ namespace DreamFoodDelivery.Common
             return new Result(true, false, null);
         }
 
-        public static Result Warning(string message)
+        public static Result Quite()
+        {
+            return new Result(false, false, null);
+        }
+
+        public static Result Quite(string message)
         {
             return new Result(false, false, message);
         }
-
-        public static Result Fail()
-        {
-            return new Result(false, true, null);
-        }
-
+        
         public static Result Fail(string message)
         {
             return new Result(false, true, message);
-        }
-
-        public static Result NoContent()
-        {
-            return new Result(false, false, null);
         }
     }
 
@@ -58,23 +53,17 @@ namespace DreamFoodDelivery.Common
         {
             return new Result<T>(true, false, null, data);
         }
-        public static Result<T> Warning<T>(T data, string message) where T : class
-        {
-            return new Result<T>(false, false, message, data);
-        }
-        public static Result<T> Warning(string message) 
+        public static Result<T> Quite<T>(string message) where T : class
         {
             return new Result<T>(false, false, message, null);
         }
-
+        public static Result<T> Quite<T>(string message, T data) where T : class
+        {
+            return new Result<T>(false, false, message, data);
+        }
         public static Result<T> Fail<T>(string message) where T : class
         {
             return new Result<T>(false, true, message, null);
-        }
-
-        public static Result<T> NoContent<T>() where T : class
-        {
-            return new Result<T>(false, false, null, null);
         }
     }
 }

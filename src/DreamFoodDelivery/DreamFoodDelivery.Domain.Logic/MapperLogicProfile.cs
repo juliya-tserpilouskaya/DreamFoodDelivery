@@ -22,6 +22,7 @@ namespace DreamFoodDelivery.Domain.Logic
 
             #region Comment
             CreateMap<CommentDB, CommentView>().ReverseMap();
+            CreateMap<CommentDB, CommentForUsersView>().ReverseMap();
             CreateMap<CommentDB, CommentToAdd>().ReverseMap();
             CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
             #endregion

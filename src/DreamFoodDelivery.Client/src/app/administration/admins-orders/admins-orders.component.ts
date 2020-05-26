@@ -11,6 +11,9 @@ import { Router } from '@angular/router';
 export class AdminsOrdersComponent implements OnInit {
   orders: OrderView[] = [];
 
+  page = 2;
+  pageSize = 10;
+
   constructor(
     private orderService: OrderService,
     private manageOrderService: ManageOrderService,
@@ -31,12 +34,12 @@ export class AdminsOrdersComponent implements OnInit {
       this.orders.splice(indexToDelete, 1);
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
+      // if (error.status === 500){
+      //   this.router.navigate(['/error/500']);
+      //  }
+      //  else if (error.status === 404) {
+      //   this.router.navigate(['/error/404']);
+      //  }
       //  else {
       //   this.router.navigate(['/error/unexpected']);
       //  }

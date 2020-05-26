@@ -14,8 +14,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
                 .WithMessage("Comment id can't parse to Guid type");
             RuleFor(_ => _.Headline).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Headline must contain from 3 to 90 characters.");
-            RuleFor(_ => _.Content).MinimumLength(3).MaximumLength(90)
-                .WithMessage("Content must contain from 3 to 90 characters.");
+            RuleFor(_ => _.Content).MinimumLength(3).MaximumLength(511)
+                .WithMessage("Content must contain from 3 to 511 characters.");
         }
     }
 }

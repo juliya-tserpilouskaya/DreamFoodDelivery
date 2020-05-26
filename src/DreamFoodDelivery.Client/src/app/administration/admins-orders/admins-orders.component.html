@@ -9,26 +9,33 @@
         </div>
       </div>
 
-      <div class="card" *ngFor="let item of orders">
+      <div class="card" *ngFor="let item of orders | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
         <h5 class="card-header">{{item.name}} {{item.surname}}</h5>
         <div class="card-body">
           <div class="col-12 col-md-12 col-lg-12 row">
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3">
               {{item.address}}
             </div>
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3">
               {{item.orderCost}}
             </div>
             <!-- Other info view -->
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3">
               <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
               <a [routerLink]="['/order', item.id, 'details']">Change orders details</a>
             </div>
-            <div class="col-4 col-md-4 col-lg-4">
+            <div class="col-3">
               <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>
             </div>
           </div>
         </div>
       </div>
     </main>
+</div>
+
+<div class="row justify-content-center">
+  <ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="orders.length"></ngb-pagination>
 </div>

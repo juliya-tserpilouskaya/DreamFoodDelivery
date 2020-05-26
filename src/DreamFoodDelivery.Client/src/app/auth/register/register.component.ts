@@ -14,6 +14,9 @@ import { AuthService } from '../auth.service';
 })
 export class RegisterComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   registerForm: FormGroup;
   user: UserWithToken;
   currentUser = {};
@@ -26,7 +29,8 @@ export class RegisterComponent implements OnInit {
     ) {
       this.registerForm = this.fb.group({
         email: [''],
-        password: ['']
+        password: [''],
+        callBackUrl: 'http://localhost:4200/confirmation'
       });
     }
     isAuthenticated: boolean;
@@ -35,10 +39,13 @@ export class RegisterComponent implements OnInit {
   }
 
   register() {
+    this.errorMessage = null;
+    this.spinning = true;
     if (this.registerForm.valid) {
       const data = this.registerForm.value;
       this.identityService.register(data)
         .subscribe(user => {this.user = user;
+                            this.spinning = false;
                             localStorage.setItem('access_token', this.user.userToken);
                             this.currentUser = this.user;
                             this.registerForm.reset();
@@ -46,12 +53,13 @@ export class RegisterComponent implements OnInit {
                             this.isAuthenticated =  this.authService.isLoggedIn;
                           },
                           error => {
-                            if (error.status === 500){
-                              this.router.navigate(['/error/500']);
-                             }
-                             else if (error.status === 404) {
-                              this.router.navigate(['/error/404']);
-                             }
+                            this.spinning = false;
+                            // if (error.status === 500){
+                            //   this.router.navigate(['/error/500']);
+                            //  }
+                            //  else if (error.status === 404) {
+                            //   this.router.navigate(['/error/404']);
+                            //  }
                             //  else {
                             //   this.router.navigate(['/error/unexpected']);
                             //  }

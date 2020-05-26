@@ -8,15 +8,15 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-comments.component.scss']
 })
 export class UserCommentsComponent implements OnInit {
-  comments: CommentView[] = [];
+  reviews: CommentView[] = [];
 
   constructor(
-    private commentService: CommentService,
+    private reviewService: CommentService,
     public router: Router,
   ) { }
 
   ngOnInit(): void {
-    this.commentService.getByUserId().subscribe(data => {this.comments = data;
+    this.reviewService.getByUserId().subscribe(data => {this.reviews = data;
     },
     error => {
       if (error.status === 500){
@@ -32,9 +32,9 @@ export class UserCommentsComponent implements OnInit {
   }
 
   removeById(id: string): void {
-    this.commentService.removeById(id).subscribe(data => {
-      const indexToDelete = this.comments.findIndex((mark: CommentView) => mark.id === id);
-      this.comments.splice(indexToDelete, 1);
+    this.reviewService.removeById(id).subscribe(data => {
+      const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
+      this.reviews.splice(indexToDelete, 1);
     },
     error => {
       if (error.status === 500){

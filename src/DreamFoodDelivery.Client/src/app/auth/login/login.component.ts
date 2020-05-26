@@ -13,6 +13,8 @@ import { AuthService } from '../auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+  spinning = false;
+  errorMessage: string;
 
   loginForm: FormGroup;
   user: UserWithToken;
@@ -34,10 +36,13 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    this.errorMessage = null;
+    this.spinning = true;
     if (this.loginForm.valid) {
       const data = this.loginForm.value;
       this.identityService.login(data)
         .subscribe(user => {this.user = user;
+                            this.spinning = false;
                             localStorage.setItem('access_token', this.user.userToken);
                             this.currentUser = this.user;
                             this.loginForm.reset();
@@ -45,6 +50,7 @@ export class LoginComponent implements OnInit {
                             this.isAuthenticated =  this.authService.isLoggedIn;
                           },
                           error => {
+                            this.spinning = false;
                             if (error.status === 500){
                               this.router.navigate(['/error/500']);
                              }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 // import service and models
-import { MenuService, DishView, BasketService, DishToBasketAdd, TagView, SearchService, API_BASE_URL } from '../app-services/nswag.generated.services';
+import { MenuService, DishView, BasketService, DishToBasketAdd, TagView, TagService } from '../app-services/nswag.generated.services';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, FormArray, FormControl } from '@angular/forms';
 import { AuthService } from '../auth/auth.service';
@@ -36,8 +36,8 @@ export class MenuSearchComponent implements OnInit {
 
   constructor(
     private menuService: MenuService,
+    private tagService: TagService,
     private basketService: BasketService,
-    private searchService: SearchService,
     private authService: AuthService,
     private manageMenuService: ManageMenuService,
     private imageService: ImageModifiedService,
@@ -64,18 +64,11 @@ export class MenuSearchComponent implements OnInit {
                       }
                      }
                     })
-      .catch(msg => console.log(msg));
-    this.searchService.getAllTags().subscribe(data => {this.tags = data; },
-      error => {
-        if (error.status === 500){
-          this.router.navigate(['/error/500']);
-         }
-         else if (error.status === 404) {
-          this.router.navigate(['/error/404']);
-         }
-        //  else {
-        //   this.router.navigate(['/error/unexpected']);
-        //  }
+      .catch(msg => {console.log(msg);
+                     console.log(msg.status);
+                     this.dishes = []; });
+    this.tagService.getAllTags().subscribe(data => {this.tags = data; },
+      error => {this.tags = [];
 
     });
   }
@@ -92,26 +85,17 @@ export class MenuSearchComponent implements OnInit {
        else if (error.status === 404) {
         this.router.navigate(['/error/404']);
        }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+
     });
   }
 
   onSearchButtonClicked() {
     console.log(this.searchForm.value);
-    this.searchService.getAllDishesByRequest(this.searchForm.value).subscribe(data => {this.dishes = data;
+    this.menuService.getAllDishesByRequest(this.searchForm.value).subscribe(data => {this.dishes = data;
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      this.dishes = null;
+
       });
   }
 

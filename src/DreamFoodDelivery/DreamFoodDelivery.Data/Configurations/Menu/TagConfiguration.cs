@@ -21,8 +21,6 @@ namespace DreamFoodDelivery.Data.Configurations
 
             builder.Property<bool>("IsDeleted");
             builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
-
-            //builder.Property(i => i.IndexNumber).HasColumnName("IndexNumber").IsRequired();
         }
     }
 }

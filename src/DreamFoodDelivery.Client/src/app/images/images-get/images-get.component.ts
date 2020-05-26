@@ -32,9 +32,9 @@ export class ImagesGetComponent implements OnInit {
 
   get isAdmin(): boolean {
     const token = this.authService.getToken();
-    const decodedoken = jwt_decode(token);
+    const decodedToken = jwt_decode(token);
     // tslint:disable-next-line: no-string-literal
-    const currentRole = decodedoken['role'];
+    const currentRole = decodedToken['role'];
     if (currentRole.includes('Admin')) {
       return true;
     }
@@ -42,16 +42,21 @@ export class ImagesGetComponent implements OnInit {
   }
 
   getImages(){
-    this.imageService.getImageNamesList(this.currentDishId)
+      this.imageService.getImageNamesList(this.currentDishId)
     .subscribe(allImages => {
       this.allImages = allImages;
-
       this.imagesCount = [];
-      for (let index = 1; index <= this.allImages.length; index++) {
-        this.imagesCount.push(index);
+      if (this.allImages) {
+        for (let index = 1; index <= this.allImages.length; index++) {
+          this.imagesCount.push(index);
+        }
+        this.getImage(this.currentImageNumber); }
+      else {
+        // TODO: Empty pic
       }
-      this.getImage(this.currentImageNumber);
-    });
+      },
+    error => { }
+    );
   }
 
   previouseImage(){

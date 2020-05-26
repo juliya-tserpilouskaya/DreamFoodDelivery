@@ -8,7 +8,7 @@ namespace DreamFoodDelivery.Domain.DTO
     {
         public string Request { get; set; }
         //public IEnumerable<int?> TagsIndexNumbers { get; set; }
-        public IEnumerable<string?> TagsNames { get; set; }
+        public IEnumerable<string> TagsNames { get; set; }
         public bool OnSale { get; set; }
         public double LowerPrice { get; set; }
         public double UpperPrice { get; set; }

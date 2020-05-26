@@ -77,5 +77,28 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="idFromIdentity">User id to confirm email</param>
         Task<Result> IsEmailConfirmedAsync(string idFromIdentity);
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        /// <param name="token"></param>
+        Task<Result> ConfirmEmailByLinkAsync(string idFromIdentity, string token);
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result> ForgotPasswordAsync(PasswordRecoveryRequest request, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result> ResetPasswordAsync(PasswordRecoveryInfo userInfo, CancellationToken cancellationToken = default);
     }
 }

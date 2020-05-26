@@ -4,8 +4,13 @@
     <div class="container">
       <h1 class="jumbotron-heading">Basket</h1>
       <div class="form-group" *ngIf="isAuthenticated">
-        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
+        <div *ngIf="basket else loading">
+          <h4 class="card-text">Total cost of selected dishes: {{basket.basketCost}} $</h4>
+          <h4 class="card-text">Delivery service: {{basket.shippingCost}} $</h4>
+          <br>
+        </div>
+        <button *ngIf="basket.dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
+        <button *ngIf="basket.dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -48,15 +49,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<TagView>.Fail<TagView>($"Cannot save model. {ex.Message}");
+                return Result<TagView>.Fail<TagView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<TagView>.Fail<TagView>($"Cannot save model. {ex.Message}");
+                return Result<TagView>.Fail<TagView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<TagView>.Fail<TagView>($"Source is null. {ex.Message}");
+                return Result<TagView>.Fail<TagView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -80,30 +81,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<TagDB>.Fail<TagDB>($"Cannot save model. {ex.Message}");
+                return Result<TagDB>.Fail<TagDB>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<TagDB>.Fail<TagDB>($"Cannot save model. {ex.Message}");
+                return Result<TagDB>.Fail<TagDB>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<TagDB>.Fail<TagDB>($"Source is null. {ex.Message}");
+                return Result<TagDB>.Fail<TagDB>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Asynchronously returns all tags
-        /// </summary>
-        [LoggerAttribute]
-        public async Task<Result<IEnumerable<TagView>>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            var tags = await _context.Tags.AsNoTracking().ToListAsync(cancellationToken);
-            if (!tags.Any())
-            {
-                return Result<IEnumerable<TagView>>.Fail<IEnumerable<TagView>>("No tags found");
-            }
-            return Result<IEnumerable<TagView>>.Ok(_mapper.Map<IEnumerable<TagView>>(tags));
         }
 
         /// <summary>
@@ -125,7 +112,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<TagView>.Fail<TagView>($"Source is null. {ex.Message}");
+                return Result<TagView>.Fail<TagView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -205,12 +192,39 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<TagToUpdate>.Fail<TagToUpdate>($"Cannot update model. {ex.Message}");
+                return Result<TagToUpdate>.Fail<TagToUpdate>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<TagToUpdate>.Fail<TagToUpdate>($"Cannot update model. {ex.Message}");
+                return Result<TagToUpdate>.Fail<TagToUpdate>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Get all tags from DB
+        /// </summary>
+        /// <returns></returns>
+        public async Task<Result<IEnumerable<TagView>>> GetAllTagsAsync(CancellationToken cancellationToken)
+        {
+            var tags = await _context.Tags.OrderBy(_ => _.TagName).AsNoTracking().ToListAsync(cancellationToken);
+            if (!tags.Any())
+            {
+                return Result<IEnumerable<TagView>>.Quite<IEnumerable<TagView>>(ExceptionConstants.TAGS_WERE_NOT_FOUND);
+            }
+            HashSet<TagDB> views = new HashSet<TagDB>();
+            foreach (var tag in tags)
+            {
+                var dishTags = await _context.DishTags.Where(_ => _.TagId == tag.Id).AsNoTracking().ToListAsync(cancellationToken);
+                if (!dishTags.Any())
+                {
+                    await RemoveByIdAsync(tag.Id.ToString());
+                }
+                else
+                {
+                    views.Add(tag);
+                }
+            }
+            return Result<IEnumerable<TagView>>.Ok(_mapper.Map<IEnumerable<TagView>>(views));
         }
     }
 }

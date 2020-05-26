@@ -34,7 +34,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         //[Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("upload")]
-        [RequestSizeLimit(Number_Сonstants.IMAGE_SIZE)] 
+        [RequestSizeLimit(NumberСonstants.IMAGE_SIZE)] 
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -42,7 +42,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [LoggerAttribute]
         public async Task<IActionResult> UploadImage([FromQuery]ImageModel file)
         {
-            if (file is null || file.Image.Length == 0 || string.IsNullOrEmpty(file.DishId))
+            if (file.DishId is null || file.Image is null || string.IsNullOrEmpty(file.DishId))
             {
                 return BadRequest();
             }
@@ -50,7 +50,9 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             {
                 var result = await _imageService.UploadImageAsync(file.Image, file.DishId);
 
-                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -68,9 +70,9 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [HttpGet]
         [Route("image/{dishId}/{imageName}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public IActionResult GetImage(string dishId, string imageName)
@@ -84,11 +86,9 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             {
                 var result = _imageService.GetImage(imageName, dishId);
 
-                return result.IsError
-                    ? throw new InvalidOperationException(result.Message)
-                    : !result.IsSuccess
-                    ? NotFound(result.Message)
-                    : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -105,9 +105,9 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [HttpGet]
         [Route("{dishId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
         public IActionResult GetImageNamesList(string dishId)
@@ -121,11 +121,9 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             {
                 var result = _imageService.GetImagesInfo(dishId);
 
-                return result.IsError
-                    ? throw new InvalidOperationException(result.Message)
-                    : !result.IsSuccess
-                    ? NotFound(result.Message)
-                    : (IActionResult)Ok(result.Data);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
             }
             catch (Exception ex)
             {

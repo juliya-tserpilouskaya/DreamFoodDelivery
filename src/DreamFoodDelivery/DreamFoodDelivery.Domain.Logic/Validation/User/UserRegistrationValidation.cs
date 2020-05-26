@@ -6,9 +6,9 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.Logic.Validation
 {
-    ///////////////////////////////
-    // For training. Not used in the program.
-    ///////////////////////////////
+    /////////////////////////////////////
+    // For training. Сurrently unused. //
+    /////////////////////////////////////
 
     public class UserRegistrationValidation : AbstractValidator<UserRegistration>
     {

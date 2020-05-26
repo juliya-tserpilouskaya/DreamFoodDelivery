@@ -19,12 +19,12 @@ export class UserOrdersComponent implements OnInit {
     this.orderService.getByUserId().subscribe(data => {this.orders = data;
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
+      // if (error.status === 500){
+      //   this.router.navigate(['/error/500']);
+      //  }
+      //  else if (error.status === 404) {
+      //   this.router.navigate(['/error/404']);
+      //  }
       //  else {
       //   this.router.navigate(['/error/unexpected']);
       //  }

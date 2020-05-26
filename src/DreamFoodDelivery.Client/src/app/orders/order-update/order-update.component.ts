@@ -32,7 +32,7 @@ export class OrderUpdateComponent implements OnInit {
     this.orderInfoUpdateForm = this.fb.group({
       isInfoFromProfile: [false, [Validators.required]],
       address: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
-      phoneNumber: ['', [Validators.required, Validators.minLength(12), Validators.maxLength(13)]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(13)]],
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       surname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]]});
    }
@@ -44,11 +44,11 @@ export class OrderUpdateComponent implements OnInit {
         this.userService.getProfile().subscribe(profile => {
           this.user = profile;
           const token = this.authService.getToken();
-          const decodedoken = jwt_decode(token);
-          const currentId = decodedoken.id;
+          const decodedToken = jwt_decode(token);
+          const currentId = decodedToken.id;
           if (currentId === this.user.userDTO.idFromIdentity){
           this.isOwner = true;
-          // console.log(true);
+          console.log(true);
         }
         });
       },
@@ -68,6 +68,15 @@ export class OrderUpdateComponent implements OnInit {
   updateOrder(id: string): void {
     this.orderInfoUpdateForm.value.id = id;
     if (this.orderInfoUpdateForm.valid) {
+      if (this.orderInfoUpdateForm.value.address === this.user.userProfile.address &&
+        this.orderInfoUpdateForm.value.phoneNumber === this.user.userProfile.phoneNumber &&
+        this.orderInfoUpdateForm.value.name === this.user.userProfile.name &&
+        this.orderInfoUpdateForm.value.surname === this.user.userProfile.surname)
+        {
+        this.orderInfoUpdateForm.value.isInfoFromProfile = true;
+        }
+      console.log(this.orderInfoUpdateForm.value);
+
       this.orderService.update(this.orderInfoUpdateForm.value).subscribe(data => {this.order = data;
                                                                                   this.done = true;
                                                                                 },
@@ -87,26 +96,21 @@ export class OrderUpdateComponent implements OnInit {
     }
   }
 
+
   getdataFromProfile(): void {
-    if (!this.isAdmin) {
-      this.orderInfoUpdateForm.value.address = this.user.userProfile.address;
-      this.orderInfoUpdateForm.value.phoneNumber = this.user.userProfile.phoneNumber;
-      this.orderInfoUpdateForm.value.name = this.user.userProfile.name;
-      this.orderInfoUpdateForm.value.surname = this.user.userProfile.surname;
-      if (this.orderInfoUpdateForm.value.valid) {
-        // console.log('valid');
-        this.orderInfoUpdateForm.value.isInfoFromProfile = true;
-        // console.log(this.orderInfoUpdateForm.value.valid);
-      }
-      else {
-        console.log('not valid');
-        // TODO: message
-      }
+    if (this.isOwner) {
+      this.orderInfoUpdateForm.setValue({
+        isInfoFromProfile: false,
+        address: this.user.userProfile.address,
+        phoneNumber: this.user.userProfile.phoneNumber,
+        name: this.user.userProfile.name,
+        surname: this.user.userProfile.surname,
+      });
     }
   }
 
   removeById(id: string): void {
-    this.orderService.removeById(id).subscribe(data => {
+    this.orderService.removeById(id).subscribe(data => { this.router.navigate(['/administration/orders']);
     },
     error => {
       if (error.status === 500){
@@ -127,9 +131,9 @@ export class OrderUpdateComponent implements OnInit {
 
   get isAdmin(): boolean {
     const token = this.authService.getToken();
-    const decodedoken = jwt_decode(token);
+    const decodedToken = jwt_decode(token);
     // tslint:disable-next-line: no-string-literal
-    const currentRole = decodedoken['role'];
+    const currentRole = decodedToken['role'];
     if (currentRole.includes('Admin')) {
       return true;
     }

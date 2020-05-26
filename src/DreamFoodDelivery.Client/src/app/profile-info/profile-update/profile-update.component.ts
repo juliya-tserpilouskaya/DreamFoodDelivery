@@ -3,6 +3,7 @@ import { UserService, UserView } from 'src/app/app-services/nswag.generated.serv
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { ImageModifiedService } from 'src/app/app-services/image.services';
 
 @Component({
   selector: 'app-profile-update',
@@ -15,13 +16,14 @@ export class ProfileUpdateComponent implements OnInit {
 
   constructor(
     private userServuice: UserService,
+    private imageService: ImageModifiedService,
     private location: Location,
     public router: Router,
     public fb: FormBuilder,
   ) {
     this.userInfoUpdateForm = this.fb.group({
       address: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
-      phoneNumber: ['', [Validators.required, Validators.minLength(12), Validators.maxLength(13)]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(13)]],
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       surname: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]]});
    }
@@ -59,5 +61,7 @@ export class ProfileUpdateComponent implements OnInit {
   goBack(): void {
     this.location.back();
   }
+
+
 
 }

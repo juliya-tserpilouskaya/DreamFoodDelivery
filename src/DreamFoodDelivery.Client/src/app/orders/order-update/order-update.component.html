@@ -10,11 +10,11 @@
   <div class="col-6">
     <div class="card shadow-sm">
       <div class="card-body">
-        <h4 class="jumbotron-heading">{{order.name}}{{order.surname}}</h4>
+        <h4 class="jumbotron-heading">{{order.name}} &nbsp; {{order.surname}}</h4>
         <p class="jumbotron-heading">Status: {{order.status}}</p>
         <p class="card-text">{{order.phoneNumber}}, {{order.address}}</p>
-        <p class="card-text">Order cost: {{order.orderCost}}</p>
-        <p class="card-text">{{order.shippingCost}}</p>
+        <p class="card-text">Order cost: {{order.orderCost}} $</p>
+        <p class="card-text">Order Shipping cost: {{order.shippingCost}} $</p>
         <div *ngFor="let dish of order.dishes">
           <ul class="list-group">
             <li class="list-group-item">Name: {{dish.name}}</li>
@@ -60,7 +60,7 @@
         <label>Phone number</label>
         <input type="text" class="form-control" formControlName="phoneNumber" placeholder="Place for phone number">
         <small *ngIf="!orderInfoUpdateForm.controls.phoneNumber.valid" class="text-danger">
-          Phone number is required (minimum 12 characters, maximum 13 characters).
+          Phone number is required (minimum 10 characters, maximum 13 characters).
         </small>
       </div>
       <button type="submit" [disabled]="!orderInfoUpdateForm.valid">Update order</button>

@@ -6,7 +6,7 @@ namespace DreamFoodDelivery.Common
 {
     public enum OrderStatuses
     {
-        InProcessing = 0,
+        InProcess = 0,
         OnWay = 1,
         Delivered = 2,
         Canceled = 3,

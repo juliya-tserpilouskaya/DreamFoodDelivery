@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <UserSecretsId>d5313cc1-8c40-46cf-a80a-48725eca5257</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -32,6 +33,7 @@
       <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
       <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
       <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0001" />
     </ItemGroup>
 
     <ItemGroup>

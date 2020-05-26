@@ -1,29 +1,43 @@
 <div class="row">
   <div class="col col-lg-3">
       <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
-        <button class="btn btn-dark"
+        <button class="btn btn-outline-secondary"
         type="button"
         data-toggle="collapse"
         data-target="#collapseOrders"
         aria-expanded="false"
-        aria-controls="collapseOrders">My Orders</button>
+        aria-controls="collapseOrders">My orders</button>
 
-        <button class="btn btn-dark"
+        <button class="btn btn-outline-secondary"
           type="button"
           data-toggle="collapse"
           data-target="#collapseComments"
           aria-expanded="false"
-          aria-controls="collapseComments">My Comments</button>
+          aria-controls="collapseComments">My reviews</button>
       </div>
       <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
-      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/profile/update']">Info update</button>
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/profile/update']">Profile info update</button>
       <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/delete']">Delete account</button>
-      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
-      <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/email/confirm']">Confirm email</button>
       <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/email/change']">Change email</button>
       <button type="button" *ngIf="isAuthenticated" class="btn btn-sm btn-outline-secondary" [routerLink]="['/password/change']">Change password</button>
       </div>
+      <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
+      </div>
   </div>
+
+  <div class="col" *ngIf="user; else loading">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h4 class="jumbotron-heading"> Name and surname: {{user.userProfile.name}}&nbsp;{{user.userProfile.surname}}</h4>
+        <ul class="list-group">
+          <li class="list-group-item">Email: {{user.userProfile.email}}</li>
+          <li class="list-group-item">Phone number: {{user.userProfile.phoneNumber}}</li>
+          <li class="list-group-item">Address: {{user.userProfile.address}}</li>
+          <li class="list-group-item">Personal discount: {{user.userProfile.personalDiscount}}</li>
+        </ul>
+      </div>
+    </div>
 
   <div class="col">
     <div class="collapse" id="collapseOrders">
@@ -36,4 +50,6 @@
   </div>
 </div>
 
-
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>

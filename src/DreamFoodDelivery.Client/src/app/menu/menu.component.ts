@@ -20,12 +20,18 @@ export class MenuComponent implements OnInit {
 
   get isAdmin(): boolean {
     const token = this.authService.getToken();
-    const decodedoken = jwt_decode(token);
+    const decodedToken = jwt_decode(token);
     // tslint:disable-next-line: no-string-literal
-    const currentRole = decodedoken['role'];
+    const currentRole = decodedToken['role'];
     if (currentRole.includes('Admin')) {
       return true;
     }
     return false;
+  }
+
+  get currentEmail(): string{
+    const token = this.authService.getToken();
+    const decodedToken = jwt_decode(token);
+    return decodedToken.email;
   }
 }

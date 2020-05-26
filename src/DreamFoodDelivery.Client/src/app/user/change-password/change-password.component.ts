@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { UserView, UserService } from 'src/app/app-services/nswag.generated.services';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth/auth.service';
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import * as jwt_decode from 'jwt-decode';
 
@@ -17,6 +18,7 @@ export class ChangePasswordComponent implements OnInit {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private location: Location,
     public fb: FormBuilder,
     public router: Router
   ) {
@@ -30,13 +32,14 @@ export class ChangePasswordComponent implements OnInit {
 
   changePassword(): void {
     const token = this.authService.getToken();
-    const decodedoken = jwt_decode(token);
-    this.changePassForm.value.idFromIdentity = decodedoken.id;
+    const decodedToken = jwt_decode(token);
+    this.changePassForm.value.idFromIdentity = decodedToken.id;
     if (this.changePassForm.valid) {
       const data = this.changePassForm.value;
       this.userService.chasngeUserPassword(data)
         .subscribe(user => {this.changePassForm.reset();
-                            this.router.navigate(['/profile']);
+                            // this.router.navigate(['/profile']);
+                            this.doLogout();
                           },
                           error => {
                             if (error.status === 500){
@@ -49,6 +52,17 @@ export class ChangePasswordComponent implements OnInit {
                             //   this.router.navigate(['/error/unexpected']);
                             //  }
                            }); }
+  }
+
+  doLogout() {
+    const removeToken = localStorage.removeItem('access_token');
+    if (removeToken == null) {
+      this.router.navigate(['/menu']);
+    }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
 }

@@ -10,10 +10,10 @@ import { Location } from '@angular/common';
 })
 export class UserCommentsAdminComponent implements OnInit {
   idFromURL = '';
-  comments: CommentView[] = [];
+  reviews: CommentView[] = [];
 
   constructor(
-    private commentService: CommentService,
+    private reviewService: CommentService,
     private route: ActivatedRoute,
     public router: Router,
     private location: Location,
@@ -22,7 +22,7 @@ export class UserCommentsAdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.commentService.getByUserIdForAdmin(this.idFromURL).subscribe(data => {this.comments = data;
+    this.reviewService.getByUserIdForAdmin(this.idFromURL).subscribe(data => {this.reviews = data;
     },
     error => {
       if (error.status === 500){
@@ -45,9 +45,9 @@ export class UserCommentsAdminComponent implements OnInit {
   }
 
   removeById(id: string): void {
-    this.commentService.removeById(id).subscribe(data => {
-      const indexToDelete = this.comments.findIndex((mark: CommentView) => mark.id === id);
-      this.comments.splice(indexToDelete, 1);
+    this.reviewService.removeById(id).subscribe(data => {
+      const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
+      this.reviews.splice(indexToDelete, 1);
     },
     error => {
       if (error.status === 500){
@@ -63,8 +63,8 @@ export class UserCommentsAdminComponent implements OnInit {
   }
 
   removeAll(): void {
-    this.commentService.removeAllByUserId(this.idFromURL).subscribe(result => {
-      this.comments = null;
+    this.reviewService.removeAllByUserId(this.idFromURL).subscribe(result => {
+      this.reviews = null;
     },
     error => {
       if (error.status === 500){

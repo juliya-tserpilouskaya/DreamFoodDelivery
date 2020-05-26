@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { IdentityService } from 'src/app/app-services/nswag.generated.services';
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,6 +14,7 @@ export class DeleteAccountComponent implements OnInit {
 
   constructor(
     private identityService: IdentityService,
+    private location: Location,
     public fb: FormBuilder,
     public router: Router) {
       this.deleteForm = fb.group({
@@ -49,6 +51,10 @@ export class DeleteAccountComponent implements OnInit {
     if (removeToken == null) {
       this.router.navigate(['/menu']);
     }
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
 }

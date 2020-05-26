@@ -3,30 +3,15 @@
 
     <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Comments</h1>
+        <h1 class="h2">Reviews</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
           <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove All</button>
         </div>
-        <div class="form-group">
-          <form [formGroup]="requestForm" #formDir="ngForm" novalidate>
-              <div class="col-12">
-                  <div class="input-group">
-                      <div class="input-group-prepend">
-                          <div class="input-group-text">Comments on the page</div>
-                      </div>
-                      <input type="number" formControlName="pageSize" class="form-control">
-
-                      <div class="input-group-append">
-                          <button class="btn btn-success" (click)="getComments()">Show comments</button>
-                      </div>
-                  </div>
-              </div>
-          </form>
-      </div>
       </div>
 
-      <div *ngIf="response">
-        <div class="card" *ngFor="let item of response.data">
+      <div *ngIf="reviews">
+
+        <div class="card" *ngFor="let item of reviews | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
           <h5 class="card-header">{{item.userId}}</h5>
           <div class="card-body">
             <div class="col-12 col-md-12 col-lg-12 row">
@@ -37,8 +22,7 @@
                 {{item.content}}
               </div>
               <div class="col-4 col-md-4 col-lg-4">
-                <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
-                <a [routerLink]="['/comment', item.id, 'update']">Change comments details</a>
+                <a [routerLink]="['/review', item.id, 'update']">Change reviews details</a>
               </div>
               <div class="col-4 col-md-4 col-lg-4">
                 <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>
@@ -47,19 +31,12 @@
           </div>
         </div>
       </div>
-
-      <div *ngIf="response" class="form-group text-center">
-        <div class="form-group btn-group col-4">
-            <button class="btn btn-warning col-8" (click)="previousePage()"><Previous</button>
-            <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
-        </div>
-        <br>
-        <div class="form-group btn-group mr-2">
-            <div *ngFor="let page of pages">
-                <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'"
-                    (click)="getPage(page)">{{page}}</button>
-            </div>
-        </div>
-      </div>
     </main>
+</div>
+
+<div class="row justify-content-center">
+  <ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="reviews.length"></ngb-pagination>
 </div>

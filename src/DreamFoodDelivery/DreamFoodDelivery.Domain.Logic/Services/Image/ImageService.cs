@@ -1,8 +1,10 @@
 ﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Common.Helpers;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,9 +31,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <returns></returns>
         public Result DeleteImageByName(string imageName, string dishId)
         {
-            if (_context.Dishes.Where(_ => _.Id.ToString().Equals(dishId)) is null)
+            if (_context.Dishes.Where(_ => _.Id.ToString().Equals(dishId)).AsNoTracking() is null)
             {
-                return Result<string>.Warning<string>(null, "Dish is not exists or you are not owner");
+                return Result<string>.Quite<string>(ExceptionConstants.DISH_WAS_NOT_FOUND);
             }
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), $"Images\\DishImages\\{dishId}");
@@ -46,7 +48,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result.Fail(checkDirectory.Message);
                 }
 
-                return Result.Warning(checkDirectory.Message);
+                return Result.Quite(checkDirectory.Message);
             }
 
             File.Delete(fullPath);
@@ -75,7 +77,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result<string>.Fail<string>(checkDirectory.Message);
                 }
 
-                return Result<string>.Warning<string>(null, checkDirectory.Message);
+                return Result<string>.Quite<string>(checkDirectory.Message);
             }
 
             return Result<string>.Ok<string>(path);
@@ -95,7 +97,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 DirectoryInfo dirInfo = new DirectoryInfo(path);
                 if (!dirInfo.Exists)
                 {
-                    return Result<ICollection<string>>.Warning<ICollection<string>>(null, "This dish doesn't have images!");
+                    return Result<ICollection<string>>.Quite<ICollection<string>>(ExceptionConstants.NO_IMAGES);
                 }
 
                 var info = dirInfo.GetFiles();
@@ -124,10 +126,17 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             if (CheckIfImageFile(file))
             {
+                var imageNames = GetImagesInfo(dishId);
+                if (!(imageNames.Data is null))
+                {
+                    foreach (var name in imageNames.Data)
+                    {
+                        DeleteImageByName(name, dishId);
+                    }
+                }
                 return await WriteFileAsync(file, dishId);
             }
-
-            return Result<string>.Warning<string>(null, "Invalid file");
+            return Result<string>.Quite<string>(NotificationConstans.INVALID_FILE);
         }
 
         /// <summary>
@@ -156,7 +165,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         {
             if (_context.Dishes.Where(_ => _.Id.ToString().Equals(dishId)).FirstOrDefault() is null)
             {
-                return Result<string>.Warning<string>(null, "Dish does not exist");
+                return Result<string>.Quite<string>(ExceptionConstants.DISH_WAS_NOT_FOUND);
             }
 
             try
@@ -197,7 +206,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 DirectoryInfo dirInfo = new DirectoryInfo(directory);
                 if (!dirInfo.Exists)
                 {
-                    return Result.Warning("This dish doesn't have images!");
+                    return Result.Quite(ExceptionConstants.NO_IMAGES);
                 }
 
                 var fullPath = Path.Combine(directory, imageName);
@@ -205,7 +214,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 FileInfo fileInfo = new FileInfo(fullPath);
                 if (!fileInfo.Exists)
                 {
-                    return Result.Warning("Image is not exists!");
+                    return Result.Quite(ExceptionConstants.NO_IMAGES);
                 }
 
                 return Result.Ok();

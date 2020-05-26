@@ -18,6 +18,12 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<DishView>> AddAsync(DishToAdd dish, CancellationToken cancellationToken = default);
 
         /// <summary>
+        ///  Asynchronously get dish by dish Id. Id must be verified 
+        /// </summary>
+        /// <param name="dishId">ID of existing dish</param>
+        Task<Result<DishView>> GetByIdAsync(string dishId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         ///  Asynchronously update dish
         /// </summary>
         /// <param name="dish">Existing dish to update</param>

@@ -32,7 +32,7 @@ export class DishUpdateComponent implements OnInit {
       composition: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       cost: ['', [Validators.required]],
-      weigh: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(250)]],
+      weigh: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]],
       sale: ['', [Validators.required]],
       tagNames: this.fb.array([
           this.initTag(), ])
@@ -40,15 +40,15 @@ export class DishUpdateComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.menuService.getById(this.idFromURL).subscribe(data => {this.dish = data;
+    this.dishService.getById(this.idFromURL).subscribe(data => {this.dish = data;
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
+      // if (error.status === 500){
+      //   this.router.navigate(['/error/500']);
+      //  }
+      //  else if (error.status === 404) {
+      //   this.router.navigate(['/error/404']);
+      //  }
       //  else {
       //   this.router.navigate(['/error/unexpected']);
       //  }
@@ -78,12 +78,12 @@ export class DishUpdateComponent implements OnInit {
                                                                                 this.done = true;
                                                                               },
                                                                               error => {
-                                                                                if (error.status === 500){
-                                                                                  this.router.navigate(['/error/500']);
-                                                                                 }
-                                                                                 else if (error.status === 404) {
-                                                                                  this.router.navigate(['/error/404']);
-                                                                                 }
+                                                                                // if (error.status === 500){
+                                                                                //   this.router.navigate(['/error/500']);
+                                                                                //  }
+                                                                                //  else if (error.status === 404) {
+                                                                                //   this.router.navigate(['/error/404']);
+                                                                                //  }
                                                                                 //  else {
                                                                                 //   this.router.navigate(['/error/unexpected']);
                                                                                 //  }
@@ -91,6 +91,23 @@ export class DishUpdateComponent implements OnInit {
     } else {
       // TODO: message
     }
+  }
+
+  removeDish(id: string): void {
+    this.dishService.removeById(id).subscribe(data => {
+      this.router.navigate(['/dishes']);
+    },
+    error => {
+      if (error.status === 500){
+        this.router.navigate(['/error/500']);
+       }
+       else if (error.status === 404) {
+        this.router.navigate(['/error/404']);
+       }
+      //  else {
+      //   this.router.navigate(['/error/unexpected']);
+      //  }
+    });
   }
 
   goBack(): void {

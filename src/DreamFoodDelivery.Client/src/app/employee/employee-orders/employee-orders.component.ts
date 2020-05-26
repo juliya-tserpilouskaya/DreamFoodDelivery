@@ -50,7 +50,9 @@ export class EmployeeOrdersComponent implements OnInit {
     this.statusUpdateForm.value.statusIndex = +this.statusUpdateForm.value.statusIndex;
     // console.log(this.statusUpdateForm.value);
     this.orderService.updateStatus(this.statusUpdateForm.value).subscribe(data => {
-      window.location.reload();
+      this.ngOnInit();
+
+      // window.location.reload();
     },
     error => {
       if (error.status === 500){
