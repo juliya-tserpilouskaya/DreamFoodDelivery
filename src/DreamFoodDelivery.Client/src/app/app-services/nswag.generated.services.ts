@@ -5382,7 +5382,7 @@ export class OrderView implements IOrderView {
     phoneNumber?: string | null;
     name?: string | null;
     surname?: string | null;
-    orderCost?: number | null;
+    totalCost?: number | null;
     shippingCost?: number | null;
     status?: string | null;
     orderTime?: Date | null;
@@ -5413,7 +5413,7 @@ export class OrderView implements IOrderView {
             this.phoneNumber = _data["phoneNumber"] !== undefined ? _data["phoneNumber"] : <any>null;
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
-            this.orderCost = _data["orderCost"] !== undefined ? _data["orderCost"] : <any>null;
+            this.totalCost = _data["totalCost"] !== undefined ? _data["totalCost"] : <any>null;
             this.shippingCost = _data["shippingCost"] !== undefined ? _data["shippingCost"] : <any>null;
             this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
             this.orderTime = _data["orderTime"] ? new Date(_data["orderTime"].toString()) : <any>null;
@@ -5444,7 +5444,7 @@ export class OrderView implements IOrderView {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        data["orderCost"] = this.orderCost !== undefined ? this.orderCost : <any>null;
+        data["totalCost"] = this.totalCost !== undefined ? this.totalCost : <any>null;
         data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
         data["status"] = this.status !== undefined ? this.status : <any>null;
         data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>null;
@@ -5464,7 +5464,7 @@ export interface IOrderView {
     phoneNumber?: string | null;
     name?: string | null;
     surname?: string | null;
-    orderCost?: number | null;
+    totalCost?: number | null;
     shippingCost?: number | null;
     status?: string | null;
     orderTime?: Date | null;
