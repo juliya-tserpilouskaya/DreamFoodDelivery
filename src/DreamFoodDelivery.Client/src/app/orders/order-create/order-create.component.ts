@@ -75,7 +75,7 @@ export class OrderCreateComponent implements OnInit {
                               this.message = 'You are not authorized!';
                             }
                             else if (error.status ===  403) {
-                              this.message = 'You are not authorized!';
+                              this.message = 'Please, confirm your email!';
                             }
                             else if (error.status ===  500) {
                               this.message = 'Error 500: Internal Server Error!';
