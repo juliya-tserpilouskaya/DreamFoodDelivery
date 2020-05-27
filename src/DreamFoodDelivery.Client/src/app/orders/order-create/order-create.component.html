@@ -1,0 +1,64 @@
+<div *ngIf="isNotConfirmed">
+  <div class="alert alert-warning text-center">
+      Please, confirm your email.
+  </div>
+</div>
+
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">New order</h1>
+  <div class="btn-toolbar mb-2 mb-md-0">
+    <button type="button" class="btn btn-sm btn-outline-success" (click)="goBack()">Go back</button>
+    <button type="button" class="btn btn-sm btn-outline-success" (click)="getdataFromProfile()">Get my profile data</button>
+  </div>
+</div>
+
+<div class="row justify-content-center" *ngIf="user else loading">
+  <div class="col-8 col-md-8 col-lg-8" >
+    <form novalidate [formGroup]="orderAddForm" novalidate (ngSubmit)="addNewOrder()" #formDir="ngForm">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" class="form-control" value = {{user.userProfile.name}} formControlName="name" placeholder="Place for name">
+        <small *ngIf="!orderAddForm.controls.name.valid" class="text-danger">
+          Name is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Surname</label>
+        <input type="text" class="form-control" value = {{user.userProfile.surname}} formControlName="surname" placeholder="Place for surname">
+        <small *ngIf="!orderAddForm.controls.surname.valid" class="text-danger">
+          Surname is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" class="form-control" value = {{user.userProfile.address}} formControlName="address" placeholder="Enter the address, building and apartment number.">
+        <small *ngIf="!orderAddForm.controls.address.valid" class="text-danger">
+          Address is required (minimum 3 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Phone number</label>
+        <input type="text" class="form-control" value = {{user.userProfile.phoneNumber}} formControlName="phoneNumber" placeholder="Place for phone number">
+        <small *ngIf="!orderAddForm.controls.phoneNumber.valid" class="text-danger">
+          Phone number is required (minimum 10 characters, maximum 13 characters).
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="horns">Do you want add this data to your prifile?</label>
+        <input type="checkbox" formControlName="updateProfile">
+      </div>
+
+      <button type="submit" [disabled]="!orderAddForm.valid">Make order</button>
+    </form>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>

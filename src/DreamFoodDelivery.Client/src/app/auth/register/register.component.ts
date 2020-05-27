@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 
-// import service
-import { IdentityService } from 'src/app/nswag_gen/services/api.generated.client';
-// import models
-import { UserRegistration, UserWithToken } from 'src/app/nswag_gen/services/api.generated.client';
+// import service and models
+import { UserWithToken, IdentityService } from 'src/app/app-services/nswag.generated.services';
 
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-register',
@@ -15,40 +14,56 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
 
+  spinning = false;
+  message: string = null;
+
   registerForm: FormGroup;
-  registerRequest: UserRegistration;
   user: UserWithToken;
+  currentUser = {};
 
   constructor(
     private identityService: IdentityService,
+    private authService: AuthService,
     public fb: FormBuilder,
     public router: Router
     ) {
       this.registerForm = this.fb.group({
-        name: [''],
-        password: ['']
+        email: [''],
+        password: [''],
+        callBackUrl: 'http://localhost:4200/confirmation'
       });
     }
+    isAuthenticated: boolean;
 
   ngOnInit(): void {
   }
 
   register() {
+    this.message = null;
+    this.spinning = true;
     if (this.registerForm.valid) {
       const data = this.registerForm.value;
-
-      //this.registerRequest = new UserRegistration();
-
-      this.registerRequest.email = data.name;
-      this.registerRequest.password = data.password;
-
-      this.identityService.register(this.registerRequest)
-        .subscribe(user => this.user = user);
-
-        this.registerForm.reset();
-        this.router.navigate(['login']);
-    }
+      this.identityService.register(data)
+        .subscribe(user => {this.user = user;
+                            this.spinning = false;
+                            localStorage.setItem('access_token', this.user.userToken);
+                            this.currentUser = this.user;
+                            this.registerForm.reset();
+                            this.router.navigate(['/profile']);
+                            this.isAuthenticated =  this.authService.isLoggedIn;
+                          },
+                          error => {
+                            this.spinning = false;
+                            if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.response;
+                            }
+                            else if (error.status ===  500) {
+                              this.message = 'Error 500: Internal Server Error!';
+                            }
+                            else{
+                              this.message = 'Something was wrong. Please, contact with us.';
+                            }
+                           });
+   }
   }
-
-
 }

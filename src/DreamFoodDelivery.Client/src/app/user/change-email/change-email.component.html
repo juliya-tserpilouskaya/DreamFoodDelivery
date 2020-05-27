@@ -1,0 +1,30 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<div class="col-8">
+  <form class="was-validated" novalidate [formGroup]="changeEmailForm" (ngSubmit)="change()">
+      <h3>Please enter new email</h3>
+      <div class="form-group">
+        <input type="email"
+        id="inputEmail"
+        class="form-control"
+        formControlName="newEmail"
+        placeholder="Email@example.by"
+        required>
+
+ <div class="valid-feedback">
+     Looks good!
+ </div>
+ <div class="invalid-feedback">
+     Please, enter your email!
+ </div>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-success" type="submit">Change</button>
+        <button type="button" class="btn btn-sm btn-primary" (click)="goBack()">Go back</button>
+      </div>
+  </form>
+</div>

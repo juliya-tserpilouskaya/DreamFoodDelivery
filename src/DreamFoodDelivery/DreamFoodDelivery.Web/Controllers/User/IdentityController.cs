@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -34,8 +35,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="user">User data: Email, Password</param>
         /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
-        [HttpPost]
-        [Route("registration")]
+        [HttpPost, Route("registration")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -65,13 +65,12 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <param name="user">User data: Email, Password</param>
         /// <returns>User identity and db user information with token</returns>
         [AllowAnonymous]
-        [HttpPost]
-        [Route("login")]
+        [HttpPost, Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> LoginAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> LoginAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -94,8 +93,7 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <summary>
         /// Log out
         /// </summary>
-        [HttpPost]
-        [Route("logout")]
+        [HttpPost, Route("logout")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LoggerAttribute]
@@ -111,15 +109,14 @@ namespace DreamFoodDelivery.Web.Controllers
         /// </summary>
         /// <param name="user">User data: Email, Password</param>
         /// <returns>Result information</returns>
-        [HttpDelete]
-        [Route("delete")]
+        [HttpDelete, Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> DeleteAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> DeleteAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {

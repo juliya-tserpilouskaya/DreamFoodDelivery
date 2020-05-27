@@ -1,0 +1,18 @@
+<div *ngIf="spinning" class="d-flex justify-content-center">
+  <div class="spinner-border text-success" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="message">
+  <div class="alert alert-danger" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<div *ngIf="isConfirmed">
+  <div class="alert alert-success text-center">
+      Your email is confirmed!
+  </div>
+</div>
+

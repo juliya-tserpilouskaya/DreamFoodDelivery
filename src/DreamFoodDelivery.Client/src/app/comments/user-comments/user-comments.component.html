@@ -1,0 +1,24 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<h3>Reviews:</h3>
+<div class="card" *ngFor="let item of reviews">
+  <h5 class="card-header">{{item.rating}}</h5>
+  <div class="card-body">
+    <div class="col-12 col-md-12 col-lg-12 row">
+      <div class="col-4 col-md-4 col-lg-4">
+        {{item.headline}}
+      </div>
+      <div class="col-4 col-md-4 col-lg-4">
+        {{item.content}}
+      </div>
+      <div class="col-4 col-md-4 col-lg-4">
+        <a [routerLink]="['/review', item.id, 'details']">Change reviews details</a>
+        <button class="btn btn-outline-success my-2 my-sm-0" (click)="removeById(item.id)" type="submit">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

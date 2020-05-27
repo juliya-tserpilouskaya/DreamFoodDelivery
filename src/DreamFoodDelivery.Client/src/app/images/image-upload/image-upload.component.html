@@ -1,0 +1,31 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<div>
+  <div *ngIf="addressImage" class="col-8">
+      <img [src]="addressImage" class="card-img">
+      <div class="alert alert-success" role="alert">
+        UPLOADED!
+      </div>
+  </div>
+
+  <div class="input-group">
+      <div class="custom-file">
+        <input type="file"
+              class="custom-file-input"
+              (change)="onFileChanged($event)"
+              #fileInput
+              id="inputGroupFile04"
+              aria-describedby="inputGroupFileAddon04">
+        <label *ngIf="!selectedFile" class="custom-file-label" for="inputGroupFile04">Choose file</label>
+        <label *ngIf="selectedFile" class="custom-file-label" for="inputGroupFile04">{{selectedFile.name}}</label>
+      </div>
+      <div class="input-group-append">
+        <button [ngClass]="selectedFile ? 'btn btn-success':'btn btn-success disabled'" (click)="onUpload()" type="button" id="inputGroupFileAddon04">Upload</button>
+      </div>
+  </div>
+</div>
+

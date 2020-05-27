@@ -10,8 +10,9 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
     {
         public DishToBasketAddValidation()
         {
-            RuleFor(_ => _.DishId).NotEmpty().WithMessage("You must enter Id");
-            RuleFor(_ => _.Quantity).GreaterThanOrEqualTo(0).WithMessage("Quantity must be greater than or equal to 0");
+            RuleFor(_ => _.DishId).Must(id => Guid.TryParse(id, out var _))
+                .WithMessage("Dish id can't parse to Guid type");
+            RuleFor(_ => _.Quantity).GreaterThanOrEqualTo(1).WithMessage("Quantity must be greater than or equal to 1");
         }
     }
 }

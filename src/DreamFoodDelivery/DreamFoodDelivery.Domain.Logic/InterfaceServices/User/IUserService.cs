@@ -1,5 +1,6 @@
 ﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,21 +12,10 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
     public interface IUserService
     {
         /// <summary>
-        /// Asynchronously returns all users
-        /// </summary>
-        Task<Result<IEnumerable<UserView>>> GetAllAsync(CancellationToken cancellationToken = default);
-
-        /// <summary>
         ///  Asynchronously add new account
         /// </summary>
         /// <param name="userIdFromIdentity">ID of user from identity</param>
         Task<Result<UserView>> CreateAccountAsyncById(string userIdFromIdentity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously get by userId. Id must be verified 
-        /// </summary>
-        /// <param name="userId">ID of user</param>
-        Task<Result<UserView>> GetByIdAsync(string userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get User Profile by idFromIdentity. Helper
@@ -47,29 +37,10 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<UserView>> UpdateUserProfileAsync(UserToUpdate userToUpdate, string idFromIdentity, CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///  Asynchronously update user personal discount
-        /// </summary>
-        /// <param name="personalDiscount">New personal discount</param>
-        /// <param name="idFromIdentity">Existing user ID</param>
-        Task<Result<UserView>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously remove user by Id. Id must be verified
-        /// </summary>
-        /// <param name="userId">ID of existing user</param>
-        Task<Result> RemoveByIdAsync(string userId, CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Remove User idFromIdentity
         /// </summary>
         /// <param name="idFromIdentity"></param>
         Task<Result> DeleteUserByIdFromIdentityAsync(string idFromIdentity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Make admin from user or vice versa
-        /// </summary>
-        /// <param name="id"></param>
-        Task<Result> ChangeRoleAsync(string id);
 
         /// <summary>
         ///  Asynchronously update user password
@@ -86,12 +57,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <summary>
         ///  Asynchronously confirms user email
         /// </summary>
-        /// <param name="idFromIdentity">User id to confirm email</param>
-        Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        ///  Asynchronously confirms user email
-        /// </summary>
         Task<Result> ConfirmEmailSendAsync(string idFromIdentity);
 
         /// <summary>
@@ -100,5 +65,34 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="idFromIdentity">User id to confirm email</param>
         /// <param name="token">User token to confirm email</param>
         Task<Result<UserView>> ConfirmEmailGetAsync(string idFromIdentity, string token, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///  Asynchronously returs IsEmailConfirmedAsync
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        Task<Result> IsEmailConfirmedAsync(string idFromIdentity);
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        /// <param name="token"></param>
+        Task<Result> ConfirmEmailByLinkAsync(string idFromIdentity, string token);
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result> ForgotPasswordAsync(PasswordRecoveryRequest request, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result> ResetPasswordAsync(PasswordRecoveryInfo userInfo, CancellationToken cancellationToken = default);
     }
 }

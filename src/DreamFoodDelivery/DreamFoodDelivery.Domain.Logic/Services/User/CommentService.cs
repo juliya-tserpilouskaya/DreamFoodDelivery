@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -28,25 +30,48 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         /// <summary>
-        /// Asynchronously returns all comments
+        /// Asynchronously returns all comments for users
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// </summary>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<CommentView>>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<Result<PageResponse<CommentForUsersView>>> GetAllAsync(PageRequest request, CancellationToken cancellationToken = default)
         {
-            var comments = await _context.Comments.AsNoTracking().ToListAsync(cancellationToken);
+            var count = await _context.Comments.CountAsync();
+            var comments = await _context.Comments.Skip((request.PageNumber - 1) * request.PageSize)
+                                                 .Take(request.PageSize)
+                                                 .AsNoTracking().ToListAsync(cancellationToken);
             if (!comments.Any())
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
+                return Result<PageResponse<CommentForUsersView>>.Quite<PageResponse<CommentForUsersView>>(ExceptionConstants.COMMENTS_WERE_NOT_FOUND);
             }
-            List<CommentView> views = new List<CommentView>();
+            List<CommentForUsersView> views = new List<CommentForUsersView>();
             foreach (var comment in comments)
             {
-                CommentView view = _mapper.Map<CommentView>(comment);
-                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
-                view.Order = order.Data;
+                CommentForUsersView view = _mapper.Map<CommentForUsersView>(comment);
+                var order = await _context.Orders.Where(_ => _.Id == comment.OrderId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                view.Name = order.Name;
+                view.Surname = order.Surname;
                 views.Add(view);
             }
-            return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+            PageResponse<CommentForUsersView> response = new PageResponse<CommentForUsersView>(_mapper.Map<IEnumerable<CommentForUsersView>>(views),
+                                                                               count,
+                                                                               request.PageNumber,
+                                                                               request.PageSize);
+            return Result<PageResponse<CommentForUsersView>>.Ok(response);
+        }
+
+        /// <summary>
+        /// Asynchronously returns all comments for admin
+        /// <param name="cancellationToken"></param>
+        /// </summary>
+        [LoggerAttribute]
+        public async Task<Result<IEnumerable<CommentView>>> GetAllAdminAsync(CancellationToken cancellationToken = default)
+        {
+            var comments = await _context.Comments.AsNoTracking().ToListAsync(cancellationToken);
+            return !comments.Any()
+                ? Result<IEnumerable<CommentView>>.Quite<IEnumerable<CommentView>>(ExceptionConstants.COMMENTS_WERE_NOT_FOUND)
+                : Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(comments));
         }
 
         /// <summary>
@@ -60,18 +85,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 var comment = await _context.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (comment is null)
-                {
-                    return Result<CommentView>.Fail<CommentView>($"Comment was not found");
-                }
-                CommentView view = _mapper.Map<CommentView>(comment);
-                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
-                view.Order = order.Data;
-                return Result<CommentView>.Ok(view);
+                return comment is null
+                    ? Result<CommentView>.Quite<CommentView>(ExceptionConstants.COMMENT_WAS_NOT_FOUND)
+                    : Result<CommentView>.Ok(_mapper.Map<CommentView>(comment));
             }
             catch (ArgumentNullException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Source is null. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -79,31 +99,32 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously add new comment
         /// </summary>
         /// <param name="comment">New comment to add</param>
+        /// <param name="userIdFromIdentity">Existing user Id to add</param>
         [LoggerAttribute]
-        public async Task<Result<CommentView>> AddAsync(CommentToAdd comment, CancellationToken cancellationToken = default)
+        public async Task<Result<CommentView>> AddAsync(CommentToAdd comment, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
+            UserDB userDB = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             var commentToAdd = _mapper.Map<CommentDB>(comment);
+            commentToAdd.UserId = userDB.Id;
+            commentToAdd.OrderId = Guid.Parse(comment.OrderId);
             _context.Comments.Add(commentToAdd);
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                CommentDB commentAfterAdding = await _context.Comments.Where(_ => _.UserId == commentToAdd.UserId).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                CommentView view = _mapper.Map<CommentView>(commentAfterAdding);
-                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
-                view.Order = order.Data;
-                return Result<CommentView>.Ok(view);
+                CommentDB commentAfterAdding = await _context.Comments.Where(_ => _.Id == commentToAdd.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                return Result<CommentView>.Ok(_mapper.Map<CommentView>(commentAfterAdding));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Cannot save model. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Cannot save model. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Source is null. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -111,24 +132,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         ///  Asynchronously get comment by userId. Id must be verified 
         /// </summary>
         /// <param name="userId">ID of user</param>
+        ///// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAdminAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<Result<IEnumerable<CommentView>>> GetByUserIdAdminAsync(/*PageRequest<string> request*/ string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
             var comments = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
-            if (!comments.Any())
-            {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
-            }
-            List<CommentView> views = new List<CommentView>();
-            foreach (var comment in comments)
-            {
-                CommentView view = _mapper.Map<CommentView>(comment);
-                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
-                view.Order = order.Data;
-                views.Add(view);
-            }
-            return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+            return !comments.Any()
+                ? Result<IEnumerable<CommentView>>.Quite<IEnumerable<CommentView>>(ExceptionConstants.COMMENTS_WERE_NOT_FOUND)
+                : Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(comments));
         }
 
         /// <summary>
@@ -141,22 +154,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             if (user is null)
             {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>($"User was not found");
+                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
             var comments = await _context.Comments.Where(_ => _.UserId == user.Id).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
-            if (!comments.Any())
-            {
-                return Result<IEnumerable<CommentView>>.Fail<IEnumerable<CommentView>>("No comments found");
-            }
-            List<CommentView> views = new List<CommentView>();
-            foreach (var comment in comments)
-            {
-                CommentView view = _mapper.Map<CommentView>(comment);
-                var order = await _orderService.GetByIdAsync(comment.OrderId.ToString());
-                view.Order = order.Data;
-                views.Add(view);
-            }
-            return Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(views));
+            return !comments.Any()
+                ? Result<IEnumerable<CommentView>>.Quite<IEnumerable<CommentView>>(ExceptionConstants.COMMENTS_WERE_NOT_FOUND)
+                : Result<IEnumerable<CommentView>>.Ok(_mapper.Map<IEnumerable<CommentView>>(comments));
         }
 
         /// <summary>
@@ -168,7 +171,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.AsNoTracking().ToListAsync(cancellationToken);
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comments were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.COMMENTS_WERE_NOT_FOUND));
             }
             try
             {
@@ -178,11 +181,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENTS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENTS + ex.Message));
             }
         }
 
@@ -197,7 +200,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.Where(_ => _.UserId == id).Select(_ => _).AsNoTracking().ToListAsync(); //check
             if (!comment.Any())
             {
-                return await Task.FromResult(Result.Fail("Commenst were not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.COMMENTS_WERE_NOT_FOUND));
             }
             try
             {
@@ -207,11 +210,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENTS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comments. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENTS + ex.Message));
             }
         }
 
@@ -226,7 +229,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var comment = await _context.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comment was not found"));
+                return await Task.FromResult(Result.Quite(ExceptionConstants.COMMENT_WAS_NOT_FOUND));
             }
             try
             {
@@ -236,11 +239,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENT + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete comment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_COMMENT + ex.Message));
             }
         }
 
@@ -252,6 +255,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<CommentView>> UpdateAsync(CommentToUpdate comment, CancellationToken cancellationToken = default)
         {
             CommentDB commentForUpdate = _mapper.Map<CommentDB>(comment);
+            commentForUpdate.Id = Guid.Parse(comment.Id);
             commentForUpdate.ModificationTime = DateTime.Now;
             _context.Entry(commentForUpdate).Property(c => c.Headline).IsModified = true;
             _context.Entry(commentForUpdate).Property(c => c.Rating).IsModified = true;
@@ -261,23 +265,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync();
-                var commentAfterUpdate = await _context.Comments.Where(_ => _.Id == comment.Id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (commentAfterUpdate is null)
-                {
-                    return Result<CommentView>.Fail<CommentView>($"Comment was not found");
-                }
-                CommentView view = _mapper.Map<CommentView>(commentAfterUpdate);
-                var order = await _orderService.GetByIdAsync(commentAfterUpdate.OrderId.ToString());
-                view.Order = order.Data;
-                return Result<CommentView>.Ok(view);
+                var commentAfterUpdate = await _context.Comments.Where(_ => _.Id == Guid.Parse(comment.Id)).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                return commentAfterUpdate is null
+                    ? Result<CommentView>.Quite<CommentView>(ExceptionConstants.COMMENT_WAS_NOT_FOUND)
+                    : Result<CommentView>.Ok(_mapper.Map<CommentView>(commentAfterUpdate));
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Cannot update model. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<CommentView>.Fail<CommentView>($"Cannot update model. {ex.Message}");
+                return Result<CommentView>.Fail<CommentView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
     }

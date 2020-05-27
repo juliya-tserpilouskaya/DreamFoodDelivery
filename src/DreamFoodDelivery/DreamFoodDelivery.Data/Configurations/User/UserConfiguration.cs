@@ -20,7 +20,7 @@ namespace DreamFoodDelivery.Data.Configurations
 
             builder.HasOne(_ => _.Basket).WithOne(_ => _.User)
                    .HasForeignKey<BasketDB>(_ => _.UserId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(_ => _.Orders).WithOne(_ => _.User)
                    .HasForeignKey(_ => _.UserId)

@@ -6,6 +6,7 @@ namespace DreamFoodDelivery.Domain.DTO
 {
     public class TagToAdd
     {
-        public int? IndexNumber { get; set; }
+        //public int? IndexNumber { get; set; }
+        public string TagName { get; set; }
     }
 }

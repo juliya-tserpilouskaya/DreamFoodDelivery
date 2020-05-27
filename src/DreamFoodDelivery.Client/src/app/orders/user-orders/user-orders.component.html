@@ -1,0 +1,31 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<h3>Orders:</h3>
+<div class="card" *ngFor="let item of orders">
+  <h5 class="card-header">{{item.name}} {{item.surname}}</h5>
+  <div class="card-body">
+    <div class="col-12 col-md-12 col-lg-12 row">
+      <div class="col-3 col-md-3 col-lg-3">
+        Address: {{item.address}}
+      </div>
+      <div class="col-3 col-md-3 col-lg-3">
+        Total cost: {{item.orderCost}}$
+      </div>
+      <div class="col-3 col-md-3 col-lg-3">
+        Order status: {{item.status}}
+      </div>
+      <div class="col-3 col-md-3 col-lg-3">
+        <!-- <a href={{parseUrl(item.URL)}}>{{item.URL}}</a> -->
+        <a *ngIf="item.status === 'InProcess'" [routerLink]="['/order', item.id, 'details']">Change orders details</a>
+        <label *ngIf="item.status !== 'InProcess'" >You could't change order details</label>
+        <br>
+        <a *ngIf="item.status == 'Delivered' && item.commentId == null" [routerLink]="['/review/create/for/', item.id]">Add review</a>
+        <a *ngIf="item.status == 'Delivered' && item.commentId != null" [routerLink]="['/review', item.commentId, 'details']">Update review</a>
+      </div>
+    </div>
+  </div>
+</div>

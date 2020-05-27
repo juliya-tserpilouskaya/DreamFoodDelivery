@@ -7,30 +7,37 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarCollapse">
     <ul class="navbar-nav mr-auto">
-
+      <div class="nav-item" *ngIf="isAuthenticated">
+        <a class="navbar-brand">{{currentEmail}}</a>
+      </div>
       <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/']" routerLinkActive="active"
-          [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <!-- <a class="nav-link" [routerLink]="['/']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">About us</a> -->
+        <a class="nav-link" [routerLink]="['/about']" routerLinkActive="active">About us</a>
       </li>
-      <!-- Use ngIf to hide buttons if user not auth/ not admin -->
+      <!-- Use ngIf to hide buttons not admin -->
       <li class="nav-item">
-        <a class="nav-link" *ngIf="true" [routerLink]="['/profile']" routerLinkActive="active">Profile</a>
+        <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/administration']" routerLinkActive="active">Admin</a>
       </li>
-
       <li class="nav-item">
-        <a class="nav-link" *ngIf="true" [routerLink]="['/menu']" routerLinkActive="active">Menu</a>
+        <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/orders/status']" routerLinkActive="active">Employee</a>
       </li>
-
-
       <li class="nav-item">
-        <button type="button" class="btn btn-success btn-circle" [routerLink]="['/basket']"><i class="fa fa-shopping-basket"></i> </button>
+        <a class="nav-link" *ngIf="isAuthenticated && isAdmin" [routerLink]="['/dishes']" routerLinkActive="active">Dishes</a>
       </li>
-
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/menu']" routerLinkActive="active">Menu</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" *ngIf="isAuthenticated" [routerLink]="['/profile']" routerLinkActive="active">Profile</a>
+      </li>
     </ul>
-
-    <div class="btn-group " role="group" aria-label="Basic example">
-      <a class="btn btn-primary" [routerLink]="['/login']" routerLinkActive="active">Sigh In</a>
-      <a class="btn btn-success" [routerLink]="['/register']" routerLinkActive="active">Sing Up</a>
+    <div class="btn-group " *ngIf="isAuthenticated" role="group" aria-label="Basic example">
+      <button type="button" *ngIf="isAuthenticated" class="btn btn-success btn-circle" [routerLink]="['/basket']"><i class="fa fa-shopping-basket"></i> </button>
     </div>
+    <div class="btn-group " *ngIf="!isAuthenticated" role="group" aria-label="Basic example">
+      <a class="btn btn-primary" [routerLink]="['/login']" routerLinkActive="active">Sign In</a>
+      <a class="btn btn-success" [routerLink]="['/register']" routerLinkActive="active">Sign Up</a>
+    </div>
+    <app-logout *ngIf="isAuthenticated"></app-logout>
   </div>
 </nav>

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,6 +22,7 @@ namespace DreamFoodDelivery.Domain.Logic
 
             #region Comment
             CreateMap<CommentDB, CommentView>().ReverseMap();
+            CreateMap<CommentDB, CommentForUsersView>().ReverseMap();
             CreateMap<CommentDB, CommentToAdd>().ReverseMap();
             CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
             #endregion

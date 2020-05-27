@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-// import service
-import { IdentityService } from 'src/app/nswag_gen/services/api.generated.client';
-// import models
-import { UserRegistration, UserWithToken } from 'src/app/nswag_gen/services/api.generated.client';
+// import service and models
+import { UserWithToken, IdentityService } from 'src/app/app-services/nswag.generated.services';
 
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,18 +13,21 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+  spinning = false;
+  message: string = null;
 
   loginForm: FormGroup;
-  loginRequest: UserRegistration;
   user: UserWithToken;
+  isAuthenticated: boolean;
   currentUser = {};
 
   constructor(
     private identityService: IdentityService,
-    fb: FormBuilder,
+    private authService: AuthService,
+    public fb: FormBuilder,
     public router: Router) {
       this.loginForm = fb.group({
-        name: [''],
+        email: [''],
         password: ['']
       });
     }
@@ -34,38 +36,30 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
+    this.message = null;
+    this.spinning = true;
     if (this.loginForm.valid) {
       const data = this.loginForm.value;
-
-      //this.loginRequest = new UserRegistration();
-
-      this.loginRequest.email = data.name;
-      this.loginRequest.password = data.password;
-
-      this.identityService.login(this.loginRequest)
-        .subscribe(user => this.user = user);
-          localStorage.setItem('access_token', this.user.userToken)
-          this.currentUser = this.user;
-
-          this.router.navigate(['profile']);
-          this.loginForm.reset();
-
-    }
-  }
-
-  getToken() {
-    return localStorage.getItem('access_token');
-  }
-
-  get isLoggedIn(): boolean {
-    let authToken = localStorage.getItem('access_token');
-    return (authToken !== null) ? true : false;
-  }
-
-  doLogout() {
-    let removeToken = localStorage.removeItem('access_token');
-    if (removeToken == null) {
-      this.router.navigate(['login']);
+      this.identityService.login(data)
+        .subscribe(user => {this.user = user;
+                            this.spinning = false;
+                            localStorage.setItem('access_token', this.user.userToken);
+                            this.currentUser = this.user;
+                            this.loginForm.reset();
+                            this.router.navigate(['/profile']);
+                            this.isAuthenticated =  this.authService.isLoggedIn;
+                          },
+                          error => {
+                            if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.response;
+                            }
+                            else if (error.status ===  500) {
+                              this.message = 'Error 500: Internal Server Error!';
+                            }
+                            else{
+                              this.message = 'Something was wrong. Please, contact with us.';
+                            }
+                           });
     }
   }
 }

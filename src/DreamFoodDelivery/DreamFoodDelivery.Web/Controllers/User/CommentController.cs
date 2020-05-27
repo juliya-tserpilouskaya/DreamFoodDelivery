@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DreamFoodDelivery.Web.Controllers
 {
     /// <summary>
-    /// Work with comments
+    /// Work with reviews
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
@@ -29,7 +30,39 @@ namespace DreamFoodDelivery.Web.Controllers
         }
 
         /// <summary>
-        /// Get all comments
+        /// Get all comments for users
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// </summary>
+        /// <returns>Returns all comments stored</returns>
+        [AllowAnonymous]
+        [HttpPost, Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponse<CommentForUsersView>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LoggerAttribute]
+        public async Task<IActionResult> GetAll([FromBody] PageRequest request, CancellationToken cancellationToken = default)
+        {
+            if (request is null)
+            {
+                return BadRequest();
+            }
+            try
+            {
+                var result = await _commentService.GetAllAsync(request, cancellationToken);
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                     : NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+        /// <summary>
+        /// Get all comments for admin
+        /// <param name="cancellationToken"></param>
         /// </summary>
         /// <returns>Returns all comments stored</returns>
         [Authorize(Roles = "Admin")]
@@ -39,11 +72,11 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LoggerAttribute]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAllAdmin(CancellationToken cancellationToken = default)
         {
             try
             {
-                var result = await _commentService.GetAllAsync(cancellationToken);
+                var result = await _commentService.GetAllAdminAsync(cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
                      : NoContent();
@@ -162,7 +195,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             try
             {
-                var result = await _commentService.AddAsync(comment, cancellationToken);
+                var result = await _commentService.AddAsync(comment, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

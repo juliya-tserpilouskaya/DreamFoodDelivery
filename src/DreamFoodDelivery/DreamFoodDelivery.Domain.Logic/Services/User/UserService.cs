@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using AutoMapper;
 using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -24,53 +27,20 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         private readonly DreamFoodDeliveryContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly IEmailSenderService _emailSender;
+        private readonly IEmailBuilder _emailBuilder;
 
-        public UserService(IMapper mapper, DreamFoodDeliveryContext context, UserManager<User> userManager)
+        public UserService(IMapper mapper, 
+                           DreamFoodDeliveryContext context, 
+                           UserManager<User> userManager, 
+                           IEmailSenderService emailSender, 
+                           IEmailBuilder emailBuilder)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
-        }
-
-        /// <summary>
-        /// Asynchronously returns all users
-        /// </summary>
-        [LoggerAttribute]
-        public async Task<Result<IEnumerable<UserView>>> GetAllAsync(CancellationToken cancellationToken = default)
-        {
-            var usersDB = await _context.Users.AsNoTracking().ToListAsync(cancellationToken);
-            var usersIdentity = await _userManager.Users.ToListAsync(cancellationToken);
-
-            if (!usersDB.Any() || !usersIdentity.Any())
-            {
-                return Result<IEnumerable<UserView>>.Fail<IEnumerable<UserView>>("No users found");
-            }
-
-            List<UserView> users = new List<UserView>();
-            foreach (var item in usersDB)
-            {
-                var item2 = usersIdentity.Where(_ => _.Id == item.IdFromIdentity).Select(_ => _).FirstOrDefault();
-                var userProfile = await GetUserProfileByIdFromIdentityAsync(item.IdFromIdentity);
-                if (userProfile.IsError)
-                {
-                    users.Add(
-                    new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(item)
-                    });
-                }
-                else
-                {
-                    users.Add(
-                    new UserView() //Check and delete excess information
-                    {
-                        UserProfile = userProfile.Data,
-                        UserDTO = _mapper.Map<UserDTO>(item)
-                    });
-                }
-            }
-            return Result<IEnumerable<UserView>>.Ok(_mapper.Map<IEnumerable<UserView>>(users));
+            _emailSender = emailSender;
+            _emailBuilder = emailBuilder;
         }
 
         /// <summary>
@@ -103,7 +73,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userAfterAdding)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -114,54 +84,15 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot save model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot save model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_SAVE_MODEL + ex.Message);
             }
             catch (ArgumentNullException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Source is null. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        ///  Asynchronously get by userId. Id must be verified 
-        /// </summary>
-        /// <param name="userId">ID of user</param>
-        [LoggerAttribute]
-        public async Task<Result<UserView>> GetByIdAsync(string userId, CancellationToken cancellationToken = default)
-        {
-            Guid id = Guid.Parse(userId);
-            try
-            {
-                var userDB = await _context.Users.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (userDB is null)
-                {
-                    return Result<UserView>.Fail<UserView>($"User was not found");
-                }
-                var userProfile = await GetUserProfileByIdFromIdentityAsync(userDB.IdFromIdentity);
-
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userDB)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userDB)
-                };
-                return Result<UserView>.Ok(view);
-            }
-            catch (ArgumentNullException ex)
-            {
-                return Result<UserView>.Fail<UserView>($"Source is null. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -178,13 +109,13 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
                 if (profile is null)
                 {
-                    return Result<UserProfile>.Fail<UserProfile>($"User was not found");
+                    return Result<UserProfile>.Fail<UserProfile>(ExceptionConstants.USER_WAS_NOT_FOUND);
                 }
                 return Result<UserProfile>.Ok(_mapper.Map<UserProfile>(profile));
             }
             catch (ArgumentNullException ex)
             {
-                return Result<UserProfile>.Fail<UserProfile>($"Source is null. {ex.Message}");
+                return Result<UserProfile>.Fail<UserProfile>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -200,7 +131,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var userDB = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (userDB is null)
                 {
-                    return Result<UserView>.Fail<UserView>($"User was not found");
+                    return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
                 }
                 var userProfile = await GetUserProfileByIdFromIdentityAsync(userDB.IdFromIdentity);
 
@@ -211,7 +142,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userDB)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -222,42 +153,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (ArgumentNullException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Source is null. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        ///  Asynchronously remove user by Id. Id must be verified
-        /// </summary>
-        /// <param name="userId">ID of existing user</param>
-        [LoggerAttribute]
-        public async Task<Result> RemoveByIdAsync(string userId, CancellationToken cancellationToken = default)
-        {
-            Guid id = Guid.Parse(userId);
-            var userDB = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-            if (userDB is null)
-            {
-                return await Task.FromResult(Result.Fail("User was not found"));
-            }
-            try
-            {
-                _context.Users.Remove(userDB); //del in DB
-                await _context.SaveChangesAsync(cancellationToken);
-                var userIdentity = await _userManager.FindByIdAsync(userDB.IdFromIdentity);
-                var result = await _userManager.DeleteAsync(userIdentity); //Del in Identity db
-                if (!result.Succeeded)
-                {
-                    return await Task.FromResult(Result.Fail(result.Errors.Select(x => x.Description).Join("\n")));
-                }
-                return await Task.FromResult(Result.Ok());
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete user. {ex.Message}"));
-            }
-            catch (DbUpdateException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot delete user. {ex.Message}"));
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
         }
 
@@ -271,21 +167,23 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.IdFromIdentity == idFromIdentity);
             if (user is null)
             {
-                return await Task.FromResult(Result.Fail("User was not found"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND));
             }
             try
             {
+                var basket = await _context.Baskets.Where(_ => _.UserId == user.Id).FirstOrDefaultAsync();
+                _context.Baskets.Remove(basket);
                 _context.Users.Remove(user); //Revise the lecture about the database. A moment about deleting information.
                 await _context.SaveChangesAsync(cancellationToken);
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_USER + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_USER + ex.Message));
             }
         }
 
@@ -300,7 +198,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
             if (usersIdentity is null)
             {
-                return Result<UserView>.Fail<UserView>($"User was not found");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
             usersIdentity.Address = userToUpdate.Address;
             usersIdentity.PhoneNumber = userToUpdate.PhoneNumber;
@@ -318,7 +216,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -329,97 +227,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        ///  Asynchronously update user personal discount
-        /// </summary>
-        /// <param name="personalDiscount">New personal discount</param>
-        /// <param name="idFromIdentity">Existing user ID</param>
-        [LoggerAttribute]
-        public async Task<Result<UserView>> UpdateUserPersonalDiscountAsync(string personalDiscount, string idFromIdentity, CancellationToken cancellationToken = default)
-        {
-            var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
-            userIdentity.PersonalDiscount = double.Parse(personalDiscount); //try parse
-            try
-            {
-                await _userManager.UpdateAsync(userIdentity);
-                var userProfile = await GetUserProfileByIdFromIdentityAsync(userIdentity.Id);
-                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userIdentity.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                };
-                return Result<UserView>.Ok(view);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Make admin from user or vice versa
-        /// </summary>
-        /// <param name="idFromIdentity">Existing user ID</param>
-        [LoggerAttribute]
-        public async Task<Result> ChangeRoleAsync(string idFromIdentity)
-        {
-            string user = "User";
-            string admin = "Admin";
-            var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
-
-            if (userIdentity == null)
-            {
-                return await Task.FromResult(Result.Fail("User was not found"));
-            }
-            try
-            {
-                if (await _userManager.IsInRoleAsync(userIdentity, user))
-                {
-                    userIdentity.Role = admin;
-                    await _userManager.UpdateAsync(userIdentity);
-                    await _userManager.AddToRoleAsync(userIdentity, admin);
-                    await _userManager.RemoveFromRoleAsync(userIdentity, user);
-                    return await Task.FromResult(Result.Ok());
-                }
-                else if (await _userManager.IsInRoleAsync(userIdentity, admin))
-                {
-                    userIdentity.Role = user;
-                    await _userManager.UpdateAsync(userIdentity);
-                    await _userManager.AddToRoleAsync(userIdentity, user);
-                    await _userManager.RemoveFromRoleAsync(userIdentity, admin);
-                    return await Task.FromResult(Result.Ok());
-                }
-                return await Task.FromResult(Result.Warning("Something wrong with roles"));
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot change role. {ex.Message}"));
-            }
-            catch (DbUpdateException ex)
-            {
-                return await Task.FromResult(Result.Fail($"Cannot change role. {ex.Message}"));
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -433,7 +245,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             User usersIdentity = await _userManager.FindByIdAsync(userInfo.IdFromIdentity);
             if (usersIdentity is null)
             {
-                return Result<UserView>.Fail<UserView>($"User was not found");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
             try
             {
@@ -448,7 +260,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -459,11 +271,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -474,18 +286,30 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result<UserView>> UpdateEmailAsync(UserEmailToChange userInfo, CancellationToken cancellationToken = default)
         {
-            User usersIdentity = await _userManager.FindByIdAsync(userInfo.IdFromIdentity);
-            if (usersIdentity is null)
+            User userIdentity = await _userManager.FindByIdAsync(userInfo.IdFromIdentity);
+            if (userIdentity is null)
             {
-                return Result<UserView>.Fail<UserView>($"User was not found");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
+            }
+            User emailCheck = await _userManager.FindByEmailAsync(userInfo.NewEmail);
+            if(!(emailCheck is null))
+            {
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_ALREADY_EXIST);
             }
             try
             {
-                var myToken = await _userManager.GenerateChangeEmailTokenAsync(usersIdentity, userInfo.NewEmail);
-                await _userManager.ChangeEmailAsync(usersIdentity, userInfo.NewEmail, myToken);
-                usersIdentity.UserName = userInfo.NewEmail;
-                await _userManager.UpdateAsync(usersIdentity);
+                
+                var myToken = await _userManager.GenerateChangeEmailTokenAsync(userIdentity, userInfo.NewEmail);
+                await _userManager.ChangeEmailAsync(userIdentity, userInfo.NewEmail, myToken);
+                userIdentity.UserName = userInfo.NewEmail;
+                var sendEmailBefore = await _emailSender.SendEmailAsync(userIdentity.Email, EmailConstants.EMAIL_SUBJECT, userInfo.NewEmail + EmailConstants.EMAIL_MESSAGE, cancellationToken);
+                if (sendEmailBefore.IsError)
+                {
+                    return Result<UserView>.Fail<UserView>(sendEmailBefore.Message);
+                }
+                await _userManager.UpdateAsync(userIdentity);
                 var userProfile = await GetUserProfileByIdFromIdentityAsync(userInfo.IdFromIdentity);
+                
                 UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userInfo.IdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (userProfile.IsError)
                 {
@@ -494,7 +318,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -505,56 +329,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        ///  Asynchronously confirms user email
-        /// </summary>
-        /// <param name="idFromIdentity">User id to confirm email</param>
-        [LoggerAttribute]
-        public async Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default)
-        {
-            User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
-            if (usersIdentity is null)
-            {
-                return Result<UserView>.Fail<UserView>($"User was not found");
-            }
-            try
-            {
-                var myToken = await _userManager.GenerateEmailConfirmationTokenAsync(usersIdentity);
-                await _userManager.ConfirmEmailAsync(usersIdentity, myToken);
-
-                var userProfile = await GetUserProfileByIdFromIdentityAsync(idFromIdentity);
-                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                };
-                return Result<UserView>.Ok(view);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -568,21 +347,22 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
             if (usersIdentity is null)
             {
-                return Result.Fail($"User was not found");
+                return Result.Fail(ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
             }
             try
             {
                 var myToken = await _userManager.GenerateEmailConfirmationTokenAsync(usersIdentity);
-                EmailSenderService.SendMail(usersIdentity.Email, "Registration", myToken);
+                //EmailSenderService.SendMail(usersIdentity.Email, "Registration", myToken);
+                //_emailSenderService.SendMailResult(usersIdentity.Email, "Registration", myToken);
                 return Result.Ok();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result.Fail($"Cannot update model. {ex.Message}");
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result.Fail($"Cannot update model. {ex.Message}");
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
@@ -597,7 +377,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
             if (usersIdentity is null)
             {
-                return Result<UserView>.Fail<UserView>($"User was not found");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
             }
             try
             {
@@ -612,7 +392,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                         UserProfile = null,
                         UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
                     };
-                    return Result<UserView>.Fail<UserView>(failProfile + "Identity user was not found");
+                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
                 }
                 UserView view = new UserView()
                 {
@@ -623,11 +403,122 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>($"Cannot update model. {ex.Message}");
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously returs IsEmailConfirmedAsync
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        [LoggerAttribute]
+        public async Task<Result> IsEmailConfirmedAsync(string idFromIdentity)
+        {
+            User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
+            if (usersIdentity is null)
+            {
+                return Result.Fail(ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
+            }
+            try
+            {
+                var isIt = await _userManager.IsEmailConfirmedAsync(usersIdentity);
+                if (isIt)
+                {
+                    return Result.Ok();
+                }
+                return Result.Quite();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+            }
+        }
+
+        /// <summary>
+        ///  Asynchronously confirms user email
+        /// </summary>
+        /// <param name="idFromIdentity">User id to confirm email</param>
+        /// <param name="token"></param>
+        [LoggerAttribute]
+        public async Task<Result> ConfirmEmailByLinkAsync(string idFromIdentity, string token)
+        {
+            User userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
+            if (userIdentity is null)
+            {
+                return Result<UserView>.Fail<UserView>(ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
+            }
+            try
+            {
+                var decodedTokenBytes = Convert.FromBase64String(token);
+                string decodedTokenString = Encoding.UTF8.GetString(decodedTokenBytes);
+
+                var result = await _userManager.ConfirmEmailAsync(userIdentity, decodedTokenString);
+                if (result.Succeeded)
+                {
+                    userIdentity.IsEmailConfirmed = true;
+                    await _userManager.UpdateAsync(userIdentity);
+                }
+                return result.Succeeded ? Result.Ok() : Result.Fail(result.Errors.Select(x => x.Description).Join("\n"));
+            }
+            catch (Exception ex)
+            {
+                return Result<UserView>.Fail<UserView>(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [LoggerAttribute]
+        public async Task<Result> ForgotPasswordAsync(PasswordRecoveryRequest request, CancellationToken cancellationToken = default)
+        {
+            User user = await _userManager.FindByEmailAsync(request.Email);
+
+            if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
+            {
+                return await Task.FromResult(Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND));
+            }
+
+            return await _emailBuilder.SendPasswordResetMessageAsync(user, request.CallBackUrl, cancellationToken);
+        }
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [LoggerAttribute]
+        public async Task<Result> ResetPasswordAsync(PasswordRecoveryInfo userInfo, CancellationToken cancellationToken = default)
+        {
+            var user = await _userManager.FindByIdAsync(userInfo.UserId);
+            if (user == null)
+            {
+                return Result.Ok();
+            }
+
+            var decodedTokenBytes = Convert.FromBase64String(userInfo.Token);
+            string decodedTokenString = Encoding.UTF8.GetString(decodedTokenBytes);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedTokenString, userInfo.Password);
+            if (result.Succeeded)
+            {
+                return await _emailBuilder.SendEmailWithLinkAsync(user.Email, EmailConstants.PASSWORD_RESET_SUBJECT, EmailConstants.PASSWORD_RESET_LINK, EmailConstants.PASSWORD_RESET_MESSAGE, userInfo.CallBackUrl, cancellationToken);
+            }
+            else
+            {
+                return Result.Fail(result.Errors.Select(x => x.Description).Join("\n"));
             }
         }
     }

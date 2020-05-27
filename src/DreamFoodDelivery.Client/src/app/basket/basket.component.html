@@ -1,1 +1,75 @@
-<p>basket works!</p>
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
+<div class="row justify-content-center">
+
+  <section class="jumbotron text-center">
+    <div class="container">
+      <h1 class="jumbotron-heading">Basket</h1>
+      <div class="form-group" *ngIf="isAuthenticated">
+        <div *ngIf="basket else loading">
+          <h4 class="card-text">Total cost of selected dishes: {{basket.basketCost}} $</h4>
+          <h4 class="card-text">Delivery service: {{basket.shippingCost}} $</h4>
+          <br>
+        </div>
+        <button *ngIf="dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
+        <button *ngIf="dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/order/create']">Make order</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="goBack()">Go back</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+  <div *ngIf="basket else loading">
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4" *ngFor="let dish of dishes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+            <form [formGroup]="updateForm" (ngSubmit)="onBasketUpdate(dish.id)"#formDir="ngForm" novalidate >
+
+              <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                  <h4 class="jumbotron-heading">{{dish.name}}</h4>
+                </div>
+                <div  *ngIf="mainImages[dish.id]">
+                  <img [src]="mainImages[dish.id]" class="card-img">
+                </div>
+                 <div class="card-body">
+                  <p class="card-text">Description: {{dish.description}}</p>
+                  <ul class="list-group">
+                    <li class="list-group-item">Cost: {{dish.cost}}$</li>
+                    <li class="list-group-item">Discount: {{dish.sale}}%</li>
+                    <li class="list-group-item">Total cost: {{dish.totalCost}}$</li>
+                  </ul>
+                    <p class="card-text">Ingredients: {{dish.composition}}, weight: {{dish.weight}}</p>
+                    <div class="form-group" *ngIf="isAuthenticated">
+                      <input type="number" class="form-control" max="20" min="1" placeholder="{{dish.quantity}}" formControlName="quantity">
+                      <button type="submit" class="btn btn-sm btn-outline-secondary">Count update</button>
+                      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeDish(dish.id)">Remove</button>
+                    </div>
+                    <div class="card-footer">
+                      <h5><span class="badge-pill badge-info" *ngFor="let tag of dish.tagList">{{tag.tagName}}</span></h5>
+                    </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<ng-template #loading>
+  <div>Loading...</div>
+</ng-template>
+
+<div class="row justify-content-center">
+  <ngb-pagination
+  [(page)]="page"
+  [pageSize]="pageSize"
+  [collectionSize]="dishes.length"></ngb-pagination>
+</div>

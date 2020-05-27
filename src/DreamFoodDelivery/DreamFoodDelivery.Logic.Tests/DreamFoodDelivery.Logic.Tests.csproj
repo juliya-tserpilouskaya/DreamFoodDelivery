@@ -27,4 +27,8 @@
       <ProjectReference Include="..\DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Log\" />
+    </ItemGroup>
+
 </Project>

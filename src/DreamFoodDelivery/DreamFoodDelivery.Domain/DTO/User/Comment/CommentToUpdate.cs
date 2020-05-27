@@ -6,7 +6,7 @@ namespace DreamFoodDelivery.Domain.DTO
 {
     public class CommentToUpdate
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string Headline { get; set; }
         public byte? Rating { get; set; }
         public string Content { get; set; }

@@ -21,6 +21,9 @@ using NSwag.Generation.Processors.Security;
 using NSwag;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Domain.Logic.Validation;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+using DreamFoodDelivery.Common.Ñonstants;
 
 namespace DreamFoodDelivery.Web
 {
@@ -68,14 +71,14 @@ namespace DreamFoodDelivery.Web
             {
                 config.PostProcess = document =>
                 {
-                    document.Info.Title = "~Dream food for you~";
-                    document.Info.Description = "Intership ASP.NET Core web API";
-                    document.Info.Version = "v0.0.1";
+                    document.Info.Title = ApiDocConstants.TITLE;
+                    document.Info.Description = ApiDocConstants.DESCRIPTION;
+                    document.Info.Version = ApiDocConstants.VERSION;
                     document.Info.Contact = new NSwag.OpenApiContact
                     {
-                        Name = "Yuliya Tserpilouskaya",
-                        Email = "yuliya.tserpilouskaya@gmail.com",
-                        Url = string.Empty
+                        Name = ApiDocConstants.CONTACT_NAME,
+                        Email = ApiDocConstants.CONTACT_EMAIL,
+                        Url = ApiDocConstants.CONTACT_URL
                     };
                 };
                 config.DocumentProcessors.Add(
@@ -90,7 +93,9 @@ namespace DreamFoodDelivery.Web
                 config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
-            services.AddControllers().AddFluentValidation(fluentValidation =>
+            services.AddControllers()
+                .AddNewtonsoftJson()
+                .AddFluentValidation(fluentValidation =>
             {
                 fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToBasketAddValidation>();
@@ -106,15 +111,19 @@ namespace DreamFoodDelivery.Web
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserPasswordToChangeValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<SearchValidation>();
             });
+
             services.AddAutoMapper(typeof(Startup).Assembly);
 
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder.WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains());
             });
         }
 
@@ -138,8 +147,13 @@ namespace DreamFoodDelivery.Web
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
+                RequestPath = "/Images"
+            });
+
             app.UseCors("CorsPolicy");
-            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

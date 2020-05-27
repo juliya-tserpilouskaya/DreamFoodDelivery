@@ -1,6 +1,7 @@
 ﻿using DreamFoodDelivery.Common;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
+using DreamFoodDelivery.Domain.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,11 +12,6 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface ITagService
     {
-        /// <summary>
-        /// Asynchronously returns all tags
-        /// </summary>
-        Task<Result<IEnumerable<TagView>>> GetAllAsync(CancellationToken cancellationToken = default);
-
         /// <summary>
         ///  Asynchronously add new tag
         /// </summary>
@@ -51,5 +47,11 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
         Task<Result<TagView>> GetByIdAsync(string tagId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Get all tags from DB
+        /// </summary>
+        /// <returns></returns>
+        Task<Result<IEnumerable<TagView>>> GetAllTagsAsync(CancellationToken cancellationToken);
     }
 }
