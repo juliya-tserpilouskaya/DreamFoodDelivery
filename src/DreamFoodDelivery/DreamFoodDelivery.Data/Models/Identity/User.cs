@@ -12,6 +12,6 @@ namespace DreamFoodDelivery.Data.Models
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Role { get; set; }
-        public bool EmailConfirmed { get; set; }
+        public bool IsEmailConfirmed { get; set; }
     }
 }

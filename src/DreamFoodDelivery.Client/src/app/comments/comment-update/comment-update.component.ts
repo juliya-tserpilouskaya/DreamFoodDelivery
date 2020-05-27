@@ -13,6 +13,7 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class CommentUpdateComponent implements OnInit {
   idFromURL = '';
+  message: string = null;
   review: CommentView;
   reviewUpdateForm: FormGroup;
   done = false;
@@ -38,15 +39,21 @@ export class CommentUpdateComponent implements OnInit {
     this.reviewService.getById(this.idFromURL).subscribe(data => {this.review = data;
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-       else {
-        this.router.navigate(['/error/unexpected']);
-       }
+      if (error.status ===  204) {
+        this.message = 'Now empty.';
+      }
+      else if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
       });
   }
 
@@ -57,34 +64,44 @@ export class CommentUpdateComponent implements OnInit {
                                                                                 this.done = true;
                                                                                 },
                                                                                 error => {
-                                                                                  if (error.status === 500){
-                                                                                    this.router.navigate(['/error/500']);
-                                                                                   }
-                                                                                   else if (error.status === 404) {
-                                                                                    this.router.navigate(['/error/404']);
-                                                                                   }
-                                                                                  //  else {
-                                                                                  //   this.router.navigate(['/error/unexpected']);
-                                                                                  //  }
+                                                                                  if (error.status ===  400) {
+                                                                                    this.message = 'Error 400: ' + error.response;
+                                                                                  }
+                                                                                  else if (error.status ===  403) {
+                                                                                    this.message = 'You are not authorized!';
+                                                                                  }
+                                                                                  else if (error.status ===  404) {
+                                                                                    this.message = 'Elements are not found.';
+                                                                                  }
+                                                                                  else if (error.status ===  500) {
+                                                                                    this.message = 'Error 500: Internal Server Error!';
+                                                                                  }
+                                                                                  else{
+                                                                                    this.message = 'Something was wrong. Please, contact with us.';
+                                                                                  }
       });
-    } else {
-      // TODO: message
     }
   }
 
   removeById(id: string): void {
     this.reviewService.removeById(id).subscribe(data => {},
       error => {
-        if (error.status === 500){
-          this.router.navigate(['/error/500']);
-         }
-         else if (error.status === 404) {
-          this.router.navigate(['/error/404']);
-         }
-        //  else {
-        //   this.router.navigate(['/error/unexpected']);
-        //  }
-         });
+        if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.response;
+        }
+        else if (error.status ===  403) {
+          this.message = 'You are not authorized!';
+        }
+        else if (error.status ===  404) {
+          this.message = 'Elements are not found.';
+        }
+        else if (error.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+      });
   }
 
 

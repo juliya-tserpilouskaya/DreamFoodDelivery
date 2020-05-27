@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <div>
   <div *ngIf="addressImage" class="col-8">
       <img [src]="addressImage" class="card-img">

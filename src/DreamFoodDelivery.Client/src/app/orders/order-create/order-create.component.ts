@@ -14,6 +14,7 @@ export class OrderCreateComponent implements OnInit {
   user: UserView;
   order: OrderView;
   isNotConfirmed = false;
+  message: string = null;
 
   constructor(
     private orderService: OrderService,
@@ -34,12 +35,21 @@ export class OrderCreateComponent implements OnInit {
   ngOnInit(): void {
     this.userService.getProfile().subscribe(data => {this.user = data; },
       error => {
-        if (error.status === 500){
-          this.router.navigate(['/error/500']);
-         }
-         else if (error.status === 404) {
-          this.router.navigate(['/error/404']);
-         }
+        if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.response;
+        }
+        else if (error.status ===  403) {
+          this.message = 'You are not authorized!';
+        }
+        else if (error.status ===  404) {
+          this.message = 'Element not found.';
+        }
+        else if (error.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
     });
   }
 
@@ -58,19 +68,21 @@ export class OrderCreateComponent implements OnInit {
                              this.router.navigate(['/order', this.order.id, 'details']);
                             },
                             error => {
-                              console.log(error);
-                              console.log(error.status);
-                              console.log(error._responseText);
-                              console.log(error._headers);
-                              if (error.status === 500){
-                                this.router.navigate(['/error/500']);
-                               }
-                               else if (error.status === 404) {
-                                this.router.navigate(['/error/404']);
-                               }
-                               else if (error.status === 403) {
-                                this.isNotConfirmed = true; // TODO: ??? in console i see status, but not here
-                               }
+                            if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.response;
+                            }
+                            else if (error.status ===  401) {
+                              this.message = 'You are not authorized!';
+                            }
+                            else if (error.status ===  403) {
+                              this.message = 'You are not authorized!';
+                            }
+                            else if (error.status ===  500) {
+                              this.message = 'Error 500: Internal Server Error!';
+                            }
+                            else{
+                              this.message = 'Something was wrong. Please, contact with us.';
+                            }
        });
       this.userService.updateUserProfile(this.orderAddForm.value).subscribe();
     }

@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class AdminUsersComponent implements OnInit {
   users: UserView[] = [];
   usersDTO: UserDTO[] = [];
+  message: string = null;
 
   page = 2;
   pageSize = 5;
@@ -24,15 +25,18 @@ export class AdminUsersComponent implements OnInit {
                                                   this.usersDTO = this.usersDTO;
                                                 },
                                                 error => {
-                                                  if (error.status === 500){
-                                                    this.router.navigate(['/error/500']);
-                                                   }
-                                                   else if (error.status === 404) {
-                                                    this.router.navigate(['/error/404']);
-                                                   }
-                                                  //  else {
-                                                  //   this.router.navigate(['/error/unexpected']);
-                                                  //  }
+                                                  if (error.status ===  204) {
+                                                    this.message = 'Now empty.';
+                                                  }
+                                                  else if (error.status ===  403) {
+                                                    this.message = 'You are not authorized!';
+                                                  }
+                                                  else if (error.status ===  500) {
+                                                    this.message = 'Error 500: Internal Server Error!';
+                                                  }
+                                                  else{
+                                                    this.message = 'Something was wrong. Please, contact with us.';
+                                                  }
                                                 });
   }
 
@@ -43,40 +47,62 @@ export class AdminUsersComponent implements OnInit {
       this.ngOnInit();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  404) {
+        this.message = 'Element not found.';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 
   changeRole(idIdentity: string): void {
     this.adminService.changeRole(idIdentity).subscribe(data => {
       this.ngOnInit();
-      // window.location.reload();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 
   confirmEmail(idIdentity: string): void {
     this.adminService.confirmUserEmail(idIdentity).subscribe(data => {
-      this.ngOnInit();
-    });
+      this.ngOnInit(); },
+      error => {
+        if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.response;
+        }
+        else if (error.status ===  403) {
+          this.message = 'You are not authorized!';
+        }
+        else if (error.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+      }
+    );
   }
 
 }

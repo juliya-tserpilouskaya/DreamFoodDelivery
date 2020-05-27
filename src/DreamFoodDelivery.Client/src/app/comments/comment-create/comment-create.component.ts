@@ -13,6 +13,7 @@ export class CommentCreateComponent implements OnInit {
   idFromURL = '';
   review: CommentView;
   reviewAddForm: FormGroup;
+  message: string = null;
 
   constructor(
     private reviewService: CommentService,
@@ -31,7 +32,7 @@ export class CommentCreateComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    console.log (this.idFromURL);
+    // console.log (this.idFromURL);
   }
 
   addNewReview(): void {
@@ -42,18 +43,22 @@ export class CommentCreateComponent implements OnInit {
                              this.router.navigate(['/review', data.id, 'details']);
                             },
                             error => {
-                              if (error.status === 500){
-                                this.router.navigate(['/error/500']);
-                               }
-                               else if (error.status === 404) {
-                                this.router.navigate(['/error/404']);
-                               }
-                              //  else {
-                              //   this.router.navigate(['/error/unexpected']);
-                              //  }
+                              if (error.status ===  400) {
+                                this.message = 'Error 400: ' + error.response;
+                              }
+                              else if (error.status ===  403) {
+                                this.message = 'You are not authorized!';
+                              }
+                              else if (error.status ===  404) {
+                                this.message = 'Elements are not found.';
+                              }
+                              else if (error.status ===  500) {
+                                this.message = 'Error 500: Internal Server Error!';
+                              }
+                              else{
+                                this.message = 'Something was wrong. Please, contact with us.';
+                              }
                             });
-    } else {
-      // TODO: message
     }
   }
 

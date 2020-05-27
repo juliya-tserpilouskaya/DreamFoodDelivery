@@ -15,7 +15,7 @@ import { AuthService } from '../auth.service';
 export class RegisterComponent implements OnInit {
 
   spinning = false;
-  errorMessage: string;
+  message: string = null;
 
   registerForm: FormGroup;
   user: UserWithToken;
@@ -39,7 +39,7 @@ export class RegisterComponent implements OnInit {
   }
 
   register() {
-    this.errorMessage = null;
+    this.message = null;
     this.spinning = true;
     if (this.registerForm.valid) {
       const data = this.registerForm.value;
@@ -54,15 +54,15 @@ export class RegisterComponent implements OnInit {
                           },
                           error => {
                             this.spinning = false;
-                            // if (error.status === 500){
-                            //   this.router.navigate(['/error/500']);
-                            //  }
-                            //  else if (error.status === 404) {
-                            //   this.router.navigate(['/error/404']);
-                            //  }
-                            //  else {
-                            //   this.router.navigate(['/error/unexpected']);
-                            //  }
+                            if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.response;
+                            }
+                            else if (error.status ===  500) {
+                              this.message = 'Error 500: Internal Server Error!';
+                            }
+                            else{
+                              this.message = 'Something was wrong. Please, contact with us.';
+                            }
                            });
    }
   }

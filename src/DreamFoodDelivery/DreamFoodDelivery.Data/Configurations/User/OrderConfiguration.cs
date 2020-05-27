@@ -29,7 +29,7 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.Property(i => i.PersonalDiscount).HasColumnName("PersonalDiscount").HasMaxLength(7);
             builder.Property(i => i.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(31);
             builder.Property(i => i.Name).HasColumnName("Name").HasMaxLength(63);
-            builder.Property(i => i.OrderCost).HasColumnName("TotalCost");
+            builder.Property(i => i.TotalCost).HasColumnName("TotalCost");
             builder.Property(i => i.ShippingCost).HasColumnName("ShippingСost");
             builder.Property(i => i.Status).HasColumnName("Status").HasMaxLength(31);
 

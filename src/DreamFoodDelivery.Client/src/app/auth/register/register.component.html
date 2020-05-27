@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <div class="col-8">
     <form class="was-validated" [formGroup]="registerForm" (ngSubmit)="register()">
         <h3>Please enter information to sign up</h3>

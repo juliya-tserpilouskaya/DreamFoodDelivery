@@ -14,7 +14,7 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent implements OnInit {
   spinning = false;
-  errorMessage: string;
+  message: string = null;
 
   loginForm: FormGroup;
   user: UserWithToken;
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.errorMessage = null;
+    this.message = null;
     this.spinning = true;
     if (this.loginForm.valid) {
       const data = this.loginForm.value;
@@ -50,16 +50,15 @@ export class LoginComponent implements OnInit {
                             this.isAuthenticated =  this.authService.isLoggedIn;
                           },
                           error => {
-                            this.spinning = false;
-                            if (error.status === 500){
-                              this.router.navigate(['/error/500']);
-                             }
-                             else if (error.status === 404) {
-                              this.router.navigate(['/error/404']);
-                             }
-                            //  else {
-                            //   this.router.navigate(['/error/unexpected']);
-                            //  }
+                            if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.response;
+                            }
+                            else if (error.status ===  500) {
+                              this.message = 'Error 500: Internal Server Error!';
+                            }
+                            else{
+                              this.message = 'Something was wrong. Please, contact with us.';
+                            }
                            });
     }
   }

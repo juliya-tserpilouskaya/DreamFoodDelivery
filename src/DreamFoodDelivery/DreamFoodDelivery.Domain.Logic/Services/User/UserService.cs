@@ -463,7 +463,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var result = await _userManager.ConfirmEmailAsync(userIdentity, decodedTokenString);
                 if (result.Succeeded)
                 {
-                    userIdentity.EmailConfirmed = true;
+                    userIdentity.IsEmailConfirmed = true;
                     await _userManager.UpdateAsync(userIdentity);
                 }
                 return result.Succeeded ? Result.Ok() : Result.Fail(result.Errors.Select(x => x.Description).Join("\n"));

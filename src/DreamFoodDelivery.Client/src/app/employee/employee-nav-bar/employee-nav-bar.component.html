@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <ul class="nav flex-column" *ngIf="orderStatuses else loading">
   <li class="nav-item" *ngFor="let status of orderStatuses">
     <a class="nav-link" [routerLink]="['/orders/status', status.statusName]" routerLinkActive="active">

@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <button *ngIf="isAdmin" class="btn btn-outline-secondary border btn-sm" (click)="show()">Click here after uploading images</button>
 <div *ngIf="currentImage">
   <div id="carouselExampleFade" class="carousel slide carousel-fade m-3" data-ride="carousel">

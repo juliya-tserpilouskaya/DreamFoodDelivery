@@ -56,11 +56,11 @@
 //                    UserName = SuperAdminData.USER_NAME,
 //                    PersonalDiscount = 0,
 //                    Role = "Admin",
-//                    EmailConfirmed = false
+//                    IsEmailConfirmed = false
 //                };
 //                var userDB = new UserDB
 //                {
-//                    IdFromIdentity = user.Id,                
+//                    IdFromIdentity = user.Id,
 //                };
 //                context.Add(user);
 //                await context.SaveChangesAsync();

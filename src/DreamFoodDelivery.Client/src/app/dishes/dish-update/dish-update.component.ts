@@ -12,6 +12,7 @@ import { removeSpaces } from '../tag-validation';
 })
 export class DishUpdateComponent implements OnInit {
   idFromURL = '';
+  message: string = null;
   dish: DishView;
   done = false;
 
@@ -43,15 +44,18 @@ export class DishUpdateComponent implements OnInit {
     this.dishService.getById(this.idFromURL).subscribe(data => {this.dish = data;
     },
     error => {
-      // if (error.status === 500){
-      //   this.router.navigate(['/error/500']);
-      //  }
-      //  else if (error.status === 404) {
-      //   this.router.navigate(['/error/404']);
-      //  }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  204) {
+        this.message = 'Now empty.';
+      }
+      else if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 
@@ -78,18 +82,19 @@ export class DishUpdateComponent implements OnInit {
                                                                                 this.done = true;
                                                                               },
                                                                               error => {
-                                                                                // if (error.status === 500){
-                                                                                //   this.router.navigate(['/error/500']);
-                                                                                //  }
-                                                                                //  else if (error.status === 404) {
-                                                                                //   this.router.navigate(['/error/404']);
-                                                                                //  }
-                                                                                //  else {
-                                                                                //   this.router.navigate(['/error/unexpected']);
-                                                                                //  }
+                                                                                if (error.status ===  400) {
+                                                                                  this.message = 'Error 400: ' + error.response;
+                                                                                }
+                                                                                else if (error.status ===  403) {
+                                                                                  this.message = 'You are not authorized!';
+                                                                                }
+                                                                                else if (error.status ===  500) {
+                                                                                  this.message = 'Error 500: Internal Server Error!';
+                                                                                }
+                                                                                else{
+                                                                                  this.message = 'Something was wrong. Please, contact with us.';
+                                                                                }
     });
-    } else {
-      // TODO: message
     }
   }
 
@@ -98,15 +103,21 @@ export class DishUpdateComponent implements OnInit {
       this.router.navigate(['/dishes']);
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  404) {
+        this.message = 'Elements are not found.';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 

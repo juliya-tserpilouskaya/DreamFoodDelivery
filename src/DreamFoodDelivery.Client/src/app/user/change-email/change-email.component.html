@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <div class="col-8">
   <form class="was-validated" novalidate [formGroup]="changeEmailForm" (ngSubmit)="change()">
       <h3>Please enter new email</h3>

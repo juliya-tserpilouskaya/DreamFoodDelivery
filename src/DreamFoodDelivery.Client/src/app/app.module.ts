@@ -36,11 +36,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthService } from './auth/auth.service';
 import { TokenInterceptorService } from './auth/token.interceptor.service';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import { BadRequestComponent } from './pages/bad-request/bad-request.component';
-import { InternalServerErrorComponent } from './pages/internal-server-error/internal-server-error.component';
 
 import { OrderCreateComponent } from './orders/order-create/order-create.component';
-import { OrderDetailsComponent } from './orders/order-details/order-details.component';
 import { UserOrdersComponent } from './orders/user-orders/user-orders.component';
 
 import { UserCommentsComponent } from './comments/user-comments/user-comments.component';
@@ -63,7 +60,6 @@ import { UserCommentsAdminComponent } from './comments/user-comments-admin/user-
 import { DeleteAccountComponent } from './user/delete-account/delete-account.component';
 import { ChangeEmailComponent } from './user/change-email/change-email.component';
 import { ChangePasswordComponent } from './user/change-password/change-password.component';
-import { ConfirmEmailComponent } from './auth/confirm-email/confirm-email.component';
 import { ImageUploadComponent } from './images/image-upload/image-upload.component';
 import { ImagesGetComponent } from './images/images-get/images-get.component';
 import { ImageModifiedService } from './app-services/image.services';
@@ -87,11 +83,8 @@ import { FogotPasswordRequestComponent } from './user/password-reset/fogot-passw
     AdministrationComponent,
     HomeComponent,
     PageNotFoundComponent,
-    BadRequestComponent,
-    InternalServerErrorComponent,
     OrderCreateComponent,
     UserOrdersComponent,
-    OrderDetailsComponent,
     UserCommentsComponent,
     CommentCreateComponent,
     ChangeUserDetailsComponent,
@@ -112,7 +105,6 @@ import { FogotPasswordRequestComponent } from './user/password-reset/fogot-passw
     DeleteAccountComponent,
     ChangeEmailComponent,
     ChangePasswordComponent,
-    ConfirmEmailComponent,
     ImageUploadComponent,
     ImagesGetComponent,
     EmailConfirmByLinkComponent,

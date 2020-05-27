@@ -146,17 +146,17 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             orderToAdd.UserId = userDB.Id;
             orderToAdd.Status = Enum.GetName(typeof(OrderStatuses), 0);
             orderToAdd.UpdateTime = DateTime.Now;
-            orderToAdd.OrderCost = 0;
+            orderToAdd.TotalCost = 0;
             orderToAdd.ShippingCost = 0;
 
             var connections = await _context.BasketDishes.Where(_ => _.BasketId == userDB.BasketId).Select(_ => _).AsNoTracking().ToListAsync(cancellationToken);
             foreach (var connection in connections)
             {
-                orderToAdd.OrderCost = orderToAdd.OrderCost.Value + connection.DishCost.Value * (1 - (connection.Sale.Value / 100)) * connection.Quantity.Value;
+                orderToAdd.TotalCost = orderToAdd.TotalCost.Value + connection.DishCost.Value * (1 - (connection.Sale.Value / 100)) * connection.Quantity.Value;
             }
-            orderToAdd.OrderCost *= (1 - userIdentity.PersonalDiscount / 100);
-            orderToAdd.OrderCost = Math.Round(orderToAdd.OrderCost.Value, 2);
-            if (orderToAdd.OrderCost < NumberСonstants.FREE_SHIPPING_BORDER)
+            orderToAdd.TotalCost *= (1 - userIdentity.PersonalDiscount / 100);
+            orderToAdd.TotalCost = Math.Round(orderToAdd.TotalCost.Value, 2);
+            if (orderToAdd.TotalCost < NumberСonstants.FREE_SHIPPING_BORDER)
             {
                 orderToAdd.ShippingCost = NumberСonstants.DELIVERY_COST;
             }

@@ -11,6 +11,7 @@ import { ImageModifiedService } from '../app-services/image.services';
 })
 export class DishesComponent implements OnInit {
   dishes: DishView[] = [];
+  message: string = null;
   mainImages: {[id: string]: string} = { };
 
   constructor(
@@ -28,14 +29,42 @@ export class DishesComponent implements OnInit {
                       this.getImages(dish.id);
           }
          }
-
       })
-      .catch(msg => console.log(msg));
+      .catch(msg => {
+        if (msg.status ===  204) {
+          this.message = msg.response;
+        }
+        else if (msg.status ===  400) {
+          this.message = 'Error 400: ' + msg.response;
+        }
+        else if (msg.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+      });
   }
 
   removeAll(): void {
     this.manageMenuService.removeAll().then(data => this.dishes = data)
-    .catch(msg => {console.log(msg); });
+    .catch(msg => {
+      if (msg.status ===  204) {
+        this.message = msg.response;
+      }
+      else if (msg.status ===  400) {
+        this.message = 'Error 400: ' + msg.response;
+      }
+      else if (msg.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (msg.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
+    });
   }
 
   removeDish(id: string): void {
@@ -44,15 +73,21 @@ export class DishesComponent implements OnInit {
       this.dishes.splice(indexToDelete, 1);
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  404) {
+        this.message = 'Elements are not found.';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 

@@ -17,6 +17,7 @@ export class BasketComponent implements OnInit {
   dishes: DishView[] = [];
   page = 2;
   pageSize = 10;
+  message: string = null;
   updateForm: FormGroup;
 
   mainImages: {[id: string]: string} = { };
@@ -43,31 +44,35 @@ export class BasketComponent implements OnInit {
                                                    }
                                                   },
                                                   error => {
-                                                    if (error.status === 500){
-                                                      this.router.navigate(['/error/500']);
-                                                     }
-                                                     else if (error.status === 404) {
-                                                      this.router.navigate(['/error/404']);
-                                                     }
-                                                    //  else {
-                                                    //   this.router.navigate(['/error/unexpected']);
-                                                    //  }
+                                                    if (error.status ===  204) {
+                                                      this.message = 'Now empty.';
+                                                    }
+                                                    else if (error.status ===  400) {
+                                                      this.message = 'Error 400: ' + error.response;
+                                                    }
+                                                    else if (error.status ===  500) {
+                                                      this.message = 'Error 500: Internal Server Error!';
+                                                    }
+                                                    else{
+                                                      this.message = 'Something was wrong. Please, contact with us.';
+                                                    }
                                                   });
   }
+
   onBasketUpdate(id: string): void {
     this.updateForm.value.dishId = id;
     this.basketService.addDish(this.updateForm.value).subscribe(data => {this.ngOnInit(); },
       error => {
-        if (error.status === 500){
-          this.router.navigate(['/error/500']);
-         }
-         else if (error.status === 404) {
-          this.router.navigate(['/error/404']);
-         }
-        //  else {
-        //   this.router.navigate(['/error/unexpected']);
-        //  }
-         });
+        if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.response;
+        }
+        else if (error.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+      });
   }
 
   removeDish(id: string): void {
@@ -77,15 +82,15 @@ export class BasketComponent implements OnInit {
       this.ngOnInit();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 
@@ -94,15 +99,15 @@ export class BasketComponent implements OnInit {
       this.ngOnInit();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  204) {
+        this.message = 'Now empty.';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
     // this.ngOnInit();
     // window.location.reload();

@@ -29,7 +29,6 @@ import { UserCommentsAdminComponent } from './comments/user-comments-admin/user-
 import { DeleteAccountComponent } from './user/delete-account/delete-account.component';
 import { ChangePasswordComponent } from './user/change-password/change-password.component';
 import { ChangeEmailComponent } from './user/change-email/change-email.component';
-import { ConfirmEmailComponent } from './auth/confirm-email/confirm-email.component';
 import { EmailConfirmByLinkComponent } from './auth/email-confirm-by-link/email-confirm-by-link.component';
 import { FogotPasswordRequestComponent } from './user/password-reset/fogot-password-request/fogot-password-request.component';
 import { PasswordResetComponent } from './user/password-reset/password-reset/password-reset.component';
@@ -39,7 +38,6 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'delete', component: DeleteAccountComponent },
   { path: 'email/change', component: ChangeEmailComponent },
-  { path: 'email/confirm', component: ConfirmEmailComponent },
   { path: 'confirmation', component: EmailConfirmByLinkComponent },
   { path: 'password/change', component: ChangePasswordComponent },
   { path: 'password/request', component: FogotPasswordRequestComponent },

@@ -14,6 +14,7 @@ export class EmployeeOrdersComponent implements OnInit {
   orderStatuses: OrderStatus[] = [];
 
   name: string;
+  message: string = null;
   statusUpdateForm: FormGroup;
 
   constructor(
@@ -38,11 +39,36 @@ export class EmployeeOrdersComponent implements OnInit {
     // });
     this.manageOrderService.getOrdersByStatus(this.name)
       .then(data => this.orders = data)
-      .catch(msg => {console.log(status);
-                     this.orders = null; });
+      .catch(msg => {
+        if (msg.status ===  403) {
+          this.message = 'You are not authorized!';
+        }
+        else if (msg.status ===  404) {
+          this.message = 'Elements are not found.';
+        }
+        else if (msg.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+        this.orders = null; });
     this.manageOrderService.getStatuses()
       .then(data => this.orderStatuses = data)
-      .catch(msg => console.log(status));
+      .catch(msg => {
+        if (msg.status ===  204) {
+          this.message = msg.response;
+        }
+        else if (msg.status ===  400) {
+          this.message = 'Error 400: ' + msg.response;
+        }
+        else if (msg.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+      });
   }
 
   statusUpdate(id: string): void {
@@ -51,21 +77,20 @@ export class EmployeeOrdersComponent implements OnInit {
     // console.log(this.statusUpdateForm.value);
     this.orderService.updateStatus(this.statusUpdateForm.value).subscribe(data => {
       this.ngOnInit();
-
-      // window.location.reload();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-      //  else {
-      //   this.router.navigate(['/error/unexpected']);
-      //  }
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
-
   }
-
 }

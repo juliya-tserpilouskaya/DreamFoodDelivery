@@ -13,7 +13,7 @@ export class ImagesGetComponent implements OnInit {
 
   imagesCount: number[] = [];
   currentImageNumber = 1;
-
+  message: string = null;
   allImages: string[];
   currentImage: string;
 
@@ -51,11 +51,21 @@ export class ImagesGetComponent implements OnInit {
           this.imagesCount.push(index);
         }
         this.getImage(this.currentImageNumber); }
-      else {
-        // TODO: Empty pic
-      }
       },
-    error => { }
+    error => {
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  403) {
+        this.message = 'You are not authorized!';
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
+     }
     );
   }
 

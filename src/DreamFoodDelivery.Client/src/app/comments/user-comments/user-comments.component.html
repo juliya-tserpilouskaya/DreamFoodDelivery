@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <h3>Reviews:</h3>
 <div class="card" *ngFor="let item of reviews">
   <h5 class="card-header">{{item.rating}}</h5>

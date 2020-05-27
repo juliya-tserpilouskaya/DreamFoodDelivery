@@ -24,7 +24,6 @@ export class ManageOrderService {
           resolve(data);
         },
         error(msg) {
-          console.log('Error Getting Location: ', msg);
           reject(msg);
         },
       });
@@ -43,11 +42,11 @@ export class ManageOrderService {
           resolve(data);
         },
         error(msg) {
-          console.log('Error Getting Location in Promise: ', msg);
-          console.log(msg.status);
-          console.log(msg._responseText);
+          // console.log('Error Getting Location in Promise: ', msg);
+          // console.log(msg.status);
+          // console.log(msg._responseText);
 
-          console.log(msg.result404);
+          // console.log(msg.result404);
           reject(msg);
         },
       });
@@ -66,9 +65,6 @@ export class ManageOrderService {
           resolve(data);
         },
         error(msg) {
-          console.log('Error Getting Location in Promise: ', msg);
-          console.log(msg.status); // +
-          console.log(msg._responseText);
           reject(msg);
         },
       });
@@ -84,7 +80,6 @@ export class ManageOrderService {
           resolve(null);
         },
         error(msg) {
-          console.log('Error Getting Location in ManageMenuService: ', msg);
           reject(msg);
         },
       });

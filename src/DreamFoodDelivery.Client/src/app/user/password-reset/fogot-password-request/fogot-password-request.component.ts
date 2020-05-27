@@ -43,22 +43,21 @@ export class FogotPasswordRequestComponent implements OnInit {
       },
       error => {
         this.spinning = false;
-
-        // if (error.status ===  500) {
-        //   this.errorMessage = "Error 500: Internal Server Error";
-        // }
-        // if (error.status ===  400) {
-        //   this.errorMessage = "Error 400: " + error.response;
-        // }
-        // else{
-        //   this.errorMessage = "Unsuspected Error";
-        // }
+        if (error.status ===  400) {
+          this.errorMessage = 'Error 400: ' + error.response;
+        }
+        else if (error.status ===  500) {
+          this.errorMessage = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.errorMessage = 'Something was wrong. Please, contact with us.';
+        }
       });
     }
     else
     {
       this.spinning = false;
-      this.errorMessage = 'Invalid data entry';
+      this.errorMessage = 'Data entered incorrectly.';
     }
   }
 

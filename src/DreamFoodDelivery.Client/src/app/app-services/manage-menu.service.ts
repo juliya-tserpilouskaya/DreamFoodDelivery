@@ -23,7 +23,6 @@ export class ManageMenuService {
           resolve(data);
         },
         error(msg) {
-          console.log('Error Getting Location in ManageMenuService: ', msg);
           reject(msg);
         },
       });
@@ -39,7 +38,6 @@ export class ManageMenuService {
           resolve(null);
         },
         error(msg) {
-          console.log('Error Getting Location in ManageMenuService: ', msg);
           reject(msg);
         },
       });

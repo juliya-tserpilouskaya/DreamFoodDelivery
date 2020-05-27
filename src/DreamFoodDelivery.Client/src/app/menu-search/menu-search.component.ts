@@ -25,6 +25,8 @@ export class MenuSearchComponent implements OnInit {
   tags: TagView[] = [];
   dishInfoToAdd: DishToBasketAdd;
 
+  message: string = null;
+
   page = 2;
   pageSize = 9;
   parameter: string;
@@ -64,12 +66,30 @@ export class MenuSearchComponent implements OnInit {
                       }
                      }
                     })
-      .catch(msg => {console.log(msg);
-                     console.log(msg.status);
-                     this.dishes = []; });
-    this.tagService.getAllTags().subscribe(data => {this.tags = data; },
-      error => {this.tags = [];
+      .catch(msg => {
+        if (msg.status ===  204) {
+          this.message = msg.response;
+        }
+        else if (msg.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+        this.dishes = []; });
 
+    this.tagService.getAllTags().subscribe(data => {this.tags = data; },
+      error => {
+        if (error.status ===  204) {
+          this.tags = [];
+        }
+        else if (error.status ===  500) {
+          this.message = 'Error 500: Internal Server Error!';
+        }
+        else{
+          this.message = 'Something was wrong. Please, contact with us.';
+        }
+        this.tags = [];
     });
   }
 
@@ -79,13 +99,15 @@ export class MenuSearchComponent implements OnInit {
       this.addForm.reset();
     },
     error => {
-      if (error.status === 500){
-        this.router.navigate(['/error/500']);
-       }
-       else if (error.status === 404) {
-        this.router.navigate(['/error/404']);
-       }
-
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
     });
   }
 
@@ -94,8 +116,16 @@ export class MenuSearchComponent implements OnInit {
     this.menuService.getAllDishesByRequest(this.searchForm.value).subscribe(data => {this.dishes = data;
     },
     error => {
-      this.dishes = null;
-
+      if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
+      this.dishes = [];
       });
   }
 

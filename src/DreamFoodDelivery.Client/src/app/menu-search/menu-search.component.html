@@ -1,3 +1,9 @@
+<div *ngIf="message">
+  <div class="alert alert-info" role="alert">
+      {{message}}
+  </div>
+</div>
+
 <div class="row justify-content-center">
   <section class="jumbotron text-center">
     <div class="container">
@@ -56,9 +62,9 @@
                   <ul class="list-group">
                     <li class="list-group-item">Cost: {{dish.cost}}$</li>
                     <li class="list-group-item">Discount: {{dish.sale}}%</li>
-                    <li class="list-group-item">Total cost: {{dish.finaleCost}}$</li>
+                    <li class="list-group-item">Total cost: {{dish.totalCost}}$</li>
                   </ul>
-                    <p class="card-text">Ingredients: {{dish.composition}}, weight: {{dish.weigh}}</p>
+                    <p class="card-text">Ingredients: {{dish.composition}}, weight: {{dish.weight}}</p>
                     <div class="form-group" *ngIf="isAuthenticated">
                       <input type="number" class="form-control" max="20" min="1" placeholder="0" formControlName="quantity">
                       <button type="submit" class="btn btn-sm btn-outline-secondary">Add to basket</button>

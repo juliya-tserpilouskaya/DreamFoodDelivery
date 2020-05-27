@@ -60,7 +60,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 UserName = SuperAdminData.USER_NAME,
                 PersonalDiscount = 0,
                 Role = "Admin",
-                EmailConfirmed = false
+                IsEmailConfirmed = false
             };
             var createUser = await _userManager.CreateAsync(user, password);
             if (!createUser.Succeeded)
@@ -74,7 +74,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var result = await _adminService.ConfirmEmailAsync(admin.Id);
             if (result.IsSuccess)
             {
-                admin.EmailConfirmed = true;
+                admin.IsEmailConfirmed = true;
                 await _userManager.UpdateAsync(admin);
             }
             return Result.Ok();
@@ -116,7 +116,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 UserName = user.Email,
                 PersonalDiscount = 0,
                 Role = defaultRole,
-                EmailConfirmed = false
+                IsEmailConfirmed = false
             };
 
             var createUser = await _userManager.CreateAsync(newUser, user.Password);
