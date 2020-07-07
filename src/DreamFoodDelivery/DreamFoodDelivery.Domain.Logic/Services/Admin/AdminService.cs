@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -21,12 +20,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     public class AdminService : IAdminService
     {
         private readonly DreamFoodDeliveryContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
         private readonly IEmailSenderService _emailSender;
         IUserService _userService;
 
-        public AdminService(IMapper mapper, DreamFoodDeliveryContext context, UserManager<User> userManager, IUserService userService, IEmailSenderService emailSender)
+        public AdminService(IMapper mapper, DreamFoodDeliveryContext context, UserManager<AppUser> userManager, IUserService userService, IEmailSenderService emailSender)
         {
             _context = context;
             _mapper = mapper;
@@ -41,7 +40,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<IEnumerable<UserView>>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var usersDB = await _context.Users.AsNoTracking().ToListAsync(cancellationToken);
-            var usersIdentity = await _userManager.Users.ToListAsync(cancellationToken);
+            var usersIdentity = await _userManager.Users.ToListAsync(cancellationToken); //clean... or leave, because an interesting test is written.
 
             if (!usersDB.Any() || !usersIdentity.Any())
             {
@@ -49,28 +48,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
 
             List<UserView> users = new List<UserView>();
-            foreach (var item in usersDB)
+            foreach (var user in usersDB)
             {
-                var item2 = usersIdentity.Where(_ => _.Id == item.IdFromIdentity).Select(_ => _).FirstOrDefault();
-                var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(item2.Id);
-                if (userProfile.IsError)
-                {
-                    users.Add(
-                    new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(item)
-                    });
-                }
-                else
-                {
-                    users.Add(
-                    new UserView() //Check and delete excess information
-                    {
-                        UserProfile = userProfile.Data,
-                        UserDTO = _mapper.Map<UserDTO>(item)
-                    });
-                }
+                //var userIdentity = usersIdentity.Where(_ => _.Id == user.IdFromIdentity).Select(_ => _).FirstOrDefault();
+                var userView = CollectUserView(user);
+                users.Add(userView.Result);
             }
             return Result<IEnumerable<UserView>>.Ok(_mapper.Map<IEnumerable<UserView>>(users));
         }
@@ -90,22 +72,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 {
                     return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
                 }
-                var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(userDB.IdFromIdentity);
-
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userDB)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userDB)
-                };
+                UserView view = CollectUserView(userDB).Result;
                 return Result<UserView>.Ok(view);
             }
             catch (ArgumentNullException ex)
@@ -127,23 +94,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _userManager.UpdateAsync(userIdentity);
-                var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(userIdentity.Id);
                 UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == userIdentity.Id).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                };
-                //await _emailSender.SendEmailAsync(userIdentity.Email, "New discount", "Your discount is: " + userProfile.Data.PersonalDiscount, cancellationToken);
+                UserView view = CollectUserView(userAfterUpdate).Result;
                 return Result<UserView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -201,8 +153,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result> ChangeRoleAsync(string idFromIdentity, CancellationToken cancellationToken = default)
         {
-            string user = "User";
-            string admin = "Admin";
             var userIdentity = await _userManager.FindByIdAsync(idFromIdentity);
 
             if (userIdentity == null)
@@ -211,29 +161,29 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             try
             {
-                if (await _userManager.IsInRoleAsync(userIdentity, user))
+                if (await _userManager.IsInRoleAsync(userIdentity, AppIdentityConstants.USER))
                 {
-                    userIdentity.Role = admin;
+                    userIdentity.Role = AppIdentityConstants.ADMIN;
                     await _userManager.UpdateAsync(userIdentity);
-                    await _userManager.AddToRoleAsync(userIdentity, admin);
-                    await _userManager.RemoveFromRoleAsync(userIdentity, user);
+                    await _userManager.AddToRoleAsync(userIdentity, AppIdentityConstants.ADMIN);
+                    await _userManager.RemoveFromRoleAsync(userIdentity, AppIdentityConstants.USER);
                     var result =  await _emailSender.SendEmailAsync(userIdentity.Email, EmailConstants.ROLE_SUBJECT, EmailConstants.ROLE_MESSAGE_FOR_ADMIN, cancellationToken);
                     if (result.IsError)
                     {
-                        return Result.Fail(result.Message);
+                        return Result.Quite(NotificationConstans.SOMETHING_WRONG_WITH_EMAIL + result.Message);
                     }
                     return await Task.FromResult(Result.Ok());
                 }
-                else if (await _userManager.IsInRoleAsync(userIdentity, admin))
+                else if (await _userManager.IsInRoleAsync(userIdentity, AppIdentityConstants.ADMIN))
                 {
-                    userIdentity.Role = user;
+                    userIdentity.Role = AppIdentityConstants.USER;
                     await _userManager.UpdateAsync(userIdentity);
-                    await _userManager.AddToRoleAsync(userIdentity, user);
-                    await _userManager.RemoveFromRoleAsync(userIdentity, admin);
+                    await _userManager.AddToRoleAsync(userIdentity, AppIdentityConstants.USER);
+                    await _userManager.RemoveFromRoleAsync(userIdentity, AppIdentityConstants.ADMIN);
                     var result = await _emailSender.SendEmailAsync(userIdentity.Email, EmailConstants.ROLE_SUBJECT, EmailConstants.ROLE_MESSAGE_FOR_USER, cancellationToken);
                     if (result.IsError)
                     {
-                        return Result.Fail(result.Message);
+                        return Result.Quite(NotificationConstans.SOMETHING_WRONG_WITH_EMAIL + result.Message);
                     }
                     return await Task.FromResult(Result.Ok());
                 }
@@ -254,12 +204,12 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="idFromIdentity">User id to confirm email</param>
         [LoggerAttribute]
-        public async Task<Result<UserView>> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default)
+        public async Task<Result> ConfirmEmailAsync(string idFromIdentity, CancellationToken cancellationToken = default)
         {
-            User usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
+            AppUser usersIdentity = await _userManager.FindByIdAsync(idFromIdentity);
             if (usersIdentity is null)
             {
-                return Result<UserView>.Fail<UserView>(ExceptionConstants.USER_WAS_NOT_FOUND);
+                return Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND);
             }
             try
             {
@@ -270,34 +220,38 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     usersIdentity.IsEmailConfirmed = true;
                     await _userManager.UpdateAsync(usersIdentity);
                 }
-
-                var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(idFromIdentity);
-                UserDB userAfterUpdate = await _context.Users.Where(_ => _.IdFromIdentity == idFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                if (userProfile.IsError)
-                {
-                    UserView failProfile = new UserView()
-                    {
-                        UserProfile = null,
-                        UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                    };
-                    return Result<UserView>.Fail<UserView>(failProfile + ExceptionConstants.IDENTITY_USER_WAS_NOT_FOUND);
-                }
-                UserView view = new UserView()
-                {
-                    UserProfile = userProfile.Data,
-                    UserDTO = _mapper.Map<UserDTO>(userAfterUpdate)
-                };
-                return Result<UserView>.Ok(view);
+                return Result.Ok();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
             catch (DbUpdateException ex)
             {
-                return Result<UserView>.Fail<UserView>(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
+                return Result.Fail(ExceptionConstants.CANNOT_UPDATE_MODEL + ex.Message);
             }
         }
 
+        /// <summary>
+        /// Collect user db info and profile data to view model
+        /// </summary>
+        /// <param name="user">User db data</param>
+        ///// <param name="userIdentity">User identity data</param>
+        /// <returns></returns>
+        public async Task<UserView> CollectUserView(UserDB user)
+        {
+            UserView view = new UserView();
+            view.UserDTO = _mapper.Map<UserDTO>(user);
+            var userProfile = await _userService.GetUserProfileByIdFromIdentityAsync(user.IdFromIdentity);
+            if (userProfile.IsError)
+            {
+                view.UserProfile = null;
+            }
+            else
+            {
+                view.UserProfile = userProfile.Data;
+            }
+            return view;
+        }
     }
 }

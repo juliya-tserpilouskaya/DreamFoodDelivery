@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Common.Сonstants
+namespace DreamFoodDelivery.Common
 {
     public class NotificationConstans
     {
@@ -14,5 +14,6 @@ namespace DreamFoodDelivery.Common.Сonstants
         public const string TOKEN_IS_NULL = "Or token is null.";
         public const string INVALID_FILE = "Invalid file";
         public const string SOMETHING_WRONG_WITH_ROLES = "Something wrong with roles!";
+        public const string SOMETHING_WRONG_WITH_EMAIL = "Something wrong with user email!";
     }
 }

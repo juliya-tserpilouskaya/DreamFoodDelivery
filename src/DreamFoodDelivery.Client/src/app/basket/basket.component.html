@@ -12,7 +12,7 @@
       <div class="form-group" *ngIf="isAuthenticated">
         <div *ngIf="basket else loading">
           <h4 class="card-text">Total cost of selected dishes: {{basket.basketCost}} $</h4>
-          <h4 class="card-text">Delivery service: {{basket.shippingCost}} $</h4>
+          <h4 class="card-text">Delivery service: {{basket.deliveryCost}} $</h4>
           <br>
         </div>
         <button *ngIf="dishes.length > 0" type="button" class="btn btn-sm btn-outline-secondary" (click)="removeAll()">Remove all</button>
@@ -40,7 +40,7 @@
                  <div class="card-body">
                   <p class="card-text">Description: {{dish.description}}</p>
                   <ul class="list-group">
-                    <li class="list-group-item">Cost: {{dish.cost}}$</li>
+                    <li class="list-group-item">Cost: {{dish.price}}$</li>
                     <li class="list-group-item">Discount: {{dish.sale}}%</li>
                     <li class="list-group-item">Total cost: {{dish.totalCost}}$</li>
                   </ul>

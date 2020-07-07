@@ -14,7 +14,7 @@ import { IdentityService,
          DishService,
          BasketService,
          OrderService,
-         CommentService,
+         ReviewService,
          TagService,
          AdminService} from './app-services/nswag.generated.services';
 
@@ -66,8 +66,7 @@ import { ImageModifiedService } from './app-services/image.services';
 import { EmailConfirmByLinkComponent } from './auth/email-confirm-by-link/email-confirm-by-link.component';
 import { PasswordResetComponent } from './user/password-reset/password-reset/password-reset.component';
 import { FogotPasswordRequestComponent } from './user/password-reset/fogot-password-request/fogot-password-request.component';
-
-
+import { InternalServerErrorComponent } from './pages/internal-server-error/internal-server-error.component';
 
 @NgModule({
   declarations: [
@@ -110,6 +109,7 @@ import { FogotPasswordRequestComponent } from './user/password-reset/fogot-passw
     EmailConfirmByLinkComponent,
     PasswordResetComponent,
     FogotPasswordRequestComponent,
+    InternalServerErrorComponent,
   ],
   imports: [
     BrowserAnimationsModule,
@@ -135,11 +135,11 @@ import { FogotPasswordRequestComponent } from './user/password-reset/fogot-passw
     DishService,
     BasketService,
     OrderService,
-    CommentService,
     TagService,
     AdminService,
     ImageModifiedService,
-    TagService
+    TagService,
+    ReviewService
   ],
   bootstrap: [AppComponent]
 })

@@ -8,5 +8,7 @@ namespace DreamFoodDelivery.Domain.View
     {
         public string UserToken { get; set; }
         public UserView UserView { get; set; }
+        public int ExpiresIn { get; set; }
+        public string RefreshToken { get; set; }
     }
 }

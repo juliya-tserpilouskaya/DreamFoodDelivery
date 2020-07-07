@@ -1,21 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { CommentService, CommentForUsersView, PageResponseOfCommentForUsersView } from 'src/app/app-services/nswag.generated.services';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { ThrowStmt } from '@angular/compiler';
+import { RatingView, ReviewForUsersView, PageResponseOfReviewForUsersView, ReviewService } from 'src/app/app-services/nswag.generated.services';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  comments: CommentForUsersView[] = [];
-  response: PageResponseOfCommentForUsersView;
+  currentRate = 1.14;
+  comments: ReviewForUsersView[] = [];
+  response: PageResponseOfReviewForUsersView;
   requestForm: FormGroup;
   pages: number[] = [];
+  rating: RatingView;
+  message: string = null;
 
   constructor(
-    private commentService: CommentService,
+    private reviewService: ReviewService,
     private fb: FormBuilder,
+    public router: Router
   ) {
     this.requestForm = this.fb.group({
       pageNumber: 1,
@@ -24,11 +30,38 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getComments();
+    // this.getComments();
+    this.getRating();
+  }
+
+  getRating(){
+    this.reviewService.getRating().subscribe(data => {this.rating = data;
+                                                      this.message = null;
+    },
+     error => {
+      if (error.status ===  206) {
+        this.message = error.detail;
+      }
+      // TODO: check codes
+      else if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.response;
+      }
+      else if (error.status ===  500) {
+        this.message = 'Error 500: Internal Server Error!';
+        this.router.navigate(['/error/500', {msg: this.message}]);
+      }
+      else{
+        this.message = 'Something was wrong. Please, contact with us.';
+      }
+
+
+
+     });
+
   }
 
   getComments(){
-    this.commentService.getAll(this.requestForm.value).subscribe(response => {
+    this.reviewService.getAll(this.requestForm.value).subscribe(response => {
       this.response = response;
       console.log(response);
       this.pages = [];
@@ -64,3 +97,4 @@ export class HomeComponent implements OnInit {
   }
 
 }
+

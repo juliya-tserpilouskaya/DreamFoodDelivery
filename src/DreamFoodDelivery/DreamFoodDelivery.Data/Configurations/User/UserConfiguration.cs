@@ -26,7 +26,11 @@ namespace DreamFoodDelivery.Data.Configurations
                    .HasForeignKey(_ => _.UserId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(_ => _.Comments).WithOne(_ => _.User)
+            builder.HasMany(_ => _.Reviews).WithOne(_ => _.User)
+                   .HasForeignKey(_ => _.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(_ => _.RefreshTokens).WithOne(_ => _.User)
                    .HasForeignKey(_ => _.UserId)
                    .OnDelete(DeleteBehavior.Restrict);
 

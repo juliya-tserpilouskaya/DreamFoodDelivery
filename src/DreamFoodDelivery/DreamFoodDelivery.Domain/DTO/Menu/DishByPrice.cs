@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class DishByCost
+    public class DishByPrice
     {
         public double LowerPrice { get; set; }
         public double UpperPrice { get; set; }

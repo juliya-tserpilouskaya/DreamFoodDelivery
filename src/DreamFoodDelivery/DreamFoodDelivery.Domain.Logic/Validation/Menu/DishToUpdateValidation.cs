@@ -19,8 +19,8 @@ namespace DreamFoodDelivery.Domain.Logic.Validation
                 .WithMessage("Description must contain from 10 to 250 characters.");
             RuleFor(_ => _.Weight).MinimumLength(3).MaximumLength(250)
                 .WithMessage("Weight must contain from 5 to 250 characters.");
-            RuleFor(_ => _.Cost).GreaterThan(0)
-                .WithMessage("Cost must be greater than 0");
+            RuleFor(_ => _.Price).GreaterThan(0)
+                .WithMessage("Price must be greater than 0");
             RuleFor(_ => _.Sale).GreaterThanOrEqualTo(0)
                 .WithMessage("Sale must be equal to or greater than 0");
             RuleForEach(_ => _.TagNames).SetValidator(new TagToAddValidation());

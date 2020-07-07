@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Bogus;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
-using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Domain.Logic.Services;
 using DreamFoodDelivery.Domain.View;
 using FluentAssertions;
@@ -18,11 +16,11 @@ using Xunit;
 
 namespace DreamFoodDelivery.Logic.Tests
 {
-    public class CommentServiceTest
+    public class ReviewServiceTest
     {
         private Faker<UserDB> _fakeUser = new Faker<UserDB>()
             .RuleFor(x => x.IdFromIdentity, y => y.Random.Guid().ToString());
-        private readonly Faker<CommentDB> _fakeComment = new Faker<CommentDB>()
+        private readonly Faker<ReviewDB> _fakeReview = new Faker<ReviewDB>()
             .RuleFor(x => x.Headline, y => y.Random.Word())
             .RuleFor(x => x.Rating, y => y.Random.Byte(0, 5))
             .RuleFor(x => x.Content, y => y.Random.Words());
@@ -34,32 +32,30 @@ namespace DreamFoodDelivery.Logic.Tests
             .RuleFor(x => x.Status, y => y.Random.Words());
 
         readonly List<UserDB> _users;
-        readonly List<CommentDB> _comments;
+        readonly List<ReviewDB> _reviews;
         readonly List<OrderDB> _orders;
         readonly IMapper _mapper;
-        readonly IOrderService _orderService;
 
-        public CommentServiceTest()
+        public ReviewServiceTest()
         {
             var mapperConfiguration = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<CommentDB, CommentForUsersView>().ReverseMap();
-                cfg.CreateMap<CommentDB, CommentView>().ReverseMap();
-                cfg.CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
+                cfg.CreateMap<ReviewDB, ReviewForUsersView>().ReverseMap();
+                cfg.CreateMap<ReviewDB, ReviewView>().ReverseMap();
+                cfg.CreateMap<ReviewDB, ReviewToUpdate>().ReverseMap();
             });
 
             _mapper = new Mapper(mapperConfiguration);
             _orders = _fakeOrder.Generate(2);
-            _comments = _fakeComment.Generate(2);
+            _reviews = _fakeReview.Generate(2);
             _users = _fakeUser.Generate(2);
-
         }
 
         [Fact]
-        public async void Comments_GetAllAsync_Test()
+        public async void Reviews_GetAllAsync_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_GetAllAsync_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_GetAllAsync_Test")
                 .Options;
 
             // Run the test against one instance of the context
@@ -69,24 +65,24 @@ namespace DreamFoodDelivery.Logic.Tests
                 await context.SaveChangesAsync();
 
                 var order = context.Orders.AsNoTracking().FirstOrDefault();
-                var comment = _comments.FirstOrDefault();
-                comment.UserId = order.UserId;
-                comment.OrderId = order.Id.GetValueOrDefault();
+                var review = _reviews.FirstOrDefault();
+                review.UserId = order.UserId;
+                review.OrderId = order.Id.GetValueOrDefault();
 
-                context.AddRange(comment);
+                context.AddRange(review);
                 await context.SaveChangesAsync();
             }
 
             // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
+                var reviewsInBase = await context.Reviews.AsNoTracking().ToListAsync();
 
                 var result = await service.GetAllAsync(new PageRequest());
 
-                foreach (var item in commentsInBase)
+                foreach (var item in reviewsInBase)
                 {
                     var itemFromResult = result.Data.Data.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
@@ -95,29 +91,29 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
-        public async void Comments_GetAllAdminAsync_Test()
+        public async void Reviews_GetAllAdminAsync_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_GetAllAdminAsync_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_GetAllAdminAsync_Test")
                 .Options;
 
             // Run the test against one instance of the context
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
                 await context.SaveChangesAsync();
             }
 
             // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
+                var reviewInBase = await context.Reviews.AsNoTracking().ToListAsync();
 
                 var result = await service.GetAllAdminAsync();
 
-                foreach (var item in commentsInBase)
+                foreach (var item in reviewInBase)
                 {
                     var itemFromResult = result.Data.Where(_ => _.Headline.Equals(item.Headline, StringComparison.OrdinalIgnoreCase)).Select(_ => _).FirstOrDefault();
                     itemFromResult.Should().NotBeNull();
@@ -126,29 +122,29 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
-        public async void Comments_GetByIdAsync_PositiveAndNegative_Test()
+        public async void Reviews_GetByIdAsync_PositiveAndNegative_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_GetByIdAsync_PositiveAndNegative_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_GetByIdAsync_PositiveAndNegative_Test")
                 .Options;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+                var review = await context.Reviews.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var resultPositive = await service.GetByIdAsync(comment.Id.ToString());
+                var resultPositive = await service.GetByIdAsync(review.Id.ToString());
                 var resultNegative = await service.GetByIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Headline.Should().BeEquivalentTo(comment.Headline);
+                resultPositive.Data.Headline.Should().BeEquivalentTo(review.Headline);
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();
@@ -156,45 +152,45 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
-        public async void Comments_GetByUserIdAsync_PositiveAndNegative_Test()
+        public async void Reviews_GetByUserIdAsync_PositiveAndNegative_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_GetByUserIdAsync_PositiveAndNegative_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_GetByUserIdAsync_PositiveAndNegative_Test")
                 .Options;
 
-            UserDB userWithComments;
+            UserDB userWithReviews;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
-                userWithComments = context.Users.AsNoTracking().FirstOrDefault();
+                userWithReviews = context.Users.AsNoTracking().FirstOrDefault();
 
-                foreach (var comment in _comments)
+                foreach (var review in _reviews)
                 {
-                    comment.UserId = userWithComments.Id;
-                    comment.OrderId = new Guid();
+                    review.UserId = userWithReviews.Id;
+                    review.OrderId = new Guid();
                 }
 
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
-                var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
+                var reviewsInBase = await context.Reviews.AsNoTracking().ToListAsync();
+                var userWithoutReviews = await context.Users.Where(_ => _.Id != userWithReviews.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetByUserIdAsync(userWithComments.IdFromIdentity.ToString());
-                var resultNegative = await service.GetByUserIdAsync(userWithoutComments.IdFromIdentity.ToString());
+                var resultPositive = await service.GetByUserIdAsync(userWithReviews.IdFromIdentity.ToString());
+                var resultNegative = await service.GetByUserIdAsync(userWithoutReviews.IdFromIdentity.ToString());
 
-                foreach (var comment in commentsInBase)
+                foreach (var review in reviewsInBase)
                 {
                     resultPositive.Data
-                        .Where(_ => _.Id == comment.Id)
+                        .Where(_ => _.Id == review.Id)
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
@@ -204,23 +200,32 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
-        public async void Comments_RemoveAllAsync_Test()
+        public async void Reviews_RemoveAllAsync_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_RemoveAllAsync_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_RemoveAllAsync_Test")
                 .Options;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
+                int sum = 0;
+                for (int i = 0; i < _reviews.Count; i++)
+                {
+                    sum += _reviews[i].Rating.Value;
+                }
+                RatingDB rating = new RatingDB()
+                {
+                    Sum = sum,
+                    Count = _reviews.Count
+                };
+                context.Add(rating);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
-
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
                 var resultPositive = await service.RemoveAllAsync();
 
@@ -230,117 +235,152 @@ namespace DreamFoodDelivery.Logic.Tests
         }
 
         [Fact]
-        public async void Comments_RemoveAllByUserIdAsync_PositiveAndNegative_Test()
+        public async void Reviews_RemoveAllByUserIdAsync_PositiveAndNegative_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_RemoveAllByUserIdAsync_PositiveAndNegative_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_RemoveAllByUserIdAsync_PositiveAndNegative_Test")
                 .Options;
 
-            UserDB userWithComments;
+            UserDB userWithReviews;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
-                userWithComments = context.Users.AsNoTracking().FirstOrDefault();
+                userWithReviews = context.Users.AsNoTracking().FirstOrDefault();
 
-                foreach (var comment in _comments)
+                foreach (var review in _reviews)
                 {
-                    comment.UserId = userWithComments.Id;
-                    comment.OrderId = new Guid();
+                    review.UserId = userWithReviews.Id;
+                    review.OrderId = new Guid();
                 }
-
-                context.AddRange(_comments);
+                int sum = 0;
+                for (int i = 0; i < _reviews.Count; i++)
+                {
+                    sum += _reviews[i].Rating.Value;
+                }
+                RatingDB rating = new RatingDB()
+                {
+                    Sum = sum,
+                    Count = _reviews.Count
+                };
+                context.Add(rating);
+                context.AddRange(_reviews);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+                //var review = await context.Reviews.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var resultPositive = await service.RemoveAllByUserIdAsync(userWithComments.Id.ToString());
+                var resultPositive = await service.RemoveAllByUserIdAsync(userWithReviews.Id.ToString());
                 var resultNegative = await service.RemoveAllByUserIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain(ExceptionConstants.COMMENTS_WERE_NOT_FOUND);
+                resultNegative.Message.Should().Contain(ExceptionConstants.REVIEWS_WERE_NOT_FOUND);
             }
         }
 
         [Fact]
-        public async void Comments_RemoveByIdAsync_PositiveAndNegative_Test()
+        public async void Reviews_RemoveByIdAsync_PositiveAndNegative_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_RemoveByIdAsync_PositiveAndNegative_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_RemoveByIdAsync_PositiveAndNegative_Test")
                 .Options;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
+                int sum = 0;
+                for (int i = 0; i < _reviews.Count; i++)
+                {
+                    sum += _reviews[i].Rating.Value;
+                }
+                RatingDB rating = new RatingDB()
+                {
+                    Sum = sum,
+                    Count = _reviews.Count
+                };
+                context.Add(rating);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+                var review = await context.Reviews.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                var resultPositive = await service.RemoveByIdAsync(comment.Id.ToString());
+                var resultPositive = await service.RemoveByIdAsync(review.Id.ToString());
                 var resultNegative = await service.RemoveByIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain(ExceptionConstants.COMMENT_WAS_NOT_FOUND);
+                resultNegative.Message.Should().Contain(ExceptionConstants.REVIEW_WAS_NOT_FOUND);
             }
         }
 
         [Fact]
-        public async void Comments_UpdateAsync_PositiveAndNegative_Test()
+        public async void Reviews_UpdateAsync_PositiveAndNegative_Test()
         {
             var options = new DbContextOptionsBuilder<DreamFoodDeliveryContext>()
-                .UseInMemoryDatabase(databaseName: "Comments_UpdateAsync_PositiveAndNegative_Test")
+                .UseInMemoryDatabase(databaseName: "Reviews_UpdateAsync_PositiveAndNegative_Test")
                 .Options;
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                context.AddRange(_comments);
+                context.AddRange(_reviews);
+                int sum = 0;
+                for (int i = 0; i < _reviews.Count; i++)
+                {
+                    sum += _reviews[i].Rating.Value;
+                }
+                RatingDB rating = new RatingDB()
+                {
+                    Sum = sum,
+                    Count = _reviews.Count
+                };
+                context.Add(rating);
                 await context.SaveChangesAsync();
             }
 
             using (var context = new DreamFoodDeliveryContext(options))
             {
-                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+                var review = await context.Reviews.AsNoTracking().FirstOrDefaultAsync();
+                var rating = await context.Rating.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentService(_mapper, context, _orderService);
+                var service = new ReviewService(_mapper, context);
 
-                CommentToUpdate updateComment = new CommentToUpdate()
+                ReviewToUpdate updateReview = new ReviewToUpdate()
                 {
-                    Id = comment.Id.ToString(),
+                    Id = review.Id.ToString(),
                     Headline = "Headline",
-                    Content = "Content"
+                    Content = "Content",
+                    Rating = 1
                 };
 
-                CommentToUpdate failComment = new CommentToUpdate()
+                ReviewToUpdate failReview = new ReviewToUpdate()
                 {
                     Id = new Guid().ToString(),
                     Headline = "Headline",
-                    Content = "Content"
+                    Content = "Content",
+                    Rating = 0
                 };
 
-                var resultPositive = await service.UpdateAsync(updateComment);
-                var resultNegative = await service.UpdateAsync(failComment);
+                var resultPositive = await service.UpdateAsync(updateReview);
+                var resultNegative = await service.UpdateAsync(failReview);
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Headline.Should().BeEquivalentTo(updateComment.Headline);
-                resultPositive.Data.Headline.Should().NotBeEquivalentTo(comment.Headline);
+                resultPositive.Data.Headline.Should().BeEquivalentTo(updateReview.Headline);
+                resultPositive.Data.Headline.Should().NotBeEquivalentTo(review.Headline);
 
                 resultNegative.IsSuccess.Should().BeFalse();
             }

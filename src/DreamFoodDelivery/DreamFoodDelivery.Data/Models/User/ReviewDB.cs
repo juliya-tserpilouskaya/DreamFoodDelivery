@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Data.Models
 {
-    public class CommentDB
+    public class ReviewDB
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

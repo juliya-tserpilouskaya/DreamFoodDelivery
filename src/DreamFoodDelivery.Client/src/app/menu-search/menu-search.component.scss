@@ -29,3 +29,52 @@
  #spacer {
   width: 10px; /* Расстояние между колонками */
  }
+ .tags-container{
+   padding: 20px;
+ }
+ .jumbotron {
+   width: 100%;
+ }
+
+ .button-search, .basket-btn {
+  margin-top: 20px;
+  background-color: #28bd1b;
+  border-color: #28bd1b;
+  font-weight: bold;
+ }
+
+ .basket-btn {
+   margin-top: 0;
+   margin-left: 20px;
+ }
+
+ .sale-circle {
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  font-size: 4vh;
+  position: absolute;
+  right: 0;
+  top: 50px;
+  padding: 10px;
+  border-radius: 50%;
+ }
+
+ .price {
+  text-align: right;
+  .discounted-price {
+    text-decoration: line-through;
+    color: red;
+    font-size: 2vh;
+    margin-bottom: 5px;
+  }
+ }
+
+ .tag-wrap {
+   display: inline-block;
+   font-size: 2vh;
+   font-weight: bold;
+   margin-right: 10px;
+ }
+
+

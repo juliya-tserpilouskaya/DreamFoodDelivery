@@ -1,5 +1,4 @@
 ﻿using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using Microsoft.AspNetCore.Identity;
@@ -14,16 +13,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 {
     public class EmailBuilder : IEmailBuilder
     {
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IEmailSenderService _emailSender;
-        public EmailBuilder(UserManager<User> userManager, IEmailSenderService emailSender)
+        public EmailBuilder(UserManager<AppUser> userManager, IEmailSenderService emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;
         }
 
         [LoggerAttribute]
-        public async Task<Result> SendConfirmMessage(User user, string callBackUrl, CancellationToken cancellationToken = default)
+        public async Task<Result> SendConfirmMessage(AppUser user, string callBackUrl, CancellationToken cancellationToken = default)
         {
             var t = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
@@ -58,7 +57,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         }
 
         [LoggerAttribute]
-        public async Task<Result> SendPasswordResetMessageAsync(User user, string callBackUrl, CancellationToken cancellationToken = default)
+        public async Task<Result> SendPasswordResetMessageAsync(AppUser user, string callBackUrl, CancellationToken cancellationToken = default)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 

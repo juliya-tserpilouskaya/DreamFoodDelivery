@@ -31,5 +31,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="email"></param>
         /// <param name="password"></param>
         Task<Result> DeleteAsync(string email, string password, CancellationToken cancellationToken = default);
+
+        Task<Result<UserWithToken>> ExchangeRefreshToken(TokenRefresh request, CancellationToken cancellationToken = default);
     }
 }

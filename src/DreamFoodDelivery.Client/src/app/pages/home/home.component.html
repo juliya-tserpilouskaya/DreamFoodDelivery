@@ -1,3 +1,5 @@
+
+
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4"><div class="chartjs-size-monitor" style="position: absolute; left: 0px; top: 0px; right: 0px; bottom: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h2>Welcome!</h2>
@@ -6,6 +8,23 @@
       If you are new here, please <a href="register">register</a>.<br>
       You could read rewiews about us here, and check our <a href="menu">menu</a> without registration.</p>
   </div>
+
+
+  <div *ngIf="message">
+    <div class="alert alert-info" role="alert">
+        {{message}}
+    </div>
+  </div>
+  <ng-template #t let-fill="fill">
+    <span class="star" [class.full]="fill === 100" *ngIf="!message">
+      <span class="half" [style.width.%]="fill">&hearts;</span>&hearts;
+    </span>
+  </ng-template>
+
+  <ngb-rating [(rate)]="currentRate" [starTemplate]="t" [readonly]="true" [max]="5"></ngb-rating>
+
+
+
 
 
   <div class="form-group">
@@ -46,11 +65,11 @@
   <div *ngIf="!response">
 
     <div class="card" >
-      <h5 class="card-header"> Your review can be here in future!</h5>
+      <h5 class="card-header">Unfortunately, no one has left a single review. </h5>
       <div class="card-body">
         <div class="col-12 col-md-12 col-lg-12 row">
           <div>
-            Unfortunately, no one has left a single review.
+            Your review can be here in future!
           </div>
         </div>
       </div>

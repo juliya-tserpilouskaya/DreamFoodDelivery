@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.View
 {
-    public class CommentForUsersView
+    public class ReviewForUsersView
     {
         public string Headline { get; set; }
         public byte? Rating { get; set; }

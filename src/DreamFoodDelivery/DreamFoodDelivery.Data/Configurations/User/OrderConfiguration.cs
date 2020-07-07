@@ -19,8 +19,8 @@ namespace DreamFoodDelivery.Data.Configurations
                    .HasForeignKey(_ => _.UserId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(_ => _.Comment).WithOne(_ => _.Order)
-                   .HasForeignKey<CommentDB>(_ => _.OrderId)
+            builder.HasOne(_ => _.Review).WithOne(_ => _.Order)
+                   .HasForeignKey<ReviewDB>(_ => _.OrderId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");
@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Data.Configurations
             builder.Property(i => i.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(31);
             builder.Property(i => i.Name).HasColumnName("Name").HasMaxLength(63);
             builder.Property(i => i.TotalCost).HasColumnName("TotalCost");
-            builder.Property(i => i.ShippingCost).HasColumnName("ShippingСost");
+            builder.Property(i => i.DeliveryCost).HasColumnName("DeliveryСost");
             builder.Property(i => i.Status).HasColumnName("Status").HasMaxLength(31);
 
             builder.Property<bool>("IsDeleted");

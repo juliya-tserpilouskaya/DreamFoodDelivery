@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.View
 {
-    public class CommentView
+    public class ReviewView
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

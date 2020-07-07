@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { CommentView, CommentService } from 'src/app/app-services/nswag.generated.services';
+import { ReviewView, ReviewService } from 'src/app/app-services/nswag.generated.services';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth/auth.service';
@@ -14,12 +14,12 @@ import * as jwt_decode from 'jwt-decode';
 export class CommentUpdateComponent implements OnInit {
   idFromURL = '';
   message: string = null;
-  review: CommentView;
+  review: ReviewView;
   reviewUpdateForm: FormGroup;
   done = false;
 
   constructor(
-    private reviewService: CommentService,
+    private reviewService: ReviewService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private location: Location,
@@ -111,6 +111,7 @@ export class CommentUpdateComponent implements OnInit {
 
   get isAdmin(): boolean {
     const token = this.authService.getToken();
+    // debugger;
     const decodedToken = jwt_decode(token);
     // tslint:disable-next-line: no-string-literal
     const currentRole = decodedToken['role'];

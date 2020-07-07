@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Common.Сonstants
+namespace DreamFoodDelivery.Common
 {
     public class SuperAdminData
     {

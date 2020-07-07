@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommentView, CommentService } from 'src/app/app-services/nswag.generated.services';
+import { ReviewView, ReviewService } from 'src/app/app-services/nswag.generated.services';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -11,12 +11,12 @@ import { Router, ActivatedRoute } from '@angular/router';
 })
 export class CommentCreateComponent implements OnInit {
   idFromURL = '';
-  review: CommentView;
+  review: ReviewView;
   reviewAddForm: FormGroup;
   message: string = null;
 
   constructor(
-    private reviewService: CommentService,
+    private reviewService: ReviewService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,

@@ -1,5 +1,4 @@
 ﻿using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,21 +21,23 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     // FIX REG
     public class IdentityService : IIdentityService
     {
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly TokenSecret _tokenSecret;
         private readonly IEmailSenderService _emailSender;
         private readonly IEmailBuilder _emailBuilder;
-        IUserService _userService;
-        IAdminService _adminService;
+        private readonly ITokenValidator _tokenValidator;
+        private readonly IUserService _userService;
+        private readonly IAdminService _adminService;
 
-        public IdentityService(UserManager<User> userManager,
+        public IdentityService(UserManager<AppUser> userManager,
                                IUserService userService,
                                IAdminService adminService,
                                RoleManager<IdentityRole> roleManager, 
                                TokenSecret tokenSecret, 
                                IEmailSenderService emailSender,
-                               IEmailBuilder emailBuilder)
+                               IEmailBuilder emailBuilder,
+                               ITokenValidator tokenValidator)
         {
             _userManager = userManager;
             _userService = userService;
@@ -44,22 +46,22 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             _tokenSecret = tokenSecret;
             _emailSender = emailSender;
             _emailBuilder = emailBuilder;
+            _tokenValidator = tokenValidator;
         }
 
         /// <summary>
-        /// Create Admin
+        /// Create Admin using constant data
         /// </summary>
-        /// <param name="user">User registration data</param>
         [LoggerAttribute]
         public async Task<Result> CreateAdminAsync(CancellationToken cancellationToken = default)
         {
             string password = SuperAdminData.PASSWORD;
-            var user = new User
+            var user = new AppUser
             {
                 Email = SuperAdminData.EMAIL,
                 UserName = SuperAdminData.USER_NAME,
                 PersonalDiscount = 0,
-                Role = "Admin",
+                Role = AppIdentityConstants.ADMIN,
                 IsEmailConfirmed = false
             };
             var createUser = await _userManager.CreateAsync(user, password);
@@ -70,7 +72,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             await _userManager.AddToRoleAsync(user, user.Role);
             var profile = await _userService.CreateAccountAsyncById(user.Id, cancellationToken);
             var admin = await _userManager.FindByEmailAsync(user.Email);
-            //await _emailBuilder.SendConfirmMessage(admin, "http://localhost:4200/confirmation", cancellationToken);
             var result = await _adminService.ConfirmEmailAsync(admin.Id);
             if (result.IsSuccess)
             {
@@ -96,26 +97,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 }
             }
 
-            string defaultRole = "User";
-
             var existingUser = await _userManager.FindByEmailAsync(user.Email);
-
             if (existingUser != null)
             {
                 return Result<UserWithToken>.Quite<UserWithToken>(ExceptionConstants.USER_ALREADY_EXIST);
             }
 
-            if (!_userManager.Users.Any())
-            {
-                defaultRole = "Admin";
-            }
-
-            var newUser = new User
+            var newUser = new AppUser
             {
                 Email = user.Email,
                 UserName = user.Email,
                 PersonalDiscount = 0,
-                Role = defaultRole,
+                Role = AppIdentityConstants.USER,
                 IsEmailConfirmed = false
             };
 
@@ -124,15 +117,22 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return Result<UserWithToken>.Fail<UserWithToken>(createUser.Errors.Select(_ => _.Description).Join("\n"));
             }
-            await _userManager.AddToRoleAsync(newUser, defaultRole);
+            await _userManager.AddToRoleAsync(newUser, AppIdentityConstants.USER);
 
             var profile = await _userService.CreateAccountAsyncById(newUser.Id, cancellationToken);
             var token = await GenerateToken(newUser);
             UserWithToken result = new UserWithToken()
             {
                 UserView = profile.Data,
-                UserToken = token.Data               
+                UserToken = token.Data,
+                RefreshToken = GenerateRefreshToken(),
+                ExpiresIn = NumberСonstants.REFRESH
             };
+            var isRefreshToketAdded = await _userService.AddRefreshTokenAsync(result.RefreshToken, profile.Data.UserDTO.IdFromIdentity);
+            if (isRefreshToketAdded.IsError)
+            {
+                return Result<UserWithToken>.Fail<UserWithToken>(isRefreshToketAdded.Message);
+            }
             await _emailBuilder.SendConfirmMessage(newUser, user.CallBackUrl, cancellationToken);
             return Result<UserWithToken>.Ok(result);
         }
@@ -203,8 +203,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             UserWithToken result = new UserWithToken()
             {
                 UserView = profile.Data,
-                UserToken = token.Data
+                UserToken = token.Data,
+                RefreshToken = GenerateRefreshToken(),
+                ExpiresIn = NumberСonstants.REFRESH
             };
+
+            var isRefrashToketAdded = await _userService.AddRefreshTokenAsync(result.RefreshToken, profile.Data.UserDTO.IdFromIdentity);
+
+            if (isRefrashToketAdded.IsError)
+            {
+                return Result<UserWithToken>.Fail<UserWithToken>(isRefrashToketAdded.Message);
+            }
+
             return Result<UserWithToken>.Ok(result);
         }
 
@@ -213,7 +223,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// </summary>
         /// <param name="user"></param>
         [LoggerAttribute]
-        private async Task<Result<string>> GenerateToken(User user)
+        private async Task<Result<string>> GenerateToken(AppUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var signingKey = Encoding.ASCII.GetBytes(_tokenSecret.SecretString);
@@ -250,12 +260,69 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(NumberСonstants.TOKEN_TIME_HOUR), //try todo update (use video example)
+                Expires = DateTime.UtcNow.AddHours(NumberСonstants.TOKEN_TIME_HOUR),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(signingKey), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return Result<string>.Ok(tokenHandler.WriteToken(token));
+        }
+
+        private static string GenerateRefreshToken(int size = 32)
+        {
+            var randomNumber = new byte[size];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        public async Task<Result<UserWithToken>> ExchangeRefreshToken(TokenRefresh request, CancellationToken cancellationToken = default)
+        {
+            var cp = _tokenValidator.GetPrincipalFromToken(request.AccessToken, _tokenSecret.SecretString);
+
+            if (cp != null)
+            {
+                var userId = cp.Claims.First(c => c.Type == "id");
+
+                var isRemovedRefreshToken = await _userService.DeleteRefreshTokenAsync(request.RefreshToken, userId.Value, cancellationToken); // delete the token we've exchanged
+                if (isRemovedRefreshToken.IsSuccess)
+                {
+                    var user = await _userManager.FindByIdAsync(userId.Value);
+                    if (user == null)
+                    {
+                        return Result<UserWithToken>.Quite<UserWithToken>(ExceptionConstants.USER_DOES_NOT_EXISTS);
+                    }
+
+                    var profile = await _userService.GetUserByIdFromIdentityAsync(user.Id, cancellationToken);
+                    var token = await GenerateToken(user);
+
+                    if (profile.IsError || string.IsNullOrEmpty(token.Data))
+                    {
+                        return Result<UserWithToken>.Fail<UserWithToken>(profile.Message + NotificationConstans.TOKEN_IS_NULL);
+                    }
+
+                    UserWithToken result = new UserWithToken()
+                    {
+                        UserView = profile.Data,
+                        UserToken = token.Data,
+                        RefreshToken = GenerateRefreshToken(),
+                        ExpiresIn = NumberСonstants.REFRESH
+                    };
+
+                    var isRefreshToketAdded = await _userService.AddRefreshTokenAsync(result.RefreshToken, profile.Data.UserDTO.IdFromIdentity); // add the new one
+                    if (isRefreshToketAdded.IsError)
+                    {
+                        return Result<UserWithToken>.Fail<UserWithToken>(isRefreshToketAdded.Message);
+                    }
+                    return Result<UserWithToken>.Ok(result);
+                }
+
+                return Result<UserWithToken>.Fail<UserWithToken>(isRemovedRefreshToken.Message);
+            }
+
+            return Result<UserWithToken>.Quite<UserWithToken>(ExceptionConstants.CLAIM_PRINCIPAL_ERROR);
         }
     }
 }

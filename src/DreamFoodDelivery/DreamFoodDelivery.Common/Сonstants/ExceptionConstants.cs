@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DreamFoodDelivery.Common.Сonstants
+namespace DreamFoodDelivery.Common
 {
     public class ExceptionConstants
     {
         public const string SOURCE_IS_NULL = "Source is null. ";
         public const string CANNOT_SAVE_MODEL = "Cannot save model. ";
+        public const string CANNOT_SAVE_CHANGES = "Cannot save changes. ";
         public const string CANNOT_UPDATE_MODEL = "Cannot update model. ";
         public const string UNABLE_TO_RETRIEVE_DATA = "Unable to retrieve data. ";
+        public const string CLAIM_PRINCIPAL_ERROR = "Claim principal error. ";
+        public const string INVALID_REFRESH_TOKEN = "Invalid refresh token. ";
 
         public const string IDENTITY_USER_WAS_NOT_FOUND = "Identity user was not found. ";
         public const string UNABLE_TO_CREATE_ADMIN = "Unable to create admin.";
@@ -35,11 +38,15 @@ namespace DreamFoodDelivery.Common.Сonstants
         public const string ORDER_STATUSES_WERE_NOT_FOUND = "Order statuses were not found. ";
 
         public const string TAGS_WERE_NOT_FOUND = "Tags were not found. ";
+        public const string TAG_WAS_NOT_FOUND = "Tag was not found. ";
+        public const string CANNOT_DELETE_TAGS = "Cannot delete tags. ";
+        public const string CANNOT_DELETE_TAG = "Cannot delete tag. ";
 
-        public const string COMMENT_WAS_NOT_FOUND = "Review was not found. ";
-        public const string CANNOT_DELETE_COMMENT = "Cannot delete review. ";
-        public const string COMMENTS_WERE_NOT_FOUND = "Reviews were not found. ";
-        public const string CANNOT_DELETE_COMMENTS = "Cannot delete review. ";
+        public const string REVIEW_WAS_NOT_FOUND = "Review was not found. ";
+        public const string CANNOT_DELETE_REVIEW = "Cannot delete review. ";
+        public const string REVIEWS_WERE_NOT_FOUND = "Reviews were not found. ";
+        public const string CANNOT_DELETE_REVIEWS = "Cannot delete review. ";
+        public const string EMPTY_RATING = "Check the information, there may be no reviews. ";
 
         public const string NO_IMAGES = "This dish doesn't have images!";
         public const string IMAGE_IS_NOT_EXISTS = "Image is not exists!";

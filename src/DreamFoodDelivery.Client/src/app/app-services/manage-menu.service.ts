@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DishView, MenuService, DishService } from './nswag.generated.services';
+import { AuthService } from '../auth/auth.service';
+import * as jwt_decode from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,8 @@ export class ManageMenuService {
 
   constructor(
     private menuService: MenuService,
-    private dishService: DishService
+    private dishService: DishService,
+    private authService: AuthService,
   ) { }
 
   getAllDishes(): Promise<DishView[]> {
@@ -43,5 +46,16 @@ export class ManageMenuService {
       });
     }
     );
+  }
+
+  isAdmin(): boolean {
+    const token = this.authService.getToken();
+    const decodedToken = jwt_decode(token)
+    // tslint:disable-next-line: no-string-literal
+    const currentRole = decodedToken['role'];
+    if (currentRole.includes('Admin')) {
+      return true;
+    }
+    return false;
   }
 }

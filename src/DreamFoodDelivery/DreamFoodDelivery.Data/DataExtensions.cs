@@ -16,7 +16,7 @@ namespace DreamFoodDelivery.Data
             services.AddDbContext<DreamFoodDeliveryContext>(options => options.UseSqlServer(configuration.GetSection("ConnectionString:Connection").Value));
             services.AddDbContext<UserContext>(options =>options.UseSqlServer(configuration.GetSection("ConnectionString:UserDbConnection").Value));
 
-            services.AddIdentity<User, IdentityRole>(opt =>
+            services.AddIdentity<AppUser, IdentityRole>(opt =>
             {
                 opt.Password.RequiredLength = 10;
                 opt.Password.RequireDigit = false;

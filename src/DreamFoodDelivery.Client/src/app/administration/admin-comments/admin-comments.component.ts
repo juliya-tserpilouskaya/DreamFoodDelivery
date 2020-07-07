@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommentService, CommentView } from 'src/app/app-services/nswag.generated.services';
+import { ReviewService, ReviewView } from 'src/app/app-services/nswag.generated.services';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
@@ -10,7 +10,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
   styleUrls: ['./admin-comments.component.scss']
 })
 export class AdminCommentsComponent implements OnInit {
-  reviews: CommentView[] = [];
+  reviews: ReviewView[] = [];
   requestForm: FormGroup;
   pages: number[] = [];
   message: string = null;
@@ -19,7 +19,7 @@ export class AdminCommentsComponent implements OnInit {
   pageSize = 10;
 
   constructor(
-    private reviewsService: CommentService,
+    private reviewsService: ReviewService,
     public router: Router,
   ) {
    }
@@ -46,7 +46,7 @@ export class AdminCommentsComponent implements OnInit {
 
   removeById(id: string): void {
     this.reviewsService.removeById(id).subscribe(data => { this.ngOnInit();
-      // const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
+      // const indexToDelete = this.reviews.findIndex((mark: ReviewView) => mark.id === id);
       // this.reviews.splice(indexToDelete, 1);
     },
     error => {

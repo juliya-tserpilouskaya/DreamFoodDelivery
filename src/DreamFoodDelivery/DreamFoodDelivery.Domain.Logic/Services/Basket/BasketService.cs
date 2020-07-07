@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
@@ -24,11 +22,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
     public class BasketService : IBasketService
     {
         private readonly DreamFoodDeliveryContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
         IDishService _dishService;
 
-        public BasketService(IMapper mapper, UserManager<User> userManager, DreamFoodDeliveryContext context, IDishService dishService)
+        public BasketService(IMapper mapper, UserManager<AppUser> userManager, DreamFoodDeliveryContext context, IDishService dishService)
         {
             _context = context;
             _userManager = userManager;
@@ -51,7 +49,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 return Result<BasketView>.Fail<BasketView>(ExceptionConstants.DISH_WAS_NOT_FOUND);
             }
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            AppUser userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
             if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>(ExceptionConstants.USER_WAS_NOT_FOUND);
@@ -63,10 +61,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
 
             var connection = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id && _.DishId == Guid.Parse(dishId)).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            
             if (connection is null)
             {
-                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity, DishCost = dishToAdd.Cost, Sale = dishToAdd.Sale };
+                BasketDishDB basketDish = new BasketDishDB() { BasketId = basket.Id, DishId = dishToAdd.Id, Quantity = quantity, DishPrice = dishToAdd.Price, Sale = dishToAdd.Sale };
                 _context.BasketDishes.Add(basketDish);
             }
             else
@@ -89,37 +86,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 await _context.SaveChangesAsync(cancellationToken);
                 var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
-                BasketView view = _mapper.Map<BasketView>(basket);
-                view.Dishes = new HashSet<DishView>();
-                foreach (var dishListItem in dishList)
-                {
-                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
-                    if (dish.IsError)
-                    {
-                        return Result<BasketView>.Fail<BasketView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA); 
-                    }
-                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
-                    if (dish.Data.Sale > 0)
-                    {
-                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale/100) * dish.Data.Quantity;
-                    }
-                    else
-                    {
-                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
-                    }
-                    view.Dishes.Add(dish.Data);
-                }
-                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                view.BasketCost = Math.Round(view.BasketCost, 2);
-                if (view.BasketCost < NumberСonstants.FREE_SHIPPING_BORDER)
-                {
-                    view.ShippingCost = NumberСonstants.DELIVERY_COST;
-                }
-                else
-                {
-                    view.ShippingCost = 0;
-                }
-                return Result<BasketView>.Ok(view);
+                //BasketView view = CollectBasket(basket, dishList, userIdentity).Result.Data;
+                //return Result<BasketView>.Ok(view);
+                return CollectBasket(basket, dishList, userIdentity).Result;
             }
             catch (DbUpdateConcurrencyException ex)
             {
@@ -144,7 +113,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<BasketView>> RemoveDishByIdAsync(string dishId, string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            AppUser userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
             if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>(ExceptionConstants.USER_WAS_NOT_FOUND);
@@ -166,36 +135,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 await _context.SaveChangesAsync(cancellationToken);
                 var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
-                BasketView view = _mapper.Map<BasketView>(basket);
-                view.Dishes = new HashSet<DishView>();
-                foreach (var dishListItem in dishList)
-                {
-                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
-                    if (dish.IsError)
-                    {
-                        return Result<BasketView>.Fail<BasketView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
-                    }
-                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
-                    if (dish.Data.Sale > 0)
-                    {
-                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale / 100) * dish.Data.Quantity;
-                    }
-                    else
-                    {
-                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
-                    }
-                    view.Dishes.Add(dish.Data);
-                }
-                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                view.BasketCost = Math.Round(view.BasketCost, 2);
-                if (view.BasketCost < NumberСonstants.FREE_SHIPPING_BORDER)
-                {
-                    view.ShippingCost = NumberСonstants.DELIVERY_COST;
-                }
-                else
-                {
-                    view.ShippingCost = 0;
-                }
+                BasketView view = CollectBasket(basket, dishList, userIdentity).Result.Data;
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -220,7 +160,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result<BasketView>> GetAllDishesByUserIdAsync(string userIdFromIdentity, CancellationToken cancellationToken = default)
         {
             UserDB user = await _context.Users.Where(_ => _.IdFromIdentity == userIdFromIdentity).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            User userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
+            AppUser userIdentity = await _userManager.FindByIdAsync(userIdFromIdentity);
             if (user is null || userIdentity is null)
             {
                 return Result<BasketView>.Fail<BasketView>(ExceptionConstants.USER_WAS_NOT_FOUND);
@@ -233,36 +173,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 var dishList = await _context.BasketDishes.Where(_ => _.BasketId == basket.Id).AsNoTracking().ToListAsync(cancellationToken);
-                BasketView view = _mapper.Map<BasketView>(basket);
-                view.Dishes = new HashSet<DishView>();
-                foreach (var dishListItem in dishList)
-                {
-                    var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
-                    if (dish.IsError)
-                    {
-                        return Result<BasketView>.Fail<BasketView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
-                    }
-                    dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
-                    if (dish.Data.Sale > 0)
-                    {
-                        view.BasketCost += dish.Data.Cost * (1 - dish.Data.Sale / 100) * dish.Data.Quantity;
-                    }
-                    else
-                    {
-                        view.BasketCost += dish.Data.Cost * dish.Data.Quantity;
-                    }
-                    view.Dishes.Add(dish.Data);
-                }
-                view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
-                view.BasketCost = Math.Round(view.BasketCost, 2);
-                if (view.BasketCost < NumberСonstants.FREE_SHIPPING_BORDER)
-                {
-                    view.ShippingCost = NumberСonstants.DELIVERY_COST;
-                }
-                else
-                {
-                    view.ShippingCost = 0;
-                }
+                BasketView view = CollectBasket(basket, dishList, userIdentity).Result.Data;
                 return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
             }
             catch (ArgumentNullException ex)
@@ -310,6 +221,42 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_DISHES + ex.Message));
             }
+        }
+
+        public async Task<Result<BasketView>> CollectBasket(BasketDB basket, List<BasketDishDB> dishList, AppUser userIdentity)
+        {
+            BasketView view = _mapper.Map<BasketView>(basket);
+            view.Dishes = new HashSet<DishView>();
+            foreach (var dishListItem in dishList)
+            {
+                var dish = await _dishService.GetByIdAsync(dishListItem.DishId.ToString());
+                if (dish.IsError)
+                {
+                    return Result<BasketView>.Fail<BasketView>(ExceptionConstants.UNABLE_TO_RETRIEVE_DATA);
+                }
+                dish.Data.Quantity = dishListItem.Quantity.GetValueOrDefault();
+                if (dish.Data.Sale > 0)
+                {
+                    view.BasketCost += dish.Data.Price * (1 - dish.Data.Sale / 100) * dish.Data.Quantity;
+                }
+                else
+                {
+                    view.BasketCost += dish.Data.Price * dish.Data.Quantity;
+                }
+                view.Dishes.Add(dish.Data);
+            }
+            view.BasketCost *= 1 - userIdentity.PersonalDiscount / 100;
+            view.BasketCost = Math.Round(view.BasketCost, 2);
+            if (view.BasketCost < NumberСonstants.FREE_DELIVERY_BORDER)
+            {
+                view.DeliveryCost = NumberСonstants.DELIVERY_PRICE;
+            }
+            else
+            {
+                view.DeliveryCost = 0;
+            }
+
+            return Result<BasketView>.Ok(_mapper.Map<BasketView>(view));
         }
     }
 }

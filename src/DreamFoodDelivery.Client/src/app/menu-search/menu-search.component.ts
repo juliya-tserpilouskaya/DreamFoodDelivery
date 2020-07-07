@@ -96,7 +96,7 @@ export class MenuSearchComponent implements OnInit {
   onAddToBasket(id: string) {
     this.addForm.value.dishId = id;
     this.basketService.addDish(this.addForm.value).subscribe(data => {
-      this.addForm.reset();
+    this.addForm.reset();
     },
     error => {
       if (error.status ===  400) {

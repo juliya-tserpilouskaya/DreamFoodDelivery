@@ -34,8 +34,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all dishes in menu</returns>
         [HttpGet, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
@@ -44,11 +44,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _menuService.GetAllAsync(cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -60,7 +60,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("request")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> GetAllDishesByRequestAsync([FromBody, CustomizeValidator] RequestParameters request, CancellationToken cancellationToken = default)
         {
@@ -74,11 +74,11 @@ namespace DreamFoodDelivery.Web.Controllers
 
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -92,9 +92,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns name matching dishes</returns>
         [HttpGet, Route("dishes/{name}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         [ObsoleteAttribute]
         public async Task<IActionResult> GetByName(string name, CancellationToken cancellationToken = default)
@@ -108,28 +108,28 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _menuService.GetByNameAsync(name, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) 
                      : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
         /// <summary>
-        /// Get dish by cost
+        /// Get dish by price
         /// !!! Obsolete controller. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="priceModel">Dish prices</param>
         /// <returns>Returns dishes in prices limits</returns>
         [HttpPost, Route("dishes/price")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         [ObsoleteAttribute]
-        public async Task<IActionResult> GetByCost([FromBody, CustomizeValidator]DishByCost priceModel, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetByPrice([FromBody, CustomizeValidator]DishByPrice priceModel, CancellationToken cancellationToken = default)
         {
             if (!(priceModel.LowerPrice >= 0 && priceModel.LowerPrice <= priceModel.UpperPrice && priceModel.UpperPrice >= 0))
             {
@@ -140,11 +140,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _menuService.GetByPriceAsync(priceModel.LowerPrice, priceModel.UpperPrice, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                  : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                 : NoContent();
+                 : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -155,9 +155,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns dishes on sales</returns>
         [HttpGet, Route("sales")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         [ObsoleteAttribute]
         public async Task<IActionResult> GetSales(CancellationToken cancellationToken = default)
@@ -167,11 +167,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _menuService.GetSalesAsync(cancellationToken);
                 return result == null ? throw new InvalidOperationException(result.Message) 
                      : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -182,9 +182,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns dishes by tag index</returns>
         [HttpGet, Route("tag/{tagIndex}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<DishView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         [ObsoleteAttribute]
         public async Task<IActionResult> GetByTagIndex(string tagName, CancellationToken cancellationToken = default)
@@ -198,11 +198,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _menuService.GetByTagIndexAsync(tagName, cancellationToken);
                 return result == null ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
     }

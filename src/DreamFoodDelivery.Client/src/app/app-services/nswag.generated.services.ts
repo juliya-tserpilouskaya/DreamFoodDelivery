@@ -65,13 +65,19 @@ export class BasketService {
             result200 = BasketView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -125,17 +131,26 @@ export class BasketService {
             result200 = BasketView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -181,13 +196,19 @@ export class BasketService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -240,17 +261,26 @@ export class BasketService {
             result200 = BasketView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -316,13 +346,19 @@ export class MenuService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -382,11 +418,17 @@ export class MenuService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -446,17 +488,26 @@ export class MenuService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -469,7 +520,7 @@ export class MenuService {
     /**
      * @deprecated
      */
-    getByCost(priceModel: DishByCost): Observable<DishView[]> {
+    getByPrice(priceModel: DishByPrice): Observable<DishView[]> {
         let url_ = this.baseUrl + "/api/Menu/dishes/price";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -486,11 +537,11 @@ export class MenuService {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetByCost(response_);
+            return this.processGetByPrice(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetByCost(<any>response_);
+                    return this.processGetByPrice(<any>response_);
                 } catch (e) {
                     return <Observable<DishView[]>><any>_observableThrow(e);
                 }
@@ -499,7 +550,7 @@ export class MenuService {
         }));
     }
 
-    protected processGetByCost(response: HttpResponseBase): Observable<DishView[]> {
+    protected processGetByPrice(response: HttpResponseBase): Observable<DishView[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -517,17 +568,26 @@ export class MenuService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -584,17 +644,26 @@ export class MenuService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -605,7 +674,7 @@ export class MenuService {
     }
 
     /**
-     * @param tagName (optional)
+     * @param tagName (optional) 
      * @deprecated
      */
     getByTagIndex(tagName: string | null | undefined, tagIndex: string): Observable<DishView[]> {
@@ -657,17 +726,26 @@ export class MenuService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -733,13 +811,19 @@ export class TagService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -798,7 +882,10 @@ export class TagService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -857,15 +944,24 @@ export class TagService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -966,15 +1062,24 @@ export class TagService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -982,662 +1087,6 @@ export class TagService {
             }));
         }
         return _observableOf<void>(<any>null);
-    }
-}
-
-@Injectable()
-export class CommentService {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
-    }
-
-    getAll(request: PageRequest): Observable<PageResponseOfCommentForUsersView> {
-        let url_ = this.baseUrl + "/api/Comment/all";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(request);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAll(<any>response_);
-                } catch (e) {
-                    return <Observable<PageResponseOfCommentForUsersView>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<PageResponseOfCommentForUsersView>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAll(response: HttpResponseBase): Observable<PageResponseOfCommentForUsersView> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = PageResponseOfCommentForUsersView.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<PageResponseOfCommentForUsersView>(<any>null);
-    }
-
-    getAllAdmin(): Observable<CommentView[]> {
-        let url_ = this.baseUrl + "/api/Comment/all";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllAdmin(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllAdmin(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetAllAdmin(response: HttpResponseBase): Observable<CommentView[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CommentView.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView[]>(<any>null);
-    }
-
-    removeAll(): Observable<void> {
-        let url_ = this.baseUrl + "/api/Comment/all";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRemoveAll(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processRemoveAll(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processRemoveAll(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    getById(id: string | null): Observable<CommentView> {
-        let url_ = this.baseUrl + "/api/Comment/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetById(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetById(response: HttpResponseBase): Observable<CommentView> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CommentView.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView>(<any>null);
-    }
-
-    removeById(id: string | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/Comment/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRemoveById(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processRemoveById(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processRemoveById(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    getByUserIdForAdmin(id: string | null): Observable<CommentView[]> {
-        let url_ = this.baseUrl + "/api/Comment/user/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetByUserIdForAdmin(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetByUserIdForAdmin(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetByUserIdForAdmin(response: HttpResponseBase): Observable<CommentView[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CommentView.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView[]>(<any>null);
-    }
-
-    removeAllByUserId(id: string | null): Observable<void> {
-        let url_ = this.baseUrl + "/api/Comment/user/{id}";
-        if (id === undefined || id === null)
-            throw new Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processRemoveAllByUserId(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processRemoveAllByUserId(<any>response_);
-                } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<void>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processRemoveAllByUserId(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<void>(<any>null);
-    }
-
-    getByUserId(): Observable<CommentView[]> {
-        let url_ = this.baseUrl + "/api/Comment";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetByUserId(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetByUserId(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView[]>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView[]>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processGetByUserId(response: HttpResponseBase): Observable<CommentView[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(CommentView.fromJS(item));
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView[]>(<any>null);
-    }
-
-    create(comment: CommentToAdd): Observable<CommentView> {
-        let url_ = this.baseUrl + "/api/Comment";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(comment);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processCreate(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processCreate(response: HttpResponseBase): Observable<CommentView> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CommentView.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView>(<any>null);
-    }
-
-    update(comment: CommentToUpdate): Observable<CommentView> {
-        let url_ = this.baseUrl + "/api/Comment";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(comment);
-
-        let options_ : any = {
-            body: content_,
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdate(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processUpdate(<any>response_);
-                } catch (e) {
-                    return <Observable<CommentView>><any>_observableThrow(e);
-                }
-            } else
-                return <Observable<CommentView>><any>_observableThrow(response_);
-        }));
-    }
-
-    protected processUpdate(response: HttpResponseBase): Observable<CommentView> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = CommentView.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf<CommentView>(<any>null);
     }
 }
 
@@ -1698,11 +1147,17 @@ export class IdentityService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1758,11 +1213,17 @@ export class IdentityService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1810,7 +1271,10 @@ export class IdentityService {
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1862,19 +1326,31 @@ export class IdentityService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1882,6 +1358,72 @@ export class IdentityService {
             }));
         }
         return _observableOf<void>(<any>null);
+    }
+
+    refreshToken(request: TokenRefresh): Observable<UserWithToken> {
+        let url_ = this.baseUrl + "/api/Identity/refresh";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRefreshToken(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRefreshToken(<any>response_);
+                } catch (e) {
+                    return <Observable<UserWithToken>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<UserWithToken>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processRefreshToken(response: HttpResponseBase): Observable<UserWithToken> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = UserWithToken.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<UserWithToken>(<any>null);
     }
 }
 
@@ -1940,17 +1482,26 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1998,19 +1549,31 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2063,21 +1626,33 @@ export class OrderService {
             result200 = OrderView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2128,19 +1703,31 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2196,15 +1783,24 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2260,19 +1856,31 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 401) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result401: any = null;
+            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result401 = ProblemDetails.fromJS(resultData401);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2328,15 +1936,24 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2390,17 +2007,26 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2457,21 +2083,33 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2522,19 +2160,31 @@ export class OrderService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2588,13 +2238,19 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2653,15 +2309,24 @@ export class OrderService {
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2669,6 +2334,843 @@ export class OrderService {
             }));
         }
         return _observableOf<OrderView[]>(<any>null);
+    }
+}
+
+@Injectable()
+export class ReviewService {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
+    }
+
+    getAll(request: PageRequest): Observable<PageResponseOfReviewForUsersView> {
+        let url_ = this.baseUrl + "/api/Review/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(<any>response_);
+                } catch (e) {
+                    return <Observable<PageResponseOfReviewForUsersView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<PageResponseOfReviewForUsersView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<PageResponseOfReviewForUsersView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PageResponseOfReviewForUsersView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<PageResponseOfReviewForUsersView>(<any>null);
+    }
+
+    getAllAdmin(): Observable<ReviewView[]> {
+        let url_ = this.baseUrl + "/api/Review/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllAdmin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllAdmin(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetAllAdmin(response: HttpResponseBase): Observable<ReviewView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ReviewView.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView[]>(<any>null);
+    }
+
+    removeAll(): Observable<void> {
+        let url_ = this.baseUrl + "/api/Review/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveAll(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processRemoveAll(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    getById(id: string | null): Observable<ReviewView> {
+        let url_ = this.baseUrl + "/api/Review/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<ReviewView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ReviewView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView>(<any>null);
+    }
+
+    removeById(id: string | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/Review/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveById(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processRemoveById(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    getByUserIdForAdmin(id: string | null): Observable<ReviewView[]> {
+        let url_ = this.baseUrl + "/api/Review/user/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByUserIdForAdmin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByUserIdForAdmin(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetByUserIdForAdmin(response: HttpResponseBase): Observable<ReviewView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ReviewView.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView[]>(<any>null);
+    }
+
+    removeAllByUserId(id: string | null): Observable<void> {
+        let url_ = this.baseUrl + "/api/Review/user/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveAllByUserId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveAllByUserId(<any>response_);
+                } catch (e) {
+                    return <Observable<void>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<void>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processRemoveAllByUserId(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return _observableOf<void>(<any>null);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 404) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<void>(<any>null);
+    }
+
+    getByUserId(): Observable<ReviewView[]> {
+        let url_ = this.baseUrl + "/api/Review";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByUserId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByUserId(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetByUserId(response: HttpResponseBase): Observable<ReviewView[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(ReviewView.fromJS(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView[]>(<any>null);
+    }
+
+    create(review: ReviewToAdd): Observable<ReviewView> {
+        let url_ = this.baseUrl + "/api/Review";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(review);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ReviewView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ReviewView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView>(<any>null);
+    }
+
+    update(review: ReviewToUpdate): Observable<ReviewView> {
+        let url_ = this.baseUrl + "/api/Review";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(review);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(<any>response_);
+                } catch (e) {
+                    return <Observable<ReviewView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<ReviewView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ReviewView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ReviewView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<ReviewView>(<any>null);
+    }
+
+    getRating(): Observable<RatingView> {
+        let url_ = this.baseUrl + "/api/Review/rating";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetRating(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetRating(<any>response_);
+                } catch (e) {
+                    return <Observable<RatingView>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<RatingView>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetRating(response: HttpResponseBase): Observable<RatingView> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RatingView.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 403) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<RatingView>(<any>null);
     }
 }
 
@@ -2723,21 +3225,33 @@ export class UserService {
             result200 = UserView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2793,15 +3307,24 @@ export class UserService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2855,21 +3378,33 @@ export class UserService {
             result200 = UserView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2920,15 +3455,24 @@ export class UserService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2981,21 +3525,33 @@ export class UserService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3045,21 +3601,33 @@ export class UserService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3069,7 +3637,7 @@ export class UserService {
         return _observableOf<void>(<any>null);
     }
 
-    confirmEmail(userId: string | null | undefined, token: string | null | undefined): Observable<void> {
+    confirmEmail(userId: string | null | undefined, token: string | null | undefined): Observable<ProblemDetails> {
         let url_ = this.baseUrl + "/api/User/confirm/email?";
         if (userId !== undefined)
             url_ += "userId=" + encodeURIComponent("" + userId) + "&";
@@ -3081,6 +3649,7 @@ export class UserService {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -3091,41 +3660,50 @@ export class UserService {
                 try {
                     return this.processConfirmEmail(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<ProblemDetails>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<ProblemDetails>><any>_observableThrow(response_);
         }));
     }
 
-    protected processConfirmEmail(response: HttpResponseBase): Observable<void> {
+    protected processConfirmEmail(response: HttpResponseBase): Observable<ProblemDetails> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
+        if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return _observableOf(result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<ProblemDetails>(<any>null);
     }
 
-    forgotPassword(request: PasswordRecoveryRequest): Observable<void> {
+    forgotPassword(request: PasswordRecoveryRequest): Observable<ProblemDetails> {
         let url_ = this.baseUrl + "/api/User/recovery/password";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3137,6 +3715,7 @@ export class UserService {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -3147,41 +3726,50 @@ export class UserService {
                 try {
                     return this.processForgotPassword(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<ProblemDetails>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<ProblemDetails>><any>_observableThrow(response_);
         }));
     }
 
-    protected processForgotPassword(response: HttpResponseBase): Observable<void> {
+    protected processForgotPassword(response: HttpResponseBase): Observable<ProblemDetails> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
+        if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return _observableOf(result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<ProblemDetails>(<any>null);
     }
 
-    resetPassword(model: PasswordRecoveryInfo): Observable<void> {
+    resetPassword(model: PasswordRecoveryInfo): Observable<ProblemDetails> {
         let url_ = this.baseUrl + "/api/User/reset/password";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -3193,6 +3781,7 @@ export class UserService {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
@@ -3203,38 +3792,47 @@ export class UserService {
                 try {
                     return this.processResetPassword(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<ProblemDetails>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<ProblemDetails>><any>_observableThrow(response_);
         }));
     }
 
-    protected processResetPassword(response: HttpResponseBase): Observable<void> {
+    protected processResetPassword(response: HttpResponseBase): Observable<ProblemDetails> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
+        if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return _observableOf(result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<ProblemDetails>(<any>null);
     }
 }
 
@@ -3295,15 +3893,24 @@ export class DishService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3359,15 +3966,24 @@ export class DishService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3413,21 +4029,33 @@ export class DishService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3480,17 +4108,26 @@ export class DishService {
             result200 = DishView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3539,21 +4176,33 @@ export class DishService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3624,15 +4273,24 @@ export class ImageService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3688,21 +4346,33 @@ export class ImageService {
             result200 = resultData200 !== undefined ? resultData200 : <any>null;
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3712,7 +4382,7 @@ export class ImageService {
         return _observableOf<string>(<any>null);
     }
 
-    delete(dishId: string | null, imageName: string | null): Observable<void> {
+    delete(dishId: string | null, imageName: string | null): Observable<ProblemDetails> {
         let url_ = this.baseUrl + "/api/Image/image/{dishId}/{imageName}";
         if (dishId === undefined || dishId === null)
             throw new Error("The parameter 'dishId' must be defined.");
@@ -3726,6 +4396,7 @@ export class ImageService {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
@@ -3736,46 +4407,61 @@ export class ImageService {
                 try {
                     return this.processDelete(<any>response_);
                 } catch (e) {
-                    return <Observable<void>><any>_observableThrow(e);
+                    return <Observable<ProblemDetails>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<void>><any>_observableThrow(response_);
+                return <Observable<ProblemDetails>><any>_observableThrow(response_);
         }));
     }
 
-    protected processDelete(response: HttpResponseBase): Observable<void> {
+    protected processDelete(response: HttpResponseBase): Observable<ProblemDetails> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
+        if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return _observableOf(result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 404) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result404: any = null;
+            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result404 = ProblemDetails.fromJS(resultData404);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<void>(<any>null);
+        return _observableOf<ProblemDetails>(<any>null);
     }
 
     getImageNamesList(dishId: string | null): Observable<string[]> {
@@ -3825,21 +4511,33 @@ export class ImageService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3905,17 +4603,26 @@ export class AdminService {
             }
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3968,21 +4675,33 @@ export class AdminService {
             result200 = UserView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4031,21 +4750,33 @@ export class AdminService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4104,15 +4835,24 @@ export class AdminService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4169,21 +4909,33 @@ export class AdminService {
             result200 = UserView.fromJS(resultData200);
             return _observableOf(result200);
             }));
-        } else if (status === 204) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4234,15 +4986,24 @@ export class AdminService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4297,15 +5058,24 @@ export class AdminService {
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -4321,7 +5091,7 @@ export class BasketView implements IBasketView {
     dishes?: DishView[] | null;
     modificationTime?: Date | null;
     basketCost?: number;
-    shippingCost?: number | null;
+    deliveryCost?: number | null;
 
     constructor(data?: IBasketView) {
         if (data) {
@@ -4342,7 +5112,7 @@ export class BasketView implements IBasketView {
             }
             this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>null;
             this.basketCost = _data["basketCost"] !== undefined ? _data["basketCost"] : <any>null;
-            this.shippingCost = _data["shippingCost"] !== undefined ? _data["shippingCost"] : <any>null;
+            this.deliveryCost = _data["deliveryCost"] !== undefined ? _data["deliveryCost"] : <any>null;
         }
     }
 
@@ -4363,8 +5133,8 @@ export class BasketView implements IBasketView {
         }
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
         data["basketCost"] = this.basketCost !== undefined ? this.basketCost : <any>null;
-        data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
-        return data;
+        data["deliveryCost"] = this.deliveryCost !== undefined ? this.deliveryCost : <any>null;
+        return data; 
     }
 }
 
@@ -4373,7 +5143,7 @@ export interface IBasketView {
     dishes?: DishView[] | null;
     modificationTime?: Date | null;
     basketCost?: number;
-    shippingCost?: number | null;
+    deliveryCost?: number | null;
 }
 
 export class DishView implements IDishView {
@@ -4381,7 +5151,7 @@ export class DishView implements IDishView {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     totalCost?: number;
@@ -4405,7 +5175,7 @@ export class DishView implements IDishView {
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
             this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.price = _data["price"] !== undefined ? _data["price"] : <any>null;
             this.weight = _data["weight"] !== undefined ? _data["weight"] : <any>null;
             this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
             this.totalCost = _data["totalCost"] !== undefined ? _data["totalCost"] : <any>null;
@@ -4433,7 +5203,7 @@ export class DishView implements IDishView {
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["composition"] = this.composition !== undefined ? this.composition : <any>null;
         data["description"] = this.description !== undefined ? this.description : <any>null;
-        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["price"] = this.price !== undefined ? this.price : <any>null;
         data["weight"] = this.weight !== undefined ? this.weight : <any>null;
         data["sale"] = this.sale !== undefined ? this.sale : <any>null;
         data["totalCost"] = this.totalCost !== undefined ? this.totalCost : <any>null;
@@ -4445,7 +5215,7 @@ export class DishView implements IDishView {
                 data["tagList"].push(item.toJSON());
         }
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4454,7 +5224,7 @@ export interface IDishView {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     totalCost?: number;
@@ -4492,7 +5262,7 @@ export class TagToAdd implements ITagToAdd {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4555,7 +5325,7 @@ export class ProblemDetails implements IProblemDetails {
                     data["extensions"][key] = this.extensions[key] !== undefined ? this.extensions[key] : <any>null;
             }
         }
-        return data;
+        return data; 
     }
 }
 
@@ -4566,6 +5336,46 @@ export interface IProblemDetails {
     detail?: string | null;
     instance?: string | null;
     extensions?: { [key: string]: any; } | null;
+}
+
+export class CustumResult implements ICustumResult {
+    message?: string | null;
+    status?: number;
+
+    constructor(data?: ICustumResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.message = _data["message"] !== undefined ? _data["message"] : <any>null;
+            this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): CustumResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustumResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["message"] = this.message !== undefined ? this.message : <any>null;
+        data["status"] = this.status !== undefined ? this.status : <any>null;
+        return data; 
+    }
+}
+
+export interface ICustumResult {
+    message?: string | null;
+    status?: number;
 }
 
 export class DishToBasketAdd implements IDishToBasketAdd {
@@ -4599,7 +5409,7 @@ export class DishToBasketAdd implements IDishToBasketAdd {
         data = typeof data === 'object' ? data : {};
         data["dishId"] = this.dishId !== undefined ? this.dishId : <any>null;
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4656,7 +5466,7 @@ export class RequestParameters implements IRequestParameters {
         data["onSale"] = this.onSale !== undefined ? this.onSale : <any>null;
         data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
         data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4668,11 +5478,11 @@ export interface IRequestParameters {
     upperPrice?: number;
 }
 
-export class DishByCost implements IDishByCost {
+export class DishByPrice implements IDishByPrice {
     lowerPrice?: number;
     upperPrice?: number;
 
-    constructor(data?: IDishByCost) {
+    constructor(data?: IDishByPrice) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -4688,9 +5498,9 @@ export class DishByCost implements IDishByCost {
         }
     }
 
-    static fromJS(data: any): DishByCost {
+    static fromJS(data: any): DishByPrice {
         data = typeof data === 'object' ? data : {};
-        let result = new DishByCost();
+        let result = new DishByPrice();
         result.init(data);
         return result;
     }
@@ -4699,11 +5509,11 @@ export class DishByCost implements IDishByCost {
         data = typeof data === 'object' ? data : {};
         data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
         data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data;
+        return data; 
     }
 }
 
-export interface IDishByCost {
+export interface IDishByPrice {
     lowerPrice?: number;
     upperPrice?: number;
 }
@@ -4739,7 +5549,7 @@ export class TagView implements ITagView {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4779,7 +5589,7 @@ export class TagToUpdate implements ITagToUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -4788,321 +5598,11 @@ export interface ITagToUpdate {
     tagName?: string | null;
 }
 
-export class PageResponseOfCommentForUsersView implements IPageResponseOfCommentForUsersView {
-    data?: CommentForUsersView[] | null;
-    pageNumber?: number;
-    totalPages?: number;
-    hasNextPage?: boolean;
-    hasPreviousPage?: boolean;
-
-    constructor(data?: IPageResponseOfCommentForUsersView) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["data"])) {
-                this.data = [] as any;
-                for (let item of _data["data"])
-                    this.data!.push(CommentForUsersView.fromJS(item));
-            }
-            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
-            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
-            this.hasNextPage = _data["hasNextPage"] !== undefined ? _data["hasNextPage"] : <any>null;
-            this.hasPreviousPage = _data["hasPreviousPage"] !== undefined ? _data["hasPreviousPage"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): PageResponseOfCommentForUsersView {
-        data = typeof data === 'object' ? data : {};
-        let result = new PageResponseOfCommentForUsersView();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.data)) {
-            data["data"] = [];
-            for (let item of this.data)
-                data["data"].push(item.toJSON());
-        }
-        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
-        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
-        data["hasNextPage"] = this.hasNextPage !== undefined ? this.hasNextPage : <any>null;
-        data["hasPreviousPage"] = this.hasPreviousPage !== undefined ? this.hasPreviousPage : <any>null;
-        return data;
-    }
-}
-
-export interface IPageResponseOfCommentForUsersView {
-    data?: CommentForUsersView[] | null;
-    pageNumber?: number;
-    totalPages?: number;
-    hasNextPage?: boolean;
-    hasPreviousPage?: boolean;
-}
-
-export class CommentForUsersView implements ICommentForUsersView {
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-    name?: string | null;
-    surname?: string | null;
-
-    constructor(data?: ICommentForUsersView) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
-            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
-            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
-            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
-            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): CommentForUsersView {
-        data = typeof data === 'object' ? data : {};
-        let result = new CommentForUsersView();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
-        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
-        data["content"] = this.content !== undefined ? this.content : <any>null;
-        data["name"] = this.name !== undefined ? this.name : <any>null;
-        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
-    }
-}
-
-export interface ICommentForUsersView {
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-    name?: string | null;
-    surname?: string | null;
-}
-
-export class PageRequest implements IPageRequest {
-    pageNumber?: number;
-    pageSize?: number;
-
-    constructor(data?: IPageRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
-            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): PageRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new PageRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
-        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
-        return data;
-    }
-}
-
-export interface IPageRequest {
-    pageNumber?: number;
-    pageSize?: number;
-}
-
-export class CommentView implements ICommentView {
-    id?: string;
-    userId?: string;
-    orderId?: string;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-    postTime?: Date | null;
-    modificationTime?: Date | null;
-
-    constructor(data?: ICommentView) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
-            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
-            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
-            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
-            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
-            this.postTime = _data["postTime"] ? new Date(_data["postTime"].toString()) : <any>null;
-            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>null;
-        }
-    }
-
-    static fromJS(data: any): CommentView {
-        data = typeof data === 'object' ? data : {};
-        let result = new CommentView();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
-        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
-        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
-        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
-        data["content"] = this.content !== undefined ? this.content : <any>null;
-        data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>null;
-        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
-        return data;
-    }
-}
-
-export interface ICommentView {
-    id?: string;
-    userId?: string;
-    orderId?: string;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-    postTime?: Date | null;
-    modificationTime?: Date | null;
-}
-
-export class CommentToAdd implements ICommentToAdd {
-    orderId?: string | null;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-
-    constructor(data?: ICommentToAdd) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
-            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
-            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
-            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): CommentToAdd {
-        data = typeof data === 'object' ? data : {};
-        let result = new CommentToAdd();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
-        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
-        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
-        data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data;
-    }
-}
-
-export interface ICommentToAdd {
-    orderId?: string | null;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-}
-
-export class CommentToUpdate implements ICommentToUpdate {
-    id?: string | null;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-
-    constructor(data?: ICommentToUpdate) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
-            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
-            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
-            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
-        }
-    }
-
-    static fromJS(data: any): CommentToUpdate {
-        data = typeof data === 'object' ? data : {};
-        let result = new CommentToUpdate();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id !== undefined ? this.id : <any>null;
-        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
-        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
-        data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data;
-    }
-}
-
-export interface ICommentToUpdate {
-    id?: string | null;
-    headline?: string | null;
-    rating?: number | null;
-    content?: string | null;
-}
-
 export class UserWithToken implements IUserWithToken {
     userToken?: string | null;
     userView?: UserView | null;
+    expiresIn?: number;
+    refreshToken?: string | null;
 
     constructor(data?: IUserWithToken) {
         if (data) {
@@ -5117,6 +5617,8 @@ export class UserWithToken implements IUserWithToken {
         if (_data) {
             this.userToken = _data["userToken"] !== undefined ? _data["userToken"] : <any>null;
             this.userView = _data["userView"] ? UserView.fromJS(_data["userView"]) : <any>null;
+            this.expiresIn = _data["expiresIn"] !== undefined ? _data["expiresIn"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
         }
     }
 
@@ -5131,13 +5633,17 @@ export class UserWithToken implements IUserWithToken {
         data = typeof data === 'object' ? data : {};
         data["userToken"] = this.userToken !== undefined ? this.userToken : <any>null;
         data["userView"] = this.userView ? this.userView.toJSON() : <any>null;
-        return data;
+        data["expiresIn"] = this.expiresIn !== undefined ? this.expiresIn : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        return data; 
     }
 }
 
 export interface IUserWithToken {
     userToken?: string | null;
     userView?: UserView | null;
+    expiresIn?: number;
+    refreshToken?: string | null;
 }
 
 export class UserView implements IUserView {
@@ -5171,7 +5677,7 @@ export class UserView implements IUserView {
         data = typeof data === 'object' ? data : {};
         data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>null;
         data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5214,7 +5720,7 @@ export class UserDTO implements IUserDTO {
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["basketId"] = this.basketId !== undefined ? this.basketId : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5273,7 +5779,7 @@ export class UserProfile implements IUserProfile {
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5322,7 +5828,7 @@ export class UserRegistration implements IUserRegistration {
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5363,7 +5869,7 @@ export class UserLoginData implements IUserLoginData {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5372,10 +5878,50 @@ export interface IUserLoginData {
     password: string;
 }
 
+export class TokenRefresh implements ITokenRefresh {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+
+    constructor(data?: ITokenRefresh) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"] !== undefined ? _data["accessToken"] : <any>null;
+            this.refreshToken = _data["refreshToken"] !== undefined ? _data["refreshToken"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): TokenRefresh {
+        data = typeof data === 'object' ? data : {};
+        let result = new TokenRefresh();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
+        data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
+        return data; 
+    }
+}
+
+export interface ITokenRefresh {
+    accessToken?: string | null;
+    refreshToken?: string | null;
+}
+
 export class OrderView implements IOrderView {
     id?: string;
     dishes?: DishView[] | null;
-    commentId?: string | null;
+    reviewId?: string | null;
     isInfoFromProfile?: boolean;
     address?: string | null;
     personalDiscount?: number;
@@ -5383,7 +5929,7 @@ export class OrderView implements IOrderView {
     name?: string | null;
     surname?: string | null;
     totalCost?: number | null;
-    shippingCost?: number | null;
+    deliveryCost?: number | null;
     status?: string | null;
     orderTime?: Date | null;
     deliveryTime?: Date | null;
@@ -5406,7 +5952,7 @@ export class OrderView implements IOrderView {
                 for (let item of _data["dishes"])
                     this.dishes!.push(DishView.fromJS(item));
             }
-            this.commentId = _data["commentId"] !== undefined ? _data["commentId"] : <any>null;
+            this.reviewId = _data["reviewId"] !== undefined ? _data["reviewId"] : <any>null;
             this.isInfoFromProfile = _data["isInfoFromProfile"] !== undefined ? _data["isInfoFromProfile"] : <any>null;
             this.address = _data["address"] !== undefined ? _data["address"] : <any>null;
             this.personalDiscount = _data["personalDiscount"] !== undefined ? _data["personalDiscount"] : <any>null;
@@ -5414,7 +5960,7 @@ export class OrderView implements IOrderView {
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
             this.totalCost = _data["totalCost"] !== undefined ? _data["totalCost"] : <any>null;
-            this.shippingCost = _data["shippingCost"] !== undefined ? _data["shippingCost"] : <any>null;
+            this.deliveryCost = _data["deliveryCost"] !== undefined ? _data["deliveryCost"] : <any>null;
             this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
             this.orderTime = _data["orderTime"] ? new Date(_data["orderTime"].toString()) : <any>null;
             this.deliveryTime = _data["deliveryTime"] ? new Date(_data["deliveryTime"].toString()) : <any>null;
@@ -5437,7 +5983,7 @@ export class OrderView implements IOrderView {
             for (let item of this.dishes)
                 data["dishes"].push(item.toJSON());
         }
-        data["commentId"] = this.commentId !== undefined ? this.commentId : <any>null;
+        data["reviewId"] = this.reviewId !== undefined ? this.reviewId : <any>null;
         data["isInfoFromProfile"] = this.isInfoFromProfile !== undefined ? this.isInfoFromProfile : <any>null;
         data["address"] = this.address !== undefined ? this.address : <any>null;
         data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
@@ -5445,19 +5991,19 @@ export class OrderView implements IOrderView {
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         data["totalCost"] = this.totalCost !== undefined ? this.totalCost : <any>null;
-        data["shippingCost"] = this.shippingCost !== undefined ? this.shippingCost : <any>null;
+        data["deliveryCost"] = this.deliveryCost !== undefined ? this.deliveryCost : <any>null;
         data["status"] = this.status !== undefined ? this.status : <any>null;
         data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>null;
         data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>null;
         data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>null;
-        return data;
+        return data; 
     }
 }
 
 export interface IOrderView {
     id?: string;
     dishes?: DishView[] | null;
-    commentId?: string | null;
+    reviewId?: string | null;
     isInfoFromProfile?: boolean;
     address?: string | null;
     personalDiscount?: number;
@@ -5465,7 +6011,7 @@ export interface IOrderView {
     name?: string | null;
     surname?: string | null;
     totalCost?: number | null;
-    shippingCost?: number | null;
+    deliveryCost?: number | null;
     status?: string | null;
     orderTime?: Date | null;
     deliveryTime?: Date | null;
@@ -5503,7 +6049,7 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5552,7 +6098,7 @@ export class OrderToAdd implements IOrderToAdd {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5604,7 +6150,7 @@ export class OrderToUpdate implements IOrderToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5647,13 +6193,365 @@ export class OrderStatus implements IOrderStatus {
         data = typeof data === 'object' ? data : {};
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
         data["statusName"] = this.statusName !== undefined ? this.statusName : <any>null;
-        return data;
+        return data; 
     }
 }
 
 export interface IOrderStatus {
     statusIndex?: number | null;
     statusName?: string | null;
+}
+
+export class PageResponseOfReviewForUsersView implements IPageResponseOfReviewForUsersView {
+    data?: ReviewForUsersView[] | null;
+    pageNumber?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+
+    constructor(data?: IPageResponseOfReviewForUsersView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ReviewForUsersView.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.totalPages = _data["totalPages"] !== undefined ? _data["totalPages"] : <any>null;
+            this.hasNextPage = _data["hasNextPage"] !== undefined ? _data["hasNextPage"] : <any>null;
+            this.hasPreviousPage = _data["hasPreviousPage"] !== undefined ? _data["hasPreviousPage"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PageResponseOfReviewForUsersView {
+        data = typeof data === 'object' ? data : {};
+        let result = new PageResponseOfReviewForUsersView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item.toJSON());
+        }
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
+        data["hasNextPage"] = this.hasNextPage !== undefined ? this.hasNextPage : <any>null;
+        data["hasPreviousPage"] = this.hasPreviousPage !== undefined ? this.hasPreviousPage : <any>null;
+        return data; 
+    }
+}
+
+export interface IPageResponseOfReviewForUsersView {
+    data?: ReviewForUsersView[] | null;
+    pageNumber?: number;
+    totalPages?: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+}
+
+export class ReviewForUsersView implements IReviewForUsersView {
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    name?: string | null;
+    surname?: string | null;
+
+    constructor(data?: IReviewForUsersView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+            this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
+            this.surname = _data["surname"] !== undefined ? _data["surname"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): ReviewForUsersView {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewForUsersView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        data["name"] = this.name !== undefined ? this.name : <any>null;
+        data["surname"] = this.surname !== undefined ? this.surname : <any>null;
+        return data; 
+    }
+}
+
+export interface IReviewForUsersView {
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    name?: string | null;
+    surname?: string | null;
+}
+
+export class PageRequest implements IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
+
+    constructor(data?: IPageRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNumber = _data["pageNumber"] !== undefined ? _data["pageNumber"] : <any>null;
+            this.pageSize = _data["pageSize"] !== undefined ? _data["pageSize"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): PageRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new PageRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
+        data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
+        return data; 
+    }
+}
+
+export interface IPageRequest {
+    pageNumber?: number;
+    pageSize?: number;
+}
+
+export class ReviewView implements IReviewView {
+    id?: string;
+    userId?: string;
+    orderId?: string;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    postTime?: Date | null;
+    modificationTime?: Date | null;
+
+    constructor(data?: IReviewView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.userId = _data["userId"] !== undefined ? _data["userId"] : <any>null;
+            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+            this.postTime = _data["postTime"] ? new Date(_data["postTime"].toString()) : <any>null;
+            this.modificationTime = _data["modificationTime"] ? new Date(_data["modificationTime"].toString()) : <any>null;
+        }
+    }
+
+    static fromJS(data: any): ReviewView {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["userId"] = this.userId !== undefined ? this.userId : <any>null;
+        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>null;
+        data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
+        return data; 
+    }
+}
+
+export interface IReviewView {
+    id?: string;
+    userId?: string;
+    orderId?: string;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+    postTime?: Date | null;
+    modificationTime?: Date | null;
+}
+
+export class ReviewToAdd implements IReviewToAdd {
+    orderId?: string | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+
+    constructor(data?: IReviewToAdd) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"] !== undefined ? _data["orderId"] : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): ReviewToAdd {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewToAdd();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId !== undefined ? this.orderId : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        return data; 
+    }
+}
+
+export interface IReviewToAdd {
+    orderId?: string | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+}
+
+export class ReviewToUpdate implements IReviewToUpdate {
+    id?: string | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+
+    constructor(data?: IReviewToUpdate) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"] !== undefined ? _data["id"] : <any>null;
+            this.headline = _data["headline"] !== undefined ? _data["headline"] : <any>null;
+            this.rating = _data["rating"] !== undefined ? _data["rating"] : <any>null;
+            this.content = _data["content"] !== undefined ? _data["content"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): ReviewToUpdate {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewToUpdate();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id !== undefined ? this.id : <any>null;
+        data["headline"] = this.headline !== undefined ? this.headline : <any>null;
+        data["rating"] = this.rating !== undefined ? this.rating : <any>null;
+        data["content"] = this.content !== undefined ? this.content : <any>null;
+        return data; 
+    }
+}
+
+export interface IReviewToUpdate {
+    id?: string | null;
+    headline?: string | null;
+    rating?: number | null;
+    content?: string | null;
+}
+
+export class RatingView implements IRatingView {
+    count?: number | null;
+    sum?: number | null;
+
+    constructor(data?: IRatingView) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.count = _data["count"] !== undefined ? _data["count"] : <any>null;
+            this.sum = _data["sum"] !== undefined ? _data["sum"] : <any>null;
+        }
+    }
+
+    static fromJS(data: any): RatingView {
+        data = typeof data === 'object' ? data : {};
+        let result = new RatingView();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["count"] = this.count !== undefined ? this.count : <any>null;
+        data["sum"] = this.sum !== undefined ? this.sum : <any>null;
+        return data; 
+    }
+}
+
+export interface IRatingView {
+    count?: number | null;
+    sum?: number | null;
 }
 
 export class UserToUpdate implements IUserToUpdate {
@@ -5693,7 +6591,7 @@ export class UserToUpdate implements IUserToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5735,7 +6633,7 @@ export class UserEmailToChange implements IUserEmailToChange {
         data = typeof data === 'object' ? data : {};
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["newEmail"] = this.newEmail !== undefined ? this.newEmail : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5778,7 +6676,7 @@ export class UserPasswordToChange implements IUserPasswordToChange {
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["currentPassword"] = this.currentPassword !== undefined ? this.currentPassword : <any>null;
         data["newPassword"] = this.newPassword !== undefined ? this.newPassword : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5819,7 +6717,7 @@ export class PasswordRecoveryRequest implements IPasswordRecoveryRequest {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5865,7 +6763,7 @@ export class PasswordRecoveryInfo implements IPasswordRecoveryInfo {
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
         data["token"] = this.token !== undefined ? this.token : <any>null;
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
-        return data;
+        return data; 
     }
 }
 
@@ -5880,7 +6778,7 @@ export class DishToAdd implements IDishToAdd {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     tagNames?: TagToAdd[] | null;
@@ -5899,7 +6797,7 @@ export class DishToAdd implements IDishToAdd {
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
             this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.price = _data["price"] !== undefined ? _data["price"] : <any>null;
             this.weight = _data["weight"] !== undefined ? _data["weight"] : <any>null;
             this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
             if (Array.isArray(_data["tagNames"])) {
@@ -5922,7 +6820,7 @@ export class DishToAdd implements IDishToAdd {
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["composition"] = this.composition !== undefined ? this.composition : <any>null;
         data["description"] = this.description !== undefined ? this.description : <any>null;
-        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["price"] = this.price !== undefined ? this.price : <any>null;
         data["weight"] = this.weight !== undefined ? this.weight : <any>null;
         data["sale"] = this.sale !== undefined ? this.sale : <any>null;
         if (Array.isArray(this.tagNames)) {
@@ -5930,7 +6828,7 @@ export class DishToAdd implements IDishToAdd {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
@@ -5938,7 +6836,7 @@ export interface IDishToAdd {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     tagNames?: TagToAdd[] | null;
@@ -5949,7 +6847,7 @@ export class DishToUpdate implements IDishToUpdate {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     tagNames?: TagToAdd[] | null;
@@ -5969,7 +6867,7 @@ export class DishToUpdate implements IDishToUpdate {
             this.name = _data["name"] !== undefined ? _data["name"] : <any>null;
             this.composition = _data["composition"] !== undefined ? _data["composition"] : <any>null;
             this.description = _data["description"] !== undefined ? _data["description"] : <any>null;
-            this.cost = _data["cost"] !== undefined ? _data["cost"] : <any>null;
+            this.price = _data["price"] !== undefined ? _data["price"] : <any>null;
             this.weight = _data["weight"] !== undefined ? _data["weight"] : <any>null;
             this.sale = _data["sale"] !== undefined ? _data["sale"] : <any>null;
             if (Array.isArray(_data["tagNames"])) {
@@ -5993,7 +6891,7 @@ export class DishToUpdate implements IDishToUpdate {
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["composition"] = this.composition !== undefined ? this.composition : <any>null;
         data["description"] = this.description !== undefined ? this.description : <any>null;
-        data["cost"] = this.cost !== undefined ? this.cost : <any>null;
+        data["price"] = this.price !== undefined ? this.price : <any>null;
         data["weight"] = this.weight !== undefined ? this.weight : <any>null;
         data["sale"] = this.sale !== undefined ? this.sale : <any>null;
         if (Array.isArray(this.tagNames)) {
@@ -6001,7 +6899,7 @@ export class DishToUpdate implements IDishToUpdate {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data;
+        return data; 
     }
 }
 
@@ -6010,7 +6908,7 @@ export interface IDishToUpdate {
     name?: string | null;
     composition?: string | null;
     description?: string | null;
-    cost?: number;
+    price?: number;
     weight?: string | null;
     sale?: number;
     tagNames?: TagToAdd[] | null;

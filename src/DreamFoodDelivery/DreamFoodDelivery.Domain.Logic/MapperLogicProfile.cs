@@ -16,15 +16,16 @@ namespace DreamFoodDelivery.Domain.Logic
             #region User
             CreateMap<UserDB, UserDTO>().ReverseMap();
             CreateMap<UserGeneration, UserDB>().ReverseMap();
-            CreateMap<UserProfile, User>().ReverseMap();
-            CreateMap<UserToUpdate, User>().ReverseMap();
+            CreateMap<UserProfile, AppUser>().ReverseMap();
+            CreateMap<UserToUpdate, AppUser>().ReverseMap();
             #endregion
 
-            #region Comment
-            CreateMap<CommentDB, CommentView>().ReverseMap();
-            CreateMap<CommentDB, CommentForUsersView>().ReverseMap();
-            CreateMap<CommentDB, CommentToAdd>().ReverseMap();
-            CreateMap<CommentDB, CommentToUpdate>().ReverseMap();
+            #region Review
+            CreateMap<ReviewDB, ReviewView>().ReverseMap();
+            CreateMap<ReviewDB, ReviewForUsersView>().ReverseMap();
+            CreateMap<ReviewDB, ReviewToAdd>().ReverseMap();
+            CreateMap<ReviewDB, ReviewToUpdate>().ReverseMap();
+            CreateMap<RatingDB, RatingView>().ReverseMap();
             #endregion
 
             #region Order

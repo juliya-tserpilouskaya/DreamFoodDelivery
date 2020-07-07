@@ -1,0 +1,77 @@
+.error-page {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  font-family: Arial,"Helvetica Neue",Helvetica,sans-serif;
+  margin-top: 10vh;
+}
+
+h1 {
+    font-size: 30vh;
+    font-weight: bold;
+    position: relative;
+    margin: -8vh 0 0;
+    padding: 0;
+}
+
+h1:after {
+    content: attr(data-h1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    color: transparent;
+    /* webkit only for graceful degradation to IE */
+    background: -webkit-repeating-linear-gradient(-45deg, #e67171, #ce6969, #cc8aa3, #ee8176, #cc8a8a, #ce6998, #b6596d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    text-shadow: 1px 1px 2px transparentize(#fff, .75);
+    animation: animateTextBackground 10s ease-in-out infinite;
+}
+
+h1:after, .back {
+  /* webkit only for graceful degradation to IE */
+  background: -webkit-repeating-linear-gradient(-45deg, #e67171, #ce6969, #cc8aa3, #ee8176, #cc8a8a, #ce6998, #b6596d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 400%;
+  text-shadow: 1px 1px 2px transparentize(#fff, .75);
+  animation: animateTextBackground 10s ease-in-out infinite;
+}
+
+p.internal-server-error-msg {
+    color: #d6d6d6;
+    font-size: 8vh;
+    font-weight: bold;
+    line-height: 10vh;
+    position: relative;
+}
+
+@keyframes animateTextBackground {
+  0%
+    { background-position: 0 0 }
+
+  25%
+    { background-position: 100% 0 }
+
+  50%
+    { background-position: 100% 100% }
+
+  75%
+    { background-position: 0 100% }
+
+  100%
+    { background-position: 0 0 }
+}
+
+.back {
+  // background: -webkit-repeating-linear-gradient(-45deg, #e67171, #ce6969, #cc8aa3, #ee8176, #cc8a8a, #ce6998, #b6596d);
+  border: none;
+  font-weight: bold;
+  font-size: 4vh;
+  // animation: animateTextBackground 10s ease-in-out infinite;
+}

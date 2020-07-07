@@ -35,8 +35,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all dishes in the basket</returns>
         [HttpGet, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
@@ -45,11 +45,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _basketService.GetAllDishesByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) 
                      : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -60,9 +60,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all dishes in the basket</returns>
         [HttpPost, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> AddDish([FromBody, CustomizeValidator]DishToBasketAdd dishInfo, CancellationToken cancellationToken = default) 
         {
@@ -76,11 +76,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _basketService.AddUpdateDishAsync(dishInfo.DishId, userIdFromIdentity, dishInfo.Quantity, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message) 
                      : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -91,9 +91,9 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns all dishes in the basket</returns>
         [HttpPost, Route("{dishId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(BasketView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string dishId, CancellationToken cancellationToken = default)
         {
@@ -106,11 +106,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _basketService.RemoveDishByIdAsync(dishId, HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -120,8 +120,8 @@ namespace DreamFoodDelivery.Web.Controllers
         /// <returns>Returns information about basket action</returns>
         [HttpDelete, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
@@ -130,11 +130,11 @@ namespace DreamFoodDelivery.Web.Controllers
                 var result = await _basketService.RemoveAllByUserIdAsync(HttpContext.User.Claims.Single(_ => _.Type == "id").Value, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess) 
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
     }

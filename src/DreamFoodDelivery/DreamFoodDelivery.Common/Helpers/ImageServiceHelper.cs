@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DreamFoodDelivery.Common.Helpers
+namespace DreamFoodDelivery.Common
 {
     public class ImageServiceHelper
     {

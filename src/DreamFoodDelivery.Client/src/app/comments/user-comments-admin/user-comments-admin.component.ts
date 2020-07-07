@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommentView, CommentService } from 'src/app/app-services/nswag.generated.services';
+import { ReviewView, ReviewService } from 'src/app/app-services/nswag.generated.services';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -11,10 +11,10 @@ import { Location } from '@angular/common';
 export class UserCommentsAdminComponent implements OnInit {
   idFromURL = '';
   message: string = null;
-  reviews: CommentView[] = [];
+  reviews: ReviewView[] = [];
 
   constructor(
-    private reviewService: CommentService,
+    private reviewService: ReviewService,
     private route: ActivatedRoute,
     public router: Router,
     private location: Location,
@@ -53,7 +53,7 @@ export class UserCommentsAdminComponent implements OnInit {
 
   removeById(id: string): void {
     this.reviewService.removeById(id).subscribe(data => {
-      const indexToDelete = this.reviews.findIndex((mark: CommentView) => mark.id === id);
+      const indexToDelete = this.reviews.findIndex((mark: ReviewView) => mark.id === id);
       this.reviews.splice(indexToDelete, 1);
     },
     error => {

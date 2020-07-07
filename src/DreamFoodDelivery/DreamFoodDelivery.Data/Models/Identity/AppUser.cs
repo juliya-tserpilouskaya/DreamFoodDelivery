@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Data.Models
 {
-    public class User : IdentityUser
+    public class AppUser : IdentityUser
     {
         public string Address { get; set; }
         public double PersonalDiscount { get; set; }

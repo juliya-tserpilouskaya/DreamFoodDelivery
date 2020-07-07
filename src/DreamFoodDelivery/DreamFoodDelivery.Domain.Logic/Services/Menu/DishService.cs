@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -47,12 +46,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
                 DishDB dishAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToAdd.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView view = _mapper.Map<DishView>(dishAfterAdding);
-                view.TagList = new HashSet<TagToAdd>();
-                foreach (var item in dishAfterAdding.DishTags)
-                {
-                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                }
+                view.TagList = CollectTagList(dishAfterAdding.DishTags, cancellationToken).Result;
                 return Result<DishView>.Ok(view);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -86,13 +80,8 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result<DishView>.Fail<DishView>(ExceptionConstants.DISH_WAS_NOT_FOUND);
                 }
                 DishView view = _mapper.Map<DishView>(dish);
-                view.TotalCost = Math.Round(view.Cost * (1 - view.Sale / 100), 2);
-                view.TagList = new HashSet<TagToAdd>();
-                foreach (var item in dish.DishTags)
-                {
-                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                }
+                view.TotalCost = Math.Round(view.Price * (1 - view.Sale / 100), 2);
+                view.TagList = CollectTagList(dish.DishTags, cancellationToken).Result;
                 return Result<DishView>.Ok(view);
             }
             catch (ArgumentNullException ex)
@@ -126,7 +115,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 _context.Entry(dishToUpdate).Property(c => c.Name).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Composition).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Description).IsModified = true;
-                _context.Entry(dishToUpdate).Property(c => c.Cost).IsModified = true;
+                _context.Entry(dishToUpdate).Property(c => c.Price).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Weight).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Sale).IsModified = true;
                 _context.Entry(dishToUpdate).Property(c => c.Modified).IsModified = true;
@@ -135,14 +124,9 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                DishDB thingAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToUpdate.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                DishView view = _mapper.Map<DishView>(thingAfterAdding);
-                view.TagList = new HashSet<TagToAdd>();
-                foreach (var item in thingAfterAdding.DishTags)
-                {
-                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    view.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                }
+                DishDB dishAfterAdding = await _context.Dishes.Where(_ => _.Id == dishToUpdate.Id).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                DishView view = _mapper.Map<DishView>(dishAfterAdding);
+                view.TagList = CollectTagList(dishAfterAdding.DishTags, cancellationToken).Result;
                 return Result<DishView>.Ok(_mapper.Map<DishView>(view));
             }
             catch (DbUpdateConcurrencyException ex)
@@ -253,6 +237,23 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     dish.DishTags.Add(new DishTagDB { TagId = tag.Id, DishId = dish.Id });
                 }
             }
+        }
+
+        /// <summary>
+        /// Collect dish tags list for view model
+        /// </summary>
+        /// <param name="dishTags">List of dish tags</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<HashSet<TagToAdd>> CollectTagList(HashSet<DishTagDB> dishTags, CancellationToken cancellationToken = default)
+        {
+            HashSet<TagToAdd> tagList = new HashSet<TagToAdd>();
+            foreach (var dishTag in dishTags)
+            {
+                var tag = await _context.Tags.Where(_ => _.Id == dishTag.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                tagList.Add(_mapper.Map<TagToAdd>(tag));
+            }
+            return tagList;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DreamFoodDelivery.Data.Configurations;
+﻿using DreamFoodDelivery.Common;
+using DreamFoodDelivery.Data.Configurations;
 using DreamFoodDelivery.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Data.Context
 {
-    public class UserContext : IdentityDbContext<User>
+    public class UserContext : IdentityDbContext<AppUser>
     {
         public UserContext(DbContextOptions options) : base(options)
         {
@@ -22,13 +23,13 @@ namespace DreamFoodDelivery.Data.Context
             modelBuilder.Entity<IdentityRole>().HasData(
                 new IdentityRole
                 {
-                    Name = "Admin",
-                    NormalizedName = "ADMIN"
+                    Name = AppIdentityConstants.ADMIN,
+                    NormalizedName = AppIdentityConstants.ADMIN.ToUpper()
                 },
                 new IdentityRole
                 {
-                    Name = "User",
-                    NormalizedName = "USER"
+                    Name = AppIdentityConstants.USER,
+                    NormalizedName = AppIdentityConstants.USER.ToUpper()
                 });
         }
     }

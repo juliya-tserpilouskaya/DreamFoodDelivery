@@ -6,9 +6,9 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.Logic.Validation
 {
-    public class CommentToAddValidation : AbstractValidator<CommentToAdd>
+    public class ReviewToAddValidation : AbstractValidator<ReviewToAdd>
     {
-        public CommentToAddValidation()
+        public ReviewToAddValidation()
         {
             RuleFor(_ => _.OrderId).Must(id => Guid.TryParse(id, out var _))
                 .WithMessage("Order id can't parse to Guid type");

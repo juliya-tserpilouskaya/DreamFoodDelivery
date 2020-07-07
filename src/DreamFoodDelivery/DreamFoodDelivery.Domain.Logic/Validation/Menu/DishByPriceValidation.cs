@@ -6,9 +6,9 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.Logic.Validation
 {
-    public class DishByCostValidation : AbstractValidator<DishByCost>
+    public class DishByPriceValidation : AbstractValidator<DishByPrice>
     {
-        public DishByCostValidation()
+        public DishByPriceValidation()
         {
             RuleFor(_ => _.LowerPrice).GreaterThanOrEqualTo(0)
                 .WithMessage("Lower price limit must be greater than 0");

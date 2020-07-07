@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.DTO
 {
-    public class CommentToAdd
+    public class ReviewToAdd
     {
         //public Guid UserId { get; set; }
         public string OrderId { get; set; }

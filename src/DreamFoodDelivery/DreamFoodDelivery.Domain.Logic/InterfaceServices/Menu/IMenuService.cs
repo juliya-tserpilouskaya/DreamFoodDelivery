@@ -30,7 +30,7 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name, CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///  Asynchronously returns dish by cost. Id must be verified 
+        ///  Asynchronously returns dish by price. Id must be verified 
         /// </summary>
         /// <param name="lowerPrice">Dish lower price</param>
         /// <param name="upperPrice">Dish upper price</param>

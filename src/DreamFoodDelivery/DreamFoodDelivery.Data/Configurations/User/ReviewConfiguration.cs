@@ -7,20 +7,20 @@ using System.Text;
 
 namespace DreamFoodDelivery.Data.Configurations
 {
-    public class CommentConfiguration : IEntityTypeConfiguration<CommentDB>
+    public class ReviewConfiguration : IEntityTypeConfiguration<ReviewDB>
     {
-        public void Configure(EntityTypeBuilder<CommentDB> builder)
+        public void Configure(EntityTypeBuilder<ReviewDB> builder)
         {
             builder.ToTable("Review");
             builder.HasKey(i => i.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 
-            builder.HasOne(_ => _.User).WithMany(_ => _.Comments)
+            builder.HasOne(_ => _.User).WithMany(_ => _.Reviews)
                    .HasForeignKey(_ => _.UserId)
                    .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(_ => _.Order).WithOne(_ => _.Comment)
-                   .HasForeignKey<OrderDB>(_ => _.CommentId)
+            builder.HasOne(_ => _.Order).WithOne(_ => _.Review)
+                   .HasForeignKey<OrderDB>(_ => _.ReviewId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(i => i.Id).HasColumnName("Id");

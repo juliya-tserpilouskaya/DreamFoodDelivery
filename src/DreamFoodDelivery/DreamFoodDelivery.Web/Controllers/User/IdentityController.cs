@@ -38,7 +38,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("registration")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> RegisterAsync([FromBody]UserRegistration user, CancellationToken cancellationToken = default)
         {
@@ -55,7 +55,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -68,7 +68,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpPost, Route("login")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> LoginAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
@@ -86,7 +86,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -114,7 +114,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> DeleteAsync([FromBody]UserLoginData user, CancellationToken cancellationToken = default)
         {
@@ -131,7 +131,29 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost, Route("refresh")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserWithToken))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
+        [LoggerAttribute]
+        public async Task<IActionResult> RefreshToken([FromBody]TokenRefresh request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var result = await _identityService.ExchangeRefreshToken(request, cancellationToken);
+
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
     }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -32,9 +31,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously add new tag
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tag">New tag to add</param>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<TagView>> AddAsync(TagToAdd tag, CancellationToken cancellationToken = default)
         {
             var tagToAdd = _mapper.Map<TagDB>(tag);
@@ -43,7 +44,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                //TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 TagDB tagAfterAdding = await _context.Tags.Where(_ => _.TagName == tagToAdd.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagView>.Ok(_mapper.Map<TagView>(tagAfterAdding));
             }
@@ -75,7 +75,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             try
             {
                 await _context.SaveChangesAsync(cancellationToken);
-                //TagDB tagAfterAdding = await _context.Tags.Where(_ => _.IndexNumber == tagToAdd.IndexNumber).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 TagDB tagAfterAdding = await _context.Tags.Where(_ => _.TagName == tagToAdd.TagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 return Result<TagDB>.Ok(tagAfterAdding);
             }
@@ -95,9 +94,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously get tag by tag Id. Id must be verified 
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tagId">ID of existing tag</param>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<TagView>> GetByIdAsync(string tagId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(tagId);
@@ -106,7 +107,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 var tag = await _context.Tags.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 if (tag is null)
                 {
-                    return Result<TagView>.Fail<TagView>($"Tag was not found");
+                    return Result<TagView>.Fail<TagView>(ExceptionConstants.TAG_WAS_NOT_FOUND);
                 }
                 return Result<TagView>.Ok(_mapper.Map<TagView>(tag));
             }
@@ -118,14 +119,16 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously remove all tags 
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result> RemoveAllAsync(CancellationToken cancellationToken = default)
         {
             var tag = await _context.Tags.ToListAsync(cancellationToken);
             if (tag is null)
             {
-                return await Task.FromResult(Result.Fail("Tags were not found"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.TAGS_WERE_NOT_FOUND));
             }
             try
             {
@@ -136,11 +139,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete tags. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_TAGS + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete tags. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_TAGS + ex.Message));
             }
         }
 
@@ -155,7 +158,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             var tag = await _context.Tags.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
             if (tag is null)
             {
-                return await Task.FromResult(Result.Fail("Tag was not found"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.TAG_WAS_NOT_FOUND));
             }
             try
             {
@@ -165,24 +168,25 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete tag. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_TAG + ex.Message));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete tag. {ex.Message}"));
+                return await Task.FromResult(Result.Fail(ExceptionConstants.CANNOT_DELETE_TAG + ex.Message));
             }
         }
 
         /// <summary>
         ///  Asynchronously update tag
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tag">Existing tag to update</param>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<TagToUpdate>> UpdateAsync(TagToUpdate tag, CancellationToken cancellationToken = default)
         {
             TagDB tagForUpdate = _mapper.Map<TagDB>(tag);
             tagForUpdate.Id = Guid.Parse(tag.Id);
-            //_context.Entry(tagForUpdate).Property(c => c.IndexNumber).IsModified = true;
             _context.Entry(tagForUpdate).Property(c => c.TagName).IsModified = true;
 
             try
@@ -204,7 +208,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// Get all tags from DB
         /// </summary>
         /// <returns></returns>
-        public async Task<Result<IEnumerable<TagView>>> GetAllTagsAsync(CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<TagView>>> GetAllTagsAsync(CancellationToken cancellationToken = default)
         {
             var tags = await _context.Tags.OrderBy(_ => _.TagName).AsNoTracking().ToListAsync(cancellationToken);
             if (!tags.Any())

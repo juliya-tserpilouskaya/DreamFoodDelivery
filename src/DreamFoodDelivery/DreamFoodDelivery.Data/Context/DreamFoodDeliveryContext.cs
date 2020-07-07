@@ -1,4 +1,5 @@
 ﻿using DreamFoodDelivery.Data.Configurations;
+using DreamFoodDelivery.Data.Configurations.User;
 using DreamFoodDelivery.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,19 +23,23 @@ namespace DreamFoodDelivery.Data.Context
             modelBuilder.ApplyConfiguration(new DishTagConfiguration());
             modelBuilder.ApplyConfiguration(new TagConfiguration());
             modelBuilder.ApplyConfiguration(new BasketConfiguration());
-            modelBuilder.ApplyConfiguration(new CommentConfiguration());
+            modelBuilder.ApplyConfiguration(new ReviewConfiguration());
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new BasketDishConfiguration());
+            modelBuilder.ApplyConfiguration(new RatingConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfig());
         }
         public DbSet<DishDB> Dishes { get; set; }
         public DbSet<DishTagDB> DishTags { get; set; }
         public DbSet<TagDB> Tags { get; set; }
         public DbSet<BasketDB> Baskets { get; set; }
-        public DbSet<CommentDB> Comments { get; set; }
+        public DbSet<ReviewDB> Reviews { get; set; }
         public DbSet<OrderDB> Orders { get; set; }
         public DbSet<UserDB> Users { get; set; }
         public DbSet<BasketDishDB> BasketDishes { get; set; }
+        public DbSet<RatingDB> Rating { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
@@ -52,10 +57,12 @@ namespace DreamFoodDelivery.Data.Context
         {
             foreach (var entry in ChangeTracker.Entries())
             {
-                if (entry.Entity is User ||
+                if (entry.Entity is AppUser ||
                     entry.Entity is UserDB ||
                     entry.Entity is BasketDB ||
-                    entry.Entity is BasketDishDB)
+                    entry.Entity is BasketDishDB ||
+                    entry.Entity is RatingDB ||
+                    entry.Entity is RefreshToken)
                 {
                     continue;
                 };

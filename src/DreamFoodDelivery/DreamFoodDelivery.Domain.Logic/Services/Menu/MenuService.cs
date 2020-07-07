@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Data.Context;
 using DreamFoodDelivery.Data.Models;
 using DreamFoodDelivery.Domain.DTO;
@@ -33,33 +32,29 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <summary>
         /// Asynchronously returns menu (all dishes)
         /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [LoggerAttribute]
         public async Task<Result<IEnumerable<DishView>>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync(cancellationToken);
-            if (!dishes.Any())
+            try
             {
-                return Result<IEnumerable<DishView>>.Quite<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
-            }
-
-            List<DishView> views = new List<DishView>();
-            foreach (var dish in dishes)
-            {
-                DishView viewItem = _mapper.Map<DishView>(dish);
-                viewItem.TotalCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
-                viewItem.TagList = new HashSet<TagToAdd>();
-                foreach (var item in dish.DishTags)
+                var dishes = await _context.Dishes.Include(c => c.DishTags).ThenInclude(sc => sc.Tag).AsNoTracking().ToListAsync(cancellationToken);
+                if (!dishes.Any())
                 {
-                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                    viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                    return Result<IEnumerable<DishView>>.Quite<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
-                views.Add(viewItem);
+                List<DishView> views = await CollectViews(dishes);
+                return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.SOURCE_IS_NULL + ex.Message);
             }
 
-            return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
         }
 
-        public async Task<Result<IEnumerable<DishView>>> GetAllDishesByRequestAsync(RequestParameters request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<DishView>>> GetAllDishesByRequestAsync(RequestParameters request, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -119,26 +114,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                 }
                 if (request.LowerPrice > 0 && dishesList.Any())
                 {
-                    dishesList = dishesList.Where(_ => _.Cost >= request.LowerPrice).ToList();
+                    dishesList = dishesList.Where(_ => _.Price >= request.LowerPrice).ToList();
                 }
                 if (request.UpperPrice > 0 && request.UpperPrice >= request.LowerPrice && dishesList.Any())
                 {
-                    dishesList = dishesList.Where(_ => _.Cost <= request.UpperPrice).ToList();
+                    dishesList = dishesList.Where(_ => _.Price <= request.UpperPrice).ToList();
                 }
 
-                List<DishView> views = new List<DishView>();
-                foreach (var dish in dishesList)
-                {
-                    DishView viewItem = _mapper.Map<DishView>(dish);
-
-                    viewItem.TagList = new HashSet<TagToAdd>();
-                    foreach (var item in dish.DishTags)
-                    {
-                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                    }
-                    views.Add(viewItem);
-                }
+                List<DishView> views = await CollectViews(dishesList);
                 return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
             }
             catch (ArgumentNullException ex)
@@ -149,9 +132,11 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously returns dish by name. Id must be verified 
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="name">Dish name</param>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<IEnumerable<DishView>>> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             try
@@ -162,19 +147,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
-                List<DishView> views = new List<DishView>();
-                foreach (var dish in dishes)
-                {
-                    DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.TotalCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
-                    viewItem.TagList = new HashSet<TagToAdd>();
-                    foreach (var item in dish.DishTags)
-                    {
-                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                    }
-                    views.Add(viewItem);
-                }
+                List<DishView> views = await CollectViews(dishes);
                 return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
             }
             catch (ArgumentNullException ex)
@@ -185,33 +158,23 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously returns dish by cost. Id must be verified 
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="lowerPrice">Dish lower price</param>
         /// <param name="upperPrice">Dish upper price</param>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<IEnumerable<DishView>>> GetByPriceAsync(double lowerPrice, double upperPrice, CancellationToken cancellationToken = default)
         {           
             try
             {
-                var dishes = await _context.Dishes.Where(_ => _.Cost >= lowerPrice).Where(_ => _.Cost <= upperPrice).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
+                var dishes = await _context.Dishes.Where(_ => _.Price >= lowerPrice).Where(_ => _.Price <= upperPrice).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).ToListAsync(cancellationToken);
                 if (!dishes.Any())
                 {
                     return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
-                List<DishView> views = new List<DishView>();
-                foreach (var dish in dishes)
-                {
-                    DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.TotalCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
-                    viewItem.TagList = new HashSet<TagToAdd>();
-                    foreach (var item in dish.DishTags)
-                    {
-                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                    }
-                    views.Add(viewItem);
-                }
+                List<DishView> views = await CollectViews(dishes);
                 return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
             }
             catch (ArgumentNullException ex)
@@ -222,8 +185,10 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         /// Asynchronously returns sales
+        /// !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         [LoggerAttribute]
+        [Obsolete]
         public async Task<Result<IEnumerable<DishView>>> GetSalesAsync(CancellationToken cancellationToken = default)
         {
             try
@@ -234,19 +199,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
                     return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.DISHES_WERE_NOT_FOUND);
                 }
 
-                List<DishView> views = new List<DishView>();
-                foreach (var dish in dishes)
-                {
-                    DishView viewItem = _mapper.Map<DishView>(dish);
-                    viewItem.TotalCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
-                    viewItem.TagList = new HashSet<TagToAdd>();
-                    foreach (var item in dish.DishTags)
-                    {
-                        var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-                        viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
-                    }
-                    views.Add(viewItem);
-                }
+                List<DishView> views = await CollectViews(dishes);
                 return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
             }
             catch (ArgumentNullException ex)
@@ -257,13 +210,18 @@ namespace DreamFoodDelivery.Domain.Logic.Services
 
         /// <summary>
         ///  Asynchronously get dishes by tag index. Id must be verified 
+        ///  !!! Obsolete service. If necessary, review their return data types and status codes!!!
         /// </summary>
         /// <param name="tagName">Existing tag</param>
         [LoggerAttribute]
-        public async Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(/*int tagIndex*/ string tagName, CancellationToken cancellationToken = default)
+        [Obsolete]
+        public async Task<Result<IEnumerable<DishView>>> GetByTagIndexAsync(string tagName, CancellationToken cancellationToken = default)
         {
-            //TagDB tag = await _context.Tags.Where(_ => _.IndexNumber == tagIndex).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
             TagDB tag = await _context.Tags.Where(_ => _.TagName == tagName).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+            if (tag is null)
+            {
+                return Result<IEnumerable<DishView>>.Fail<IEnumerable<DishView>>(ExceptionConstants.TAG_WAS_NOT_FOUND);
+            }
             var dishTags = await _context.DishTags.Where(_ => _.TagId  == tag.Id).AsNoTracking().ToListAsync(cancellationToken);
             if (!dishTags.Any())
             {
@@ -275,7 +233,7 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             {
                 DishDB dish = await _context.Dishes.Where(_ => _.Id == dishTag.DishId).Include(c => c.DishTags).ThenInclude(sc => sc.Tag).Select(_ => _).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
                 DishView viewItem = _mapper.Map<DishView>(dish);
-                viewItem.TotalCost = Math.Round(viewItem.Cost * (1 - viewItem.Sale / 100), 2);
+                viewItem.TotalCost = Math.Round(viewItem.Price * (1 - viewItem.Sale / 100), 2);
                 viewItem.TagList = new HashSet<TagToAdd>();
                 foreach (var item in dish.DishTags)
                 {
@@ -286,6 +244,30 @@ namespace DreamFoodDelivery.Domain.Logic.Services
             }
 
             return Result<IEnumerable<DishView>>.Ok(_mapper.Map<IEnumerable<DishView>>(views));
+        }
+
+        /// <summary>
+        /// Gets additional data and collects elements dishes views
+        /// </summary>
+        /// <param name="dishes">Dishes list</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Dishes views</returns>
+        private async Task<List<DishView>> CollectViews(List<DishDB> dishes, CancellationToken cancellationToken = default)
+        {
+            List<DishView> views = new List<DishView>();
+            foreach (var dish in dishes)
+            {
+                DishView viewItem = _mapper.Map<DishView>(dish);
+                viewItem.TotalCost = Math.Round(viewItem.Price * (1 - viewItem.Sale / 100), 2);
+                viewItem.TagList = new HashSet<TagToAdd>();
+                foreach (var item in dish.DishTags)
+                {
+                    var tag = await _context.Tags.Where(_ => _.Id == item.TagId).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+                    viewItem.TagList.Add(_mapper.Map<TagToAdd>(tag));
+                }
+                views.Add(viewItem);
+            }
+            return views;
         }
     }
 }

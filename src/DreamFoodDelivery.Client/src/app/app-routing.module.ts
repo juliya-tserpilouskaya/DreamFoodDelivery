@@ -32,6 +32,7 @@ import { ChangeEmailComponent } from './user/change-email/change-email.component
 import { EmailConfirmByLinkComponent } from './auth/email-confirm-by-link/email-confirm-by-link.component';
 import { FogotPasswordRequestComponent } from './user/password-reset/fogot-password-request/fogot-password-request.component';
 import { PasswordResetComponent } from './user/password-reset/password-reset/password-reset.component';
+import { InternalServerErrorComponent } from './pages/internal-server-error/internal-server-error.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -73,6 +74,7 @@ const routes: Routes = [
   { path: 'dish/create', component: DishAddNewComponent, canActivate: [AuthGuard]},
 
   { path: 'about', component: HomeComponent },
+  { path: 'error/500', component: InternalServerErrorComponent},
   { path: '', redirectTo: '/menu', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 ];

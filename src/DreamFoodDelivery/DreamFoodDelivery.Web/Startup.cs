@@ -23,7 +23,10 @@ using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Domain.Logic.Validation;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
-using DreamFoodDelivery.Common.Ñonstants;
+using DreamFoodDelivery.Common;
+using Microsoft.AspNetCore.Http;
+using AutoWrapper;
+using DreamFoodDelivery.Web.SignalR;
 
 namespace DreamFoodDelivery.Web
 {
@@ -65,7 +68,18 @@ namespace DreamFoodDelivery.Web
                         RequireExpirationTime = false,
                         ValidateLifetime = true
                     };
-                });
+                })
+                //.AddGoogle(options =>
+                //{
+                //    IConfigurationSection googleAuthNSection =
+                //        Configuration.GetSection("Authentication:Google");
+
+                //    options.ClientId = googleAuthNSection["ClientId"];
+                //    options.ClientSecret = googleAuthNSection["ClientSecret"];
+                //})
+                //.AddTwitter(twitterOptions => {  })
+                //.AddFacebook(facebookOptions => {  })
+                ;
 
             services.AddOpenApiDocument(config =>
             {
@@ -99,13 +113,13 @@ namespace DreamFoodDelivery.Web
             {
                 fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToBasketAddValidation>();
-                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishByCostValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<DishByPriceValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<DishToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<TagToUpdateValidation>();
-                fluentValidation.RegisterValidatorsFromAssemblyContaining<CommentToAddValidation>();
-                fluentValidation.RegisterValidatorsFromAssemblyContaining<CommentToUpdateValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<ReviewToAddValidation>();
+                fluentValidation.RegisterValidatorsFromAssemblyContaining<ReviewToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToAddValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToStatusUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<OrderToUpdateValidation>();
@@ -113,6 +127,27 @@ namespace DreamFoodDelivery.Web
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<UserToUpdateValidation>();
                 fluentValidation.RegisterValidatorsFromAssemblyContaining<SearchValidation>();
             });
+
+            ////check and del if it doesnt help
+            //services.Configure<ApiBehaviorOptions>(options =>
+            //{
+            //    options.InvalidModelStateResponseFactory = context =>
+            //    {
+            //        var problemDetails = new ValidationProblemDetails(context.ModelState)
+            //        {
+            //            Instance = context.HttpContext.Request.Path,
+            //            Status = StatusCodes.Status400BadRequest,
+            //            Type = "https://asp.net/core",
+            //            Detail = "Please refer to the errors property for additional details."
+            //        };
+            //        return new BadRequestObjectResult(problemDetails)
+            //        {
+            //            ContentTypes = { "application/problem+json", "application/problem+xml" }
+            //        };
+            //    };
+            //});
+
+
 
             services.AddAutoMapper(typeof(Startup).Assembly);
 
@@ -125,6 +160,8 @@ namespace DreamFoodDelivery.Web
                         .AllowCredentials()
                         .SetIsOriginAllowedToAllowWildcardSubdomains());
             });
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -147,6 +184,17 @@ namespace DreamFoodDelivery.Web
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
+            // AutoWrapper - used for BadRequest("message");
+            //app.UseApiResponseAndExceptionWrapper(new AutoWrapperOptions
+            //{
+            //    UseApiProblemDetailsException = true
+            //});
+
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Images")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Images"));
+            }
+
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
@@ -155,7 +203,10 @@ namespace DreamFoodDelivery.Web
 
             app.UseCors("CorsPolicy");
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints => { 
+                endpoints.MapControllers();
+                endpoints.MapHub<NotificationHub>("/chat"); // "http://localhost:4200/chat"
+            });
         }
     }
 }

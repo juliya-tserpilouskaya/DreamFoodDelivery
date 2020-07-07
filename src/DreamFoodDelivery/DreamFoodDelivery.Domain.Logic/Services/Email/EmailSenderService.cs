@@ -11,7 +11,6 @@ using System.Net;
 using System.Diagnostics;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Сonstants;
 
 namespace DreamFoodDelivery.Domain.Logic.Services
 {

@@ -6,12 +6,12 @@ using System.Text;
 
 namespace DreamFoodDelivery.Domain.Logic.Validation
 {
-    public class CommentToUpdateValidation : AbstractValidator<CommentToUpdate>
+    public class ReviewToUpdateValidation : AbstractValidator<ReviewToUpdate>
     {
-        public CommentToUpdateValidation()
+        public ReviewToUpdateValidation()
         {
             RuleFor(_ => _.Id).Must(id => Guid.TryParse(id, out var _))
-                .WithMessage("Comment id can't parse to Guid type");
+                .WithMessage("Review id can't parse to Guid type");
             RuleFor(_ => _.Headline).MinimumLength(3).MaximumLength(90)
                 .WithMessage("Headline must contain from 3 to 90 characters.");
             RuleFor(_ => _.Content).MinimumLength(3).MaximumLength(511)

@@ -20,7 +20,7 @@
         <p class="jumbotron-heading">Status: {{order.status}}</p>
         <p class="card-text">{{order.phoneNumber}}, {{order.address}}</p>
         <p class="card-text">Order cost: {{order.totalCost}} $</p>
-        <p class="card-text">Order Shipping cost: {{order.shippingCost}} $</p>
+        <p class="card-text">Order shipping cost: {{order.deliveryCost}} $</p>
         <div *ngFor="let dish of order.dishes">
           <ul class="list-group">
             <li class="list-group-item">Name: {{dish.name}}</li>

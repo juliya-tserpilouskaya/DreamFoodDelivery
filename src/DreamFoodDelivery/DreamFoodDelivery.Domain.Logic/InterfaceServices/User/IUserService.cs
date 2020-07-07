@@ -94,5 +94,9 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> ResetPasswordAsync(PasswordRecoveryInfo userInfo, CancellationToken cancellationToken = default);
+
+        Task<Result> AddRefreshTokenAsync(string refreshToken, string idFromIdentity);
+
+        Task<Result> DeleteRefreshTokenAsync(string refreshToken, string idFromIdentity, CancellationToken cancellationToken = default);
     }
 }

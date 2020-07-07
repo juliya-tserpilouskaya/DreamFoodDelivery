@@ -3,3 +3,8 @@
 
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';
+
+body {
+  background: url(assets/background.jpg) no-repeat center center fixed;
+  background-size: cover;
+}

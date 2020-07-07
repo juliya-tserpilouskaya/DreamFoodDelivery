@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DreamFoodDelivery.Common;
-using DreamFoodDelivery.Common.Helpers;
-using DreamFoodDelivery.Common.Сonstants;
 using DreamFoodDelivery.Domain.Image;
 using DreamFoodDelivery.Domain.Logic.InterfaceServices;
+using DreamFoodDelivery.Domain.View;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,14 +30,14 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        //[Authorize(Roles = "Admin")]
+        //[Authorize(Roles = AppIdentityConstants.ADMIN)]
         [HttpPost]
         [Route("upload")]
         [RequestSizeLimit(NumberСonstants.IMAGE_SIZE)] 
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> UploadImage([FromQuery]ImageModel file)
         {
@@ -56,7 +55,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -70,10 +69,10 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [HttpGet]
         [Route("image/{dishId}/{imageName}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public IActionResult GetImage(string dishId, string imageName)
         {
@@ -88,11 +87,11 @@ namespace DreamFoodDelivery.Web.Controllers.Image
 
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -105,10 +104,10 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [HttpGet]
         [Route("{dishId}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public IActionResult GetImageNamesList(string dishId)
         {
@@ -123,11 +122,11 @@ namespace DreamFoodDelivery.Web.Controllers.Image
 
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -137,14 +136,14 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         /// <param name="imageName"></param>
         /// <param name="dishId"></param>
         /// <returns></returns>
-        //[Authorize(Roles = "Admin")]
+        //[Authorize(Roles = AppIdentityConstants.ADMIN)]
         [HttpDelete]
         [Route("image/{dishId}/{imageName}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public IActionResult Delete(string dishId, string imageName)
         {
@@ -164,7 +163,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
     }

@@ -20,7 +20,7 @@ namespace DreamFoodDelivery.Domain.Logic
             services.AddScoped<IBasketService, BasketService>();
             services.AddScoped<IMenuService, MenuService>();
             services.AddScoped<ITagService, TagService>();
-            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IIdentityService, IdentityService>();
@@ -29,6 +29,9 @@ namespace DreamFoodDelivery.Domain.Logic
             services.AddScoped<IImageInterface, ImageService>();
             services.AddTransient<IEmailSenderService, EmailSenderService>();
             services.AddTransient<IEmailBuilder, EmailBuilder>();
+
+            services.AddScoped<ITokenHandler, TokenHandler>();
+            services.AddScoped<ITokenValidator, JwtTokenValidator>();
 
             services.Configure<AuthMessageSenderOptions>(configuration);
 

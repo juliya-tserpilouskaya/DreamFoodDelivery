@@ -16,7 +16,7 @@ using DreamFoodDelivery.Domain.View;
 
 namespace DreamFoodDelivery.Web.Controllers.User
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = AppIdentityConstants.ADMIN)]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -35,9 +35,9 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// <returns>Returns all users stored</returns>
         [HttpGet, Route("all")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UserView>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
@@ -46,11 +46,11 @@ namespace DreamFoodDelivery.Web.Controllers.User
                 var result = await _adminService.GetAllAsync(cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -61,10 +61,10 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// <returns>Returns ID matching user</returns>
         [HttpGet, Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> GetById(string id, CancellationToken cancellationToken = default)
         {
@@ -77,11 +77,11 @@ namespace DreamFoodDelivery.Web.Controllers.User
                 var result = await _adminService.GetByIdAsync(id, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -95,7 +95,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> UpdateUserProfileByAdmin([FromBody, CustomizeValidator]UserToUpdate user, string idFromIdentity, CancellationToken cancellationToken = default)
         {
@@ -110,7 +110,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -122,10 +122,10 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// <returns>Returns users information after updating</returns>
         [HttpPost, Route("{identityId}/discount")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> UpdatePersonalDiscount([FromBody]int personalDiscount, string identityId, CancellationToken cancellationToken = default)
         {
@@ -138,11 +138,11 @@ namespace DreamFoodDelivery.Web.Controllers.User
                 var result = await _adminService.UpdateUserPersonalDiscountAsync(personalDiscount, identityId, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -153,10 +153,10 @@ namespace DreamFoodDelivery.Web.Controllers.User
         /// <returns>Result information</returns>
         [HttpDelete, Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> RemoveById(string id, CancellationToken cancellationToken = default)
         {
@@ -169,11 +169,11 @@ namespace DreamFoodDelivery.Web.Controllers.User
                 var result = await _adminService.RemoveByIdAsync(id, cancellationToken);
                 return result.IsError ? throw new InvalidOperationException(result.Message)
                      : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
-                     : NoContent();
+                     : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -186,7 +186,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> ChangeRoleAsync(string identityId, CancellationToken cancellationToken = default)
         {
@@ -201,7 +201,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
 
@@ -213,7 +213,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> ConfirmUserEmail(string identityId, CancellationToken cancellationToken = default)
         {
@@ -224,13 +224,14 @@ namespace DreamFoodDelivery.Web.Controllers.User
             try
             {
                 var result = await _adminService.ConfirmEmailAsync(identityId, cancellationToken);
-                return result.IsError ? throw new InvalidOperationException(result.Message)
-                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                     : NoContent();
+                return result.IsError ? throw new InvalidOperationException(result.Message) : Ok(result.IsSuccess);
+                //return result.IsError ? throw new InvalidOperationException(result.Message)
+                //     : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                //     : NoContent();
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
     }

@@ -47,6 +47,7 @@ export class RegisterComponent implements OnInit {
         .subscribe(user => {this.user = user;
                             this.spinning = false;
                             localStorage.setItem('access_token', this.user.userToken);
+                            this.authService.setTokenExpirationDate(this.user.expiresIn);
                             this.currentUser = this.user;
                             this.registerForm.reset();
                             this.router.navigate(['/profile']);

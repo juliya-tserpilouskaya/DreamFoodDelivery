@@ -10,8 +10,8 @@ namespace DreamFoodDelivery.Domain.Logic.InterfaceServices
 {
     public interface IEmailBuilder
     {
-        Task<Result> SendConfirmMessage(User user, string callBackUrl, CancellationToken cancellationToken = default);
-        Task<Result> SendPasswordResetMessageAsync(User user, string callBackUrl, CancellationToken cancellationToken = default);
+        Task<Result> SendConfirmMessage(AppUser user, string callBackUrl, CancellationToken cancellationToken = default);
+        Task<Result> SendPasswordResetMessageAsync(AppUser user, string callBackUrl, CancellationToken cancellationToken = default);
 
         Task<Result> SendEmailWithLinkAsync(string email, string subject, string link, string message, string callBackUrl = null, CancellationToken cancellationToken = default);
     }

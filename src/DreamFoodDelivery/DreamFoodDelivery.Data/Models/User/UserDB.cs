@@ -11,6 +11,7 @@ namespace DreamFoodDelivery.Data.Models
         public BasketDB Basket { get; set; }
         public Guid BasketId { get; set; }
         public HashSet<OrderDB> Orders { get; set; }
-        public HashSet<CommentDB> Comments { get; set; }
+        public HashSet<ReviewDB> Reviews { get; set; }
+        public HashSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
