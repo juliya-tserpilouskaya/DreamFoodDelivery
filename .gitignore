@@ -353,3 +353,6 @@ MigrationBackup/
 
 # Folder with images
 /src/DreamFoodDelivery/DreamFoodDelivery.Web/Images/DishImages
+
+# Folder with logs
+/src\DreamFoodDelivery\DreamFoodDelivery.Web\catched_errors_logs
