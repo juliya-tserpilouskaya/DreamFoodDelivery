@@ -12,6 +12,7 @@ using DreamFoodDelivery.Common;
 using System.Threading;
 using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Domain.View;
+using Serilog;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -49,6 +50,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -80,6 +82,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -110,6 +113,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -134,6 +138,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }

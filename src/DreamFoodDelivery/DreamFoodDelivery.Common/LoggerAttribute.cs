@@ -11,22 +11,6 @@ namespace DreamFoodDelivery.Common
 {
     public class LoggerAttribute : OnMethodBoundaryAspect
     {
-        public override void OnExit(MethodExecutionArgs args)
-        {
-            if (args.ReturnValue is Task<string> task)
-            {
-                args.ReturnValue = task.ContinueWith(t =>
-                {
-                    if (t.IsFaulted)
-                    {
-                        return "An error happened: " + t.Exception.Message;
-                    }
-
-                    return t.Result;
-                });
-            }
-        }
-
         public override void OnEntry(MethodExecutionArgs args)
         {
             string writePath = InitMyLogger();
@@ -34,36 +18,27 @@ namespace DreamFoodDelivery.Common
                 $"METHOD: {args.Method.Name} started.";
             Debug.WriteLine(message);
             LogWrite(message, writePath);
-
         }
 
-        //public override void OnExit(MethodExecutionArgs args)
-        //{
-
-
-        //    //var type = args.ReturnValue.GetType();
-
-        //    //if (args.ReturnValue is null)
-        //    //{
-        //    string writePath = InitMyLogger();
-        //    string message = $"{DateTime.Now} - {args.ReturnValue.ToString()} \n" +
-        //            $"METHOD Finished.";
-        //        Debug.WriteLine(message);
-        //    LogWrite(message, writePath);
-        //    //}
-
-        //}
+        public override void OnExit(MethodExecutionArgs args)
+        {
+            string writePath = InitMyLogger();
+            string message = $"{DateTime.Now} - {args.ReturnValue.ToString()} \n" +
+                    $"METHOD Finished.";
+            Debug.WriteLine(message);
+            LogWrite(message, writePath);
+        }
 
         public override void OnException(MethodExecutionArgs args)
         {
-            //string writePath = InitMyLogger();
+            string writePath = InitMyLogger();
             string message = $"{DateTime.Now} - CLASS: {args.Method.DeclaringType.Name} \n" +
                 $"METHOD: {args.Method.Name} has exception: " +
                 $"\n{args.Exception.Data}\n" +
                 $"{args.Exception.Message}\n" +
                 $"{args.Exception.InnerException?.Message}";
             Debug.WriteLine(message);
-            //LogWrite(message, writePath);
+            LogWrite(message, writePath);
         }
 
         private string InitMyLogger()

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  currentRate = 1.14;
+  currentRate: number;
   comments: ReviewForUsersView[] = [];
   response: PageResponseOfReviewForUsersView;
   requestForm: FormGroup;
@@ -30,34 +30,27 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.getComments();
+    this.getComments();
     this.getRating();
   }
 
   getRating(){
     this.reviewService.getRating().subscribe(data => {this.rating = data;
+                                                      this.currentRate = data.sum;
                                                       this.message = null;
     },
      error => {
       if (error.status ===  206) {
         this.message = error.detail;
       }
-      // TODO: check codes
-      else if (error.status ===  400) {
-        this.message = 'Error 400: ' + error.response;
-      }
       else if (error.status ===  500) {
-        this.message = 'Error 500: Internal Server Error!';
+        this.message = error.message;
         this.router.navigate(['/error/500', {msg: this.message}]);
       }
       else{
         this.message = 'Something was wrong. Please, contact with us.';
       }
-
-
-
      });
-
   }
 
   getComments(){
@@ -95,6 +88,5 @@ export class HomeComponent implements OnInit {
       this.ngOnInit();
     }
   }
-
 }
 

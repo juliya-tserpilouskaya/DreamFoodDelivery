@@ -27,6 +27,7 @@ using DreamFoodDelivery.Common;
 using Microsoft.AspNetCore.Http;
 using AutoWrapper;
 using DreamFoodDelivery.Web.SignalR;
+using Serilog;
 
 namespace DreamFoodDelivery.Web
 {
@@ -154,7 +155,7 @@ namespace DreamFoodDelivery.Web
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.WithOrigins("http://localhost:4200")
+                    builder => builder.WithOrigins("http://localhost:4200") //+url host-a
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials()
@@ -175,8 +176,10 @@ namespace DreamFoodDelivery.Web
             app.UseSession(); // use this before .UseEndpoints
             app.UseHttpsRedirection();
 
-            app.UseRouting();
+            app.UseSerilogRequestLogging();
 
+            app.UseRouting();
+            
             app.UseAuthentication();
 
             app.UseAuthorization();

@@ -6,6 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="logs\**" />
+      <Content Remove="logs\**" />
+      <EmbeddedResource Remove="logs\**" />
+      <None Remove="logs\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\DreamFoodDelivery.Common\DreamFoodDelivery.Common.csproj" />
       <ProjectReference Include="..\DreamFoodDelivery.Domain.Logic\DreamFoodDelivery.Domain.Logic.csproj" />
       <ProjectReference Include="..\DreamFoodDelivery.Domain\DreamFoodDelivery.Domain.csproj" />
@@ -40,6 +47,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="catched_errors_logs\" />
       <Folder Include="Images\DishImages\" />
     </ItemGroup>
 

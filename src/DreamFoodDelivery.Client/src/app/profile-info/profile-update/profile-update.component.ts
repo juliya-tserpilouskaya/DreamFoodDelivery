@@ -32,8 +32,8 @@ export class ProfileUpdateComponent implements OnInit {
   ngOnInit(): void {
     this.userServuice.getProfile().subscribe(data => {this.user = data; },
       error => {
-        if (error.status ===  204) {
-          this.message = 'Now empty.';
+        if (error.status ===  206) {
+          this.message = error.detail;
         }
         else if (error.status ===  400) {
           this.message = 'Error 400: ' + error.response;
@@ -41,11 +41,9 @@ export class ProfileUpdateComponent implements OnInit {
         else if (error.status ===  403) {
           this.message = 'You are not authorized!';
         }
-        else if (error.status ===  404) {
-          this.message = 'Element not found.';
-        }
         else if (error.status ===  500) {
-          this.message = 'Error 500: Internal Server Error!';
+          this.message = error.message;
+          this.router.navigate(['/error/500', {msg: this.message}]);
         }
         else{
           this.message = 'Something was wrong. Please, contact with us.';
@@ -57,13 +55,14 @@ export class ProfileUpdateComponent implements OnInit {
     this.userServuice.updateUserProfile(this.userInfoUpdateForm.value).subscribe(data => {this.user = data; },
       error => {
         if (error.status ===  400) {
-          this.message = 'Error 400: ' + error.response;
+          this.message = 'Error 400: ' + error.result400;
         }
         else if (error.status ===  403) {
           this.message = 'You are not authorized!';
         }
         else if (error.status ===  500) {
-          this.message = 'Error 500: Internal Server Error!';
+          this.message = error.message;
+          this.router.navigate(['/error/500', {msg: this.message}]);
         }
         else{
           this.message = 'Something was wrong. Please, contact with us.';

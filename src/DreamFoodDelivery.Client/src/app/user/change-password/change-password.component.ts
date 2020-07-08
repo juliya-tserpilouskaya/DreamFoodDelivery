@@ -43,17 +43,18 @@ export class ChangePasswordComponent implements OnInit {
                             this.doLogout();
                           },
                           error => {
-                            if (error.status ===  400) {
-                              this.message = 'Error 400: ' + error.response;
+                            if (error.status ===  206) {
+                              this.message = error.detail;
+                            }
+                            else if (error.status ===  400) {
+                              this.message = 'Error 400: ' + error.result400;
                             }
                             else if (error.status ===  403) {
                               this.message = 'You are not authorized!';
                             }
-                            else if (error.status ===  404) {
-                              this.message = 'Element not found.';
-                            }
                             else if (error.status ===  500) {
-                              this.message = 'Error 500: Internal Server Error!';
+                              this.message = error.message;
+                              this.router.navigate(['/error/500', {msg: this.message}]);
                             }
                             else{
                               this.message = 'Something was wrong. Please, contact with us.';

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/app-services/nswag.generated.services';
 
 @Component({
@@ -22,6 +22,7 @@ export class PasswordResetComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     public fb: FormBuilder,
+    public router: Router,
     private userService: UserService
   ) {
     this.userId = route.snapshot.queryParamMap.get('userId');
@@ -51,11 +52,15 @@ export class PasswordResetComponent implements OnInit {
       },
       error => {
         this.spinning = false;
-        if (error.status ===  400) {
-          this.errorMessage = 'Error 400: ' + error.response;
+        if (error.status ===  206) {
+          this.errorMessage = error.detail;
+        }
+        else if (error.status ===  400) {
+          this.errorMessage = 'Error 400: ' + error.result400;
         }
         else if (error.status ===  500) {
-          this.errorMessage = 'Error 500: Internal Server Error!';
+          this.errorMessage = error.message;
+          this.router.navigate(['/error/500', {msg: this.errorMessage}]);
         }
         else{
           this.errorMessage = 'Something was wrong. Please, contact with us.';

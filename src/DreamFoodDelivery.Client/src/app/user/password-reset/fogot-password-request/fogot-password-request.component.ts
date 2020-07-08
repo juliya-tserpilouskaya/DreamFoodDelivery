@@ -43,11 +43,15 @@ export class FogotPasswordRequestComponent implements OnInit {
       },
       error => {
         this.spinning = false;
-        if (error.status ===  400) {
-          this.errorMessage = 'Error 400: ' + error.response;
+        if (error.status ===  206) {
+          this.errorMessage = error.detail;
+        }
+        else if (error.status ===  400) {
+          this.errorMessage = 'Error 400: ' + error.result400;
         }
         else if (error.status ===  500) {
-          this.errorMessage = 'Error 500: Internal Server Error!';
+          this.errorMessage = error.message;
+          this.router.navigate(['/error/500', {msg: this.errorMessage}]);
         }
         else{
           this.errorMessage = 'Something was wrong. Please, contact with us.';

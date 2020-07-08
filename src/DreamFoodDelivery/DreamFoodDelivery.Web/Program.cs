@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace DreamFoodDelivery.Web
 {
@@ -14,9 +16,10 @@ namespace DreamFoodDelivery.Web
     {
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.File("catched_errors_logs/log.txt", rollingInterval: RollingInterval.Day).WriteTo.Console().CreateLogger();
             try
             {
+                Log.Information("Starting up");
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
@@ -31,8 +34,10 @@ namespace DreamFoodDelivery.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(builder => builder.ClearProviders()
-                    .AddSerilog().AddDebug().AddConsole())
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .UseSerilog()
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

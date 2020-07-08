@@ -12,6 +12,7 @@ using FluentValidation.AspNetCore;
 using DreamFoodDelivery.Common;
 using System.Threading;
 using DreamFoodDelivery.Domain.View;
+using Serilog;
 
 namespace DreamFoodDelivery.Web.Controllers
 {
@@ -50,6 +51,7 @@ namespace DreamFoodDelivery.Web.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -84,8 +86,8 @@ namespace DreamFoodDelivery.Web.Controllers
         [ObsoleteAttribute]
         [HttpPut, Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TagView))]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public async Task<IActionResult> Update([FromBody, CustomizeValidator]TagToUpdate tag, CancellationToken cancellationToken = default)
@@ -98,10 +100,11 @@ namespace DreamFoodDelivery.Web.Controllers
             try
             {
                 var result = await _tagService.UpdateAsync(tag, cancellationToken);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext)) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -115,7 +118,7 @@ namespace DreamFoodDelivery.Web.Controllers
         [HttpDelete, Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         [ObsoleteAttribute]
@@ -128,10 +131,11 @@ namespace DreamFoodDelivery.Web.Controllers
             try
             {
                 var result = await _tagService.RemoveByIdAsync(id, cancellationToken);
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext)) : (IActionResult)Ok(result.IsSuccess);
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }

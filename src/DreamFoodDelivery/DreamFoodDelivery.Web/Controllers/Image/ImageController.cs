@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace DreamFoodDelivery.Web.Controllers.Image
 {
@@ -35,6 +36,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [Route("upload")]
         [RequestSizeLimit(NumberСonstants.IMAGE_SIZE)] 
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
@@ -50,11 +52,12 @@ namespace DreamFoodDelivery.Web.Controllers.Image
                 var result = await _imageService.UploadImageAsync(file.Image, file.DishId);
 
                 return result.IsError ? throw new InvalidOperationException(result.Message)
-                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : !result.IsSuccess ? StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext))
                     : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -91,6 +94,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -126,6 +130,7 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             }
             catch (Exception ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -142,7 +147,6 @@ namespace DreamFoodDelivery.Web.Controllers.Image
         [ProducesResponseType(StatusCodes.Status206PartialContent, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(CustumResult))]
         [LoggerAttribute]
         public IActionResult Delete(string dishId, string imageName)
@@ -155,14 +159,13 @@ namespace DreamFoodDelivery.Web.Controllers.Image
             {
                 var result = _imageService.DeleteImageByName(imageName, dishId);
 
-                return result.IsError
-                    ? throw new InvalidOperationException(result.Message)
-                    : !result.IsSuccess
-                    ? NotFound(result.Message)
-                    : (IActionResult)NoContent();
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : !result.IsSuccess ? StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext))
+                    : StatusCode(StatusCodes.Status206PartialContent, result.Message.CollectProblemDetailsPartialContent(HttpContext));
             }
             catch (Exception ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }

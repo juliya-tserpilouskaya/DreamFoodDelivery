@@ -28,15 +28,15 @@ export class AdminsOrdersComponent implements OnInit {
       .then(data => this.orders = data)
       .catch(msg => {
         console.log(msg.status);
-        if (msg.status ===  204) {
-          this.message = 'Now empty.';
-          this.orders = [];
+        if (msg.status ===  206) {
+          this.message = msg.detail;
         }
         else if (msg.status ===  403) {
           this.message = 'You are not authorized!';
         }
         else if (msg.status ===  500) {
-          this.message = 'Error 500: Internal Server Error!';
+          this.message = msg.message;
+          this.router.navigate(['/error/500', {msg: this.message}]);
         }
         else{
           this.message = 'Something was wrong. Please, contact with us.';
@@ -50,17 +50,18 @@ export class AdminsOrdersComponent implements OnInit {
       // this.orders.splice(indexToDelete, 1);
     },
     error => {
-      if (error.status ===  400) {
-        this.message = 'Error 400: ' + error.response;
+      if (error.status ===  206) {
+        this.message = error.detail;
+      }
+      else if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.result400;
       }
       else if (error.status ===  403) {
         this.message = 'You are not authorized!';
       }
-      else if (error.status ===  404) {
-        this.message = 'Element not found.';
-      }
       else if (error.status ===  500) {
-        this.message = 'Error 500: Internal Server Error!';
+        this.message = error.message;
+        this.router.navigate(['/error/500', {msg: this.message}]);
       }
       else{
         this.message = 'Something was wrong. Please, contact with us.';
@@ -71,17 +72,18 @@ export class AdminsOrdersComponent implements OnInit {
   removeAll(): void {
       this.manageOrderService.removeAll().then(data => this.orders = data)
       .catch(msg => {
-        if (msg.status ===  400) {
-          this.message = 'Error 400: ' + msg.response;
+        if (msg.status ===  206) {
+          this.message = msg.detail;
+        }
+        else if (msg.status ===  400) {
+          this.message = 'Error 400: ' + msg.result400;
         }
         else if (msg.status ===  403) {
           this.message = 'You are not authorized!';
         }
-        else if (msg.status ===  404) {
-          this.message = 'Element not found.';
-        }
         else if (msg.status ===  500) {
-          this.message = 'Error 500: Internal Server Error!';
+          this.message = msg.message;
+          this.router.navigate(['/error/500', {msg: this.message}]);
         }
         else{
           this.message = 'Something was wrong. Please, contact with us.';

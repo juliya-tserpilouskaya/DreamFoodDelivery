@@ -44,14 +44,15 @@ export class DishUpdateComponent implements OnInit {
     this.dishService.getById(this.idFromURL).subscribe(data => {this.dish = data;
     },
     error => {
-      if (error.status ===  204) {
-        this.message = 'Now empty.';
+      if (error.status ===  206) {
+        this.message = error.detail;
       }
       else if (error.status ===  400) {
-        this.message = 'Error 400: ' + error.response;
+        this.message = 'Error 400: ' + error.result400;
       }
       else if (error.status ===  500) {
-        this.message = 'Error 500: Internal Server Error!';
+        this.message = error.message;
+        this.router.navigate(['/error/500', {msg: this.message}]);
       }
       else{
         this.message = 'Something was wrong. Please, contact with us.';
@@ -78,22 +79,26 @@ export class DishUpdateComponent implements OnInit {
   updateDish(id: string): void {
     this.dishInfoUpdateForm.value.id = id;
     if (this.dishInfoUpdateForm.valid) {
-      this.dishService.update(this.dishInfoUpdateForm.value).subscribe(data => {this.dish = data;
-                                                                                this.done = true;
-                                                                              },
-                                                                              error => {
-                                                                                if (error.status ===  400) {
-                                                                                  this.message = 'Error 400: ' + error.response;
-                                                                                }
-                                                                                else if (error.status ===  403) {
-                                                                                  this.message = 'You are not authorized!';
-                                                                                }
-                                                                                else if (error.status ===  500) {
-                                                                                  this.message = 'Error 500: Internal Server Error!';
-                                                                                }
-                                                                                else{
-                                                                                  this.message = 'Something was wrong. Please, contact with us.';
-                                                                                }
+      this.dishService.update(this.dishInfoUpdateForm.value)
+        .subscribe(data => {this.dish = data;
+                            this.done = true;
+                           },
+                   error => {
+                    if (error.status ===  206) {
+                      this.message = error.detail;
+                    }
+                    if (error.status ===  400) {
+                      this.message = 'Error 400: ' + error.result400;
+                    }
+                    else if (error.status ===  403) {
+                      this.message = 'You are not authorized!';
+                    }
+                    else if (error.status ===  500) {
+                      this.message = 'Error 500: Internal Server Error!';
+                    }
+                    else{
+                      this.message = 'Something was wrong. Please, contact with us.';
+                    }
     });
     }
   }
@@ -103,8 +108,11 @@ export class DishUpdateComponent implements OnInit {
       this.router.navigate(['/dishes']);
     },
     error => {
-      if (error.status ===  400) {
-        this.message = 'Error 400: ' + error.response;
+      if (error.status ===  206) {
+        this.message = error.detail;
+      }
+      else if (error.status ===  400) {
+        this.message = 'Error 400: ' + error.result400;
       }
       else if (error.status ===  403) {
         this.message = 'You are not authorized!';
@@ -113,7 +121,8 @@ export class DishUpdateComponent implements OnInit {
         this.message = 'Elements are not found.';
       }
       else if (error.status ===  500) {
-        this.message = 'Error 500: Internal Server Error!';
+        this.message = error.message;
+        this.router.navigate(['/error/500', {msg: this.message}]);
       }
       else{
         this.message = 'Something was wrong. Please, contact with us.';

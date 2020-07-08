@@ -13,6 +13,7 @@ using Microsoft.Net.Http.Headers;
 using FluentValidation.AspNetCore;
 using System.Threading;
 using DreamFoodDelivery.Domain.View;
+using Serilog;
 
 namespace DreamFoodDelivery.Web.Controllers.User
 {
@@ -50,6 +51,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -81,6 +83,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -110,6 +113,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -142,6 +146,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -173,6 +178,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -201,6 +207,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }
@@ -231,6 +238,7 @@ namespace DreamFoodDelivery.Web.Controllers.User
             }
             catch (InvalidOperationException ex)
             {
+                Log.Error(ex, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new CustumResult() { Status = StatusCodes.Status500InternalServerError, Message = ex.Message });
             }
         }

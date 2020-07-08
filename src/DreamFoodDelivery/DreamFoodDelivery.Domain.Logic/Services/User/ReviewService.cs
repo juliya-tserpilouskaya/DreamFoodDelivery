@@ -321,7 +321,6 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         /// <returns></returns>
         public async Task<Result<RatingView>> GetRating(CancellationToken cancellationToken = default)
         {
-            //throw new InvalidOperationException("MY TEST STRING!!!");
             var rating = await _context.Rating.FirstOrDefaultAsync(cancellationToken);
             return rating is null
                 ? Result<RatingView>.Quite<RatingView>(ExceptionConstants.EMPTY_RATING)

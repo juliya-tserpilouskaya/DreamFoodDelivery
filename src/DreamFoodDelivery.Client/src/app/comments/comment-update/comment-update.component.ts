@@ -39,17 +39,18 @@ export class CommentUpdateComponent implements OnInit {
     this.reviewService.getById(this.idFromURL).subscribe(data => {this.review = data;
     },
     error => {
-      if (error.status ===  204) {
-        this.message = 'Now empty.';
+      if (error.status ===  206) {
+        this.message = error.detail;
       }
       else if (error.status ===  400) {
-        this.message = 'Error 400: ' + error.response;
+        this.message = 'Error 400: ' + error.result400;
       }
       else if (error.status ===  403) {
         this.message = 'You are not authorized';
       }
       else if (error.status ===  500) {
-        this.message = 'Error 500: Internal Server Error!';
+        this.message = error.message;
+        this.router.navigate(['/error/500', {msg: this.message}]);
       }
       else{
         this.message = 'Something was wrong. Please, contact with us.';
@@ -60,25 +61,24 @@ export class CommentUpdateComponent implements OnInit {
   reviewUpdate(id: string): void {
     this.reviewUpdateForm.value.id = id;
     if (this.reviewUpdateForm.valid) {
-      this.reviewService.update(this.reviewUpdateForm.value).subscribe(data => {this.review = data;
-                                                                                this.done = true;
-                                                                                },
-                                                                                error => {
-                                                                                  if (error.status ===  400) {
-                                                                                    this.message = 'Error 400: ' + error.response;
-                                                                                  }
-                                                                                  else if (error.status ===  403) {
-                                                                                    this.message = 'You are not authorized!';
-                                                                                  }
-                                                                                  else if (error.status ===  404) {
-                                                                                    this.message = 'Elements are not found.';
-                                                                                  }
-                                                                                  else if (error.status ===  500) {
-                                                                                    this.message = 'Error 500: Internal Server Error!';
-                                                                                  }
-                                                                                  else{
-                                                                                    this.message = 'Something was wrong. Please, contact with us.';
-                                                                                  }
+      this.reviewService.update(this.reviewUpdateForm.value)
+      .subscribe(data => {this.review = data;
+                          this.done = true;
+                          },
+                          error => {
+                          if (error.status ===  400) {
+                            this.message = 'Error 400: ' + error.result403;
+                          }
+                          else if (error.status ===  403) {
+                            this.message = 'You are not authorized!';
+                          }
+                          else if (error.status ===  500) {
+                            this.message = error.message;
+                            this.router.navigate(['/error/500', {msg: this.message}]);
+                          }
+                          else{
+                            this.message = 'Something was wrong. Please, contact with us.';
+                          }
       });
     }
   }
@@ -86,14 +86,14 @@ export class CommentUpdateComponent implements OnInit {
   removeById(id: string): void {
     this.reviewService.removeById(id).subscribe(data => {},
       error => {
-        if (error.status ===  400) {
-          this.message = 'Error 400: ' + error.response;
+        if (error.status ===  206) {
+          this.message = error.detail;
+        }
+        else if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.result400;
         }
         else if (error.status ===  403) {
           this.message = 'You are not authorized!';
-        }
-        else if (error.status ===  404) {
-          this.message = 'Elements are not found.';
         }
         else if (error.status ===  500) {
           this.message = 'Error 500: Internal Server Error!';

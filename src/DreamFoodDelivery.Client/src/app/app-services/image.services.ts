@@ -72,17 +72,33 @@ export class ImageModifiedService {
             result200 = resultData200 !== undefined ? resultData200 : <any>null;
             return _observableOf(this.baseUrl + "/" + result200);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -138,21 +154,33 @@ export class ImageModifiedService {
             result200 = resultData200 !== undefined ? resultData200 : <any>null;
             return _observableOf(this.baseUrl + "/" + result200);
             }));
+          } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -200,31 +228,43 @@ export class ImageModifiedService {
             (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return _observableOf<void>(<any>null);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 500) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
+        if (status === 200) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          return _observableOf<void>(<any>null);
+          }));
+      } else if (status === 206) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          let result206: any = null;
+          let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result206 = ProblemDetails.fromJS(resultData206);
+          return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+          }));
+      } else if (status === 400) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          let result400: any = null;
+          let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result400 = ProblemDetails.fromJS(resultData400);
+          return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+          }));
+      } else if (status === 403) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          let result403: any = null;
+          let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result403 = ProblemDetails.fromJS(resultData403);
+          return throwException("A server side error occurred.", status, _responseText, _headers, result403);
+          }));
+      } else if (status === 500) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          let result500: any = null;
+          let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+          result500 = CustumResult.fromJS(resultData500);
+          return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+          }));
+      } else if (status !== 200 && status !== 204) {
+          return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+          return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+          }));
+      }
         return _observableOf<void>(<any>null);
     }
 
@@ -275,21 +315,33 @@ export class ImageModifiedService {
             }
             return _observableOf(result200);
             }));
+          } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result403: any = null;
+            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result403 = ProblemDetails.fromJS(resultData403);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            return throwException("A server side error occurred.", status, _responseText, _headers);
+            let result500: any = null;
+            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result500 = CustumResult.fromJS(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -366,6 +418,46 @@ export interface IProblemDetails {
     detail?: string | null;
     instance?: string | null;
     extensions?: { [key: string]: any; } | null;
+}
+
+export class CustumResult implements ICustumResult {
+  message?: string | null;
+  status?: number;
+
+  constructor(data?: ICustumResult) {
+      if (data) {
+          for (var property in data) {
+              if (data.hasOwnProperty(property))
+                  (<any>this)[property] = (<any>data)[property];
+          }
+      }
+  }
+
+  init(_data?: any) {
+      if (_data) {
+          this.message = _data["message"] !== undefined ? _data["message"] : <any>null;
+          this.status = _data["status"] !== undefined ? _data["status"] : <any>null;
+      }
+  }
+
+  static fromJS(data: any): CustumResult {
+      data = typeof data === 'object' ? data : {};
+      let result = new CustumResult();
+      result.init(data);
+      return result;
+  }
+
+  toJSON(data?: any) {
+      data = typeof data === 'object' ? data : {};
+      data["message"] = this.message !== undefined ? this.message : <any>null;
+      data["status"] = this.status !== undefined ? this.status : <any>null;
+      return data;
+  }
+}
+
+export interface ICustumResult {
+  message?: string | null;
+  status?: number;
 }
 
 export class ApiException extends Error {

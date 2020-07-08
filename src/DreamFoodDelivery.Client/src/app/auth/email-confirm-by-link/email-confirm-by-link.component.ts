@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { UserService } from 'src/app/app-services/nswag.generated.services';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-email-confirm-by-link',
@@ -21,6 +21,7 @@ export class EmailConfirmByLinkComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private userService: UserService,
+    public router: Router,
   ) {
       this.userId = route.snapshot.queryParamMap.get('userId');
       this.token = route.snapshot.queryParamMap.get('token');
@@ -32,11 +33,15 @@ export class EmailConfirmByLinkComponent implements OnInit {
         this.isConfirmed = true;
       },
       error => {
-        if (error.status ===  400) {
-          this.message = 'Error 400: ' + error.response;
+        if (error.status ===  206) {
+          this.message = error.detail;
+        }
+        else if (error.status ===  400) {
+          this.message = 'Error 400: ' + error.result400;
         }
         else if (error.status ===  500) {
-          this.message = 'Error 500: Internal Server Error!';
+          this.message = error.message;
+          this.router.navigate(['/error/500', {msg: this.message}]);
         }
         else{
           this.message = 'Something was wrong. Please, contact with us.';

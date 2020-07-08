@@ -674,7 +674,7 @@ export class MenuService {
     }
 
     /**
-     * @param tagName (optional) 
+     * @param tagName (optional)
      * @deprecated
      */
     getByTagIndex(tagName: string | null | undefined, tagIndex: string): Observable<DishView[]> {
@@ -942,19 +942,19 @@ export class TagService {
             result200 = TagView.fromJS(resultData200);
             return _observableOf(result200);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
             let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1067,12 +1067,12 @@ export class TagService {
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
-        } else if (status === 404) {
+        } else if (status === 206) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1152,6 +1152,13 @@ export class IdentityService {
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result500: any = null;
@@ -1210,6 +1217,13 @@ export class IdentityService {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = UserWithToken.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1324,6 +1338,13 @@ export class IdentityService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -1337,13 +1358,6 @@ export class IdentityService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1403,6 +1417,13 @@ export class IdentityService {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = UserWithToken.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
             }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1547,6 +1568,13 @@ export class OrderService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -1560,13 +1588,6 @@ export class OrderService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1701,6 +1722,13 @@ export class OrderService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -1714,13 +1742,6 @@ export class OrderService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -1860,13 +1881,6 @@ export class OrderService {
             let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result400 = ProblemDetails.fromJS(resultData400);
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 401) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result401: any = null;
-            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result401 = ProblemDetails.fromJS(resultData401);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result401);
             }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2158,6 +2172,13 @@ export class OrderService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -2171,13 +2192,6 @@ export class OrderService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2307,19 +2321,19 @@ export class OrderService {
             }
             return _observableOf(result200);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 403) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result403: any = null;
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2530,6 +2544,13 @@ export class ReviewService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -2543,13 +2564,6 @@ export class ReviewService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2684,6 +2698,13 @@ export class ReviewService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -2697,13 +2718,6 @@ export class ReviewService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -2842,6 +2856,13 @@ export class ReviewService {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             return _observableOf<void>(<any>null);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -2855,13 +2876,6 @@ export class ReviewService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3143,20 +3157,6 @@ export class ReviewService {
             let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result206 = ProblemDetails.fromJS(resultData206);
             return throwException("A server side error occurred.", status, _responseText, _headers, result206);
-            }));
-        } else if (status === 400) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result400: any = null;
-            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result400 = ProblemDetails.fromJS(resultData400);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-            }));
-        } else if (status === 403) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result403: any = null;
-            let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result403 = ProblemDetails.fromJS(resultData403);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result403);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -3964,6 +3964,13 @@ export class DishService {
             result200 = DishView.fromJS(resultData200);
             return _observableOf(result200);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -4271,6 +4278,13 @@ export class ImageService {
             result200 = resultData200 !== undefined ? resultData200 : <any>null;
             return _observableOf(result200);
             }));
+        } else if (status === 206) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result206: any = null;
+            let resultData206 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result206 = ProblemDetails.fromJS(resultData206);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result206);
+            }));
         } else if (status === 400) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result400: any = null;
@@ -4441,13 +4455,6 @@ export class ImageService {
             let resultData403 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result403 = ProblemDetails.fromJS(resultData403);
             return throwException("A server side error occurred.", status, _responseText, _headers, result403);
-            }));
-        } else if (status === 404) {
-            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
-            let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = ProblemDetails.fromJS(resultData404);
-            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
             }));
         } else if (status === 500) {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
@@ -5134,7 +5141,7 @@ export class BasketView implements IBasketView {
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
         data["basketCost"] = this.basketCost !== undefined ? this.basketCost : <any>null;
         data["deliveryCost"] = this.deliveryCost !== undefined ? this.deliveryCost : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5215,7 +5222,7 @@ export class DishView implements IDishView {
                 data["tagList"].push(item.toJSON());
         }
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5262,7 +5269,7 @@ export class TagToAdd implements ITagToAdd {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5325,7 +5332,7 @@ export class ProblemDetails implements IProblemDetails {
                     data["extensions"][key] = this.extensions[key] !== undefined ? this.extensions[key] : <any>null;
             }
         }
-        return data; 
+        return data;
     }
 }
 
@@ -5369,7 +5376,7 @@ export class CustumResult implements ICustumResult {
         data = typeof data === 'object' ? data : {};
         data["message"] = this.message !== undefined ? this.message : <any>null;
         data["status"] = this.status !== undefined ? this.status : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5409,7 +5416,7 @@ export class DishToBasketAdd implements IDishToBasketAdd {
         data = typeof data === 'object' ? data : {};
         data["dishId"] = this.dishId !== undefined ? this.dishId : <any>null;
         data["quantity"] = this.quantity !== undefined ? this.quantity : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5466,7 +5473,7 @@ export class RequestParameters implements IRequestParameters {
         data["onSale"] = this.onSale !== undefined ? this.onSale : <any>null;
         data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
         data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5509,7 +5516,7 @@ export class DishByPrice implements IDishByPrice {
         data = typeof data === 'object' ? data : {};
         data["lowerPrice"] = this.lowerPrice !== undefined ? this.lowerPrice : <any>null;
         data["upperPrice"] = this.upperPrice !== undefined ? this.upperPrice : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5549,7 +5556,7 @@ export class TagView implements ITagView {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5589,7 +5596,7 @@ export class TagToUpdate implements ITagToUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["tagName"] = this.tagName !== undefined ? this.tagName : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5635,7 +5642,7 @@ export class UserWithToken implements IUserWithToken {
         data["userView"] = this.userView ? this.userView.toJSON() : <any>null;
         data["expiresIn"] = this.expiresIn !== undefined ? this.expiresIn : <any>null;
         data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5677,7 +5684,7 @@ export class UserView implements IUserView {
         data = typeof data === 'object' ? data : {};
         data["userDTO"] = this.userDTO ? this.userDTO.toJSON() : <any>null;
         data["userProfile"] = this.userProfile ? this.userProfile.toJSON() : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5720,7 +5727,7 @@ export class UserDTO implements IUserDTO {
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["basketId"] = this.basketId !== undefined ? this.basketId : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5779,7 +5786,7 @@ export class UserProfile implements IUserProfile {
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["personalDiscount"] = this.personalDiscount !== undefined ? this.personalDiscount : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5828,7 +5835,7 @@ export class UserRegistration implements IUserRegistration {
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5869,7 +5876,7 @@ export class UserLoginData implements IUserLoginData {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["password"] = this.password !== undefined ? this.password : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5909,7 +5916,7 @@ export class TokenRefresh implements ITokenRefresh {
         data = typeof data === 'object' ? data : {};
         data["accessToken"] = this.accessToken !== undefined ? this.accessToken : <any>null;
         data["refreshToken"] = this.refreshToken !== undefined ? this.refreshToken : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -5996,7 +6003,7 @@ export class OrderView implements IOrderView {
         data["orderTime"] = this.orderTime ? this.orderTime.toISOString() : <any>null;
         data["deliveryTime"] = this.deliveryTime ? this.deliveryTime.toISOString() : <any>null;
         data["paymentTime"] = this.paymentTime ? this.paymentTime.toISOString() : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6049,7 +6056,7 @@ export class OrderToStatusUpdate implements IOrderToStatusUpdate {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id !== undefined ? this.id : <any>null;
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6098,7 +6105,7 @@ export class OrderToAdd implements IOrderToAdd {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6150,7 +6157,7 @@ export class OrderToUpdate implements IOrderToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6193,7 +6200,7 @@ export class OrderStatus implements IOrderStatus {
         data = typeof data === 'object' ? data : {};
         data["statusIndex"] = this.statusIndex !== undefined ? this.statusIndex : <any>null;
         data["statusName"] = this.statusName !== undefined ? this.statusName : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6250,7 +6257,7 @@ export class PageResponseOfReviewForUsersView implements IPageResponseOfReviewFo
         data["totalPages"] = this.totalPages !== undefined ? this.totalPages : <any>null;
         data["hasNextPage"] = this.hasNextPage !== undefined ? this.hasNextPage : <any>null;
         data["hasPreviousPage"] = this.hasPreviousPage !== undefined ? this.hasPreviousPage : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6302,7 +6309,7 @@ export class ReviewForUsersView implements IReviewForUsersView {
         data["content"] = this.content !== undefined ? this.content : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6345,7 +6352,7 @@ export class PageRequest implements IPageRequest {
         data = typeof data === 'object' ? data : {};
         data["pageNumber"] = this.pageNumber !== undefined ? this.pageNumber : <any>null;
         data["pageSize"] = this.pageSize !== undefined ? this.pageSize : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6403,7 +6410,7 @@ export class ReviewView implements IReviewView {
         data["content"] = this.content !== undefined ? this.content : <any>null;
         data["postTime"] = this.postTime ? this.postTime.toISOString() : <any>null;
         data["modificationTime"] = this.modificationTime ? this.modificationTime.toISOString() : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6455,7 +6462,7 @@ export class ReviewToAdd implements IReviewToAdd {
         data["headline"] = this.headline !== undefined ? this.headline : <any>null;
         data["rating"] = this.rating !== undefined ? this.rating : <any>null;
         data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6503,7 +6510,7 @@ export class ReviewToUpdate implements IReviewToUpdate {
         data["headline"] = this.headline !== undefined ? this.headline : <any>null;
         data["rating"] = this.rating !== undefined ? this.rating : <any>null;
         data["content"] = this.content !== undefined ? this.content : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6545,7 +6552,7 @@ export class RatingView implements IRatingView {
         data = typeof data === 'object' ? data : {};
         data["count"] = this.count !== undefined ? this.count : <any>null;
         data["sum"] = this.sum !== undefined ? this.sum : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6591,7 +6598,7 @@ export class UserToUpdate implements IUserToUpdate {
         data["phoneNumber"] = this.phoneNumber !== undefined ? this.phoneNumber : <any>null;
         data["name"] = this.name !== undefined ? this.name : <any>null;
         data["surname"] = this.surname !== undefined ? this.surname : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6633,7 +6640,7 @@ export class UserEmailToChange implements IUserEmailToChange {
         data = typeof data === 'object' ? data : {};
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["newEmail"] = this.newEmail !== undefined ? this.newEmail : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6676,7 +6683,7 @@ export class UserPasswordToChange implements IUserPasswordToChange {
         data["idFromIdentity"] = this.idFromIdentity !== undefined ? this.idFromIdentity : <any>null;
         data["currentPassword"] = this.currentPassword !== undefined ? this.currentPassword : <any>null;
         data["newPassword"] = this.newPassword !== undefined ? this.newPassword : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6717,7 +6724,7 @@ export class PasswordRecoveryRequest implements IPasswordRecoveryRequest {
         data = typeof data === 'object' ? data : {};
         data["email"] = this.email !== undefined ? this.email : <any>null;
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6763,7 +6770,7 @@ export class PasswordRecoveryInfo implements IPasswordRecoveryInfo {
         data["callBackUrl"] = this.callBackUrl !== undefined ? this.callBackUrl : <any>null;
         data["token"] = this.token !== undefined ? this.token : <any>null;
         data["userId"] = this.userId !== undefined ? this.userId : <any>null;
-        return data; 
+        return data;
     }
 }
 
@@ -6828,7 +6835,7 @@ export class DishToAdd implements IDishToAdd {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data; 
+        return data;
     }
 }
 
@@ -6899,7 +6906,7 @@ export class DishToUpdate implements IDishToUpdate {
             for (let item of this.tagNames)
                 data["tagNames"].push(item.toJSON());
         }
-        return data; 
+        return data;
     }
 }
 
