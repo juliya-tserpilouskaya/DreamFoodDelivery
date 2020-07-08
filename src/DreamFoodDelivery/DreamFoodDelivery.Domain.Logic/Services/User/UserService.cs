@@ -145,14 +145,14 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         [LoggerAttribute]
         public async Task<Result> DeleteUserByIdFromIdentityAsync(string idFromIdentity, CancellationToken cancellationToken = default)
         {
-            var user = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.IdFromIdentity == idFromIdentity);
+            var user = await _context.Users.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(_ => _.IdFromIdentity == idFromIdentity);
             if (user is null)
             {
                 return await Task.FromResult(Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND));
             }
             try
             {
-                var basket = await _context.Baskets.Where(_ => _.UserId == user.Id).FirstOrDefaultAsync();
+                var basket = await _context.Baskets.Where(_ => _.UserId == user.Id).AsNoTracking().FirstOrDefaultAsync();
                 _context.Baskets.Remove(basket);
                 _context.Users.Remove(user);
                 await _context.SaveChangesAsync(cancellationToken);

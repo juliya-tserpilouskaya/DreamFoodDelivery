@@ -36,7 +36,7 @@ export class HomeComponent implements OnInit {
 
   getRating(){
     this.reviewService.getRating().subscribe(data => {this.rating = data;
-                                                      this.currentRate = data.sum;
+                                                      this.currentRate = data.sum / data.count;
                                                       this.message = null;
     },
      error => {

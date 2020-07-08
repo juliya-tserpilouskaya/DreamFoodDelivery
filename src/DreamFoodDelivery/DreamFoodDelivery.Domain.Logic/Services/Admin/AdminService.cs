@@ -116,16 +116,17 @@ namespace DreamFoodDelivery.Domain.Logic.Services
         public async Task<Result> RemoveByIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             Guid id = Guid.Parse(userId);
-            var userDB = await _context.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
-            var basket = await _context.Baskets.Where(_ => _.UserId == id).FirstOrDefaultAsync();
+            var userDB = await _context.Users.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(_ => _.Id == id);
+            var basket = await _context.Baskets.Where(_ => _.UserId == id).AsNoTracking().FirstOrDefaultAsync();
             if (userDB is null || basket is null)
             {
                 return await Task.FromResult(Result.Fail(ExceptionConstants.USER_WAS_NOT_FOUND));
             }
             try
             {
-                _context.Users.Remove(userDB);
                 _context.Baskets.Remove(basket);
+                _context.Users.Remove(userDB);
+                
                 await _context.SaveChangesAsync(cancellationToken);
                 var userIdentity = await _userManager.FindByIdAsync(userDB.IdFromIdentity);
                 var result = await _userManager.DeleteAsync(userIdentity); 

@@ -27,7 +27,7 @@
               <a [routerLink]="['/administration/reviews/user/', item.userDTO.id]">Change users reviews</a>
             </div>
             <div class="btn-group-vertical col-4 col-md-4 col-lg-4">
-              <button class="btn btn-outline-success " (click)="removeUser(item.userDTO.id)" type="submit">Delete</button>
+              <!-- <button class="btn btn-outline-success " (click)="removeUser(item.userDTO.id)" type="submit">Delete</button> -->
               <button class="btn btn-outline-success " (click)="changeRole(item.userDTO.idFromIdentity)" type="submit">Change role</button>
               <button class="btn btn-outline-success " (click)="confirmEmail(item.userDTO.idFromIdentity)" type="submit">Confirm email</button>
             </div>

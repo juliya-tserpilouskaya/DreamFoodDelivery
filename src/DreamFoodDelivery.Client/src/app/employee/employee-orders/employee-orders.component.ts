@@ -50,9 +50,9 @@ export class EmployeeOrdersComponent implements OnInit {
           this.message = msg.message;
           this.router.navigate(['/error/500', {msg: this.message}]);
         }
-        else{
-          this.message = 'Something was wrong. Please, contact with us.';
-        }
+        // else{
+        //   this.message = 'Something was wrong. Please, contact with us.';
+        // }
         this.orders = null; });
     this.manageOrderService.getStatuses()
       .then(data => this.orderStatuses = data)
@@ -67,9 +67,9 @@ export class EmployeeOrdersComponent implements OnInit {
           this.message = msg.message;
           this.router.navigate(['/error/500', {msg: this.message}]);
         }
-        else{
-          this.message = 'Something was wrong. Please, contact with us.';
-        }
+        // else{
+        //   this.message = 'Something was wrong. Please, contact with us.';
+        // }
       });
   }
 

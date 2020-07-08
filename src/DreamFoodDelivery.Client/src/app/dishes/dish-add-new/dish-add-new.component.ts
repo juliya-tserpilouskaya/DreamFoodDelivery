@@ -26,7 +26,7 @@ export class DishAddNewComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       composition: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
-      cost: ['', [Validators.required]],
+      price: ['', [Validators.required]],
       weight: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]],
       sale: ['', [Validators.required]],
       tagNames: this.fb.array([
@@ -46,7 +46,7 @@ export class DishAddNewComponent implements OnInit {
                             },
                             error => {
                               if (error.status ===  400) {
-                                this.message = 'Error 400: ' + error.result400;
+                                this.message = 'Error 400: ' + error.title;
                               }
                               else if (error.status ===  403) {
                                 this.message = 'You are not authorized!';

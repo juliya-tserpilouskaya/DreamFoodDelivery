@@ -32,7 +32,7 @@ export class DishUpdateComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(90)]],
       composition: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(250)]],
-      cost: ['', [Validators.required]],
+      price: ['', [Validators.required]],
       weight: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(250)]],
       sale: ['', [Validators.required]],
       tagNames: this.fb.array([

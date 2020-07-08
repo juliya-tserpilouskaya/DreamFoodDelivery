@@ -356,3 +356,4 @@ MigrationBackup/
 
 # Folder with logs
 /src\DreamFoodDelivery\DreamFoodDelivery.Web\catched_errors_logs
+/src/DreamFoodDelivery/DreamFoodDelivery.Web/catched_errors_logs/log20200708.txt

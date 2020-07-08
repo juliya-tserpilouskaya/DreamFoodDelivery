@@ -23,8 +23,8 @@
         <a *ngIf="item.status === 'InProcess'" [routerLink]="['/order', item.id, 'details']">Change orders details</a>
         <label *ngIf="item.status !== 'InProcess'" >You could't change order details</label>
         <br>
-        <a *ngIf="item.status == 'Delivered' && item.commentId == null" [routerLink]="['/review/create/for/', item.id]">Add review</a>
-        <a *ngIf="item.status == 'Delivered' && item.commentId != null" [routerLink]="['/review', item.commentId, 'details']">Update review</a>
+        <a *ngIf="item.status == 'Delivered' && item.reviewId == null" [routerLink]="['/review/create/for/', item.id]">Add review</a>
+        <a *ngIf="item.status == 'Delivered' && item.reviewId != null" [routerLink]="['/review', item.reviewId, 'details']">Update review</a>
       </div>
     </div>
   </div>
